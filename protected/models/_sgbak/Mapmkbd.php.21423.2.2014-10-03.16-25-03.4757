@@ -1,0 +1,243 @@
+<?php
+
+/**
+ * This is the model class for table "MST_MAP_MKBD".
+ *
+ * The followings are the available columns in table 'MST_MAP_MKBD':
+ * @property string $ver_bgn_dt
+ * @property string $ver_end_dt
+ * @property string $gl_a
+ * @property integer $mkbd_cd
+ * @property string $source
+ * @property string $upd_dt
+ * @property string $cre_dt
+ * @property string $user_id
+ * @property string $upd_by
+ * @property string $approved_dt
+ * @property string $approved_by
+ * @property string $approved_stat
+ */
+class Mapmkbd extends AActiveRecordSP
+{
+	//AH: #BEGIN search (datetime || date) additional comparison
+	public $ver_bgn_dt_date;
+	public $ver_bgn_dt_month;
+	public $ver_bgn_dt_year;
+
+	public $ver_end_dt_date;
+	public $ver_end_dt_month;
+	public $ver_end_dt_year;
+
+	public $upd_dt_date;
+	public $upd_dt_month;
+	public $upd_dt_year;
+
+	public $cre_dt_date;
+	public $cre_dt_month;
+	public $cre_dt_year;
+
+	public $approved_dt_date;
+	public $approved_dt_month;
+	public $approved_dt_year;
+	public $save_flg = 'N';
+	public $cancel_flg = 'N';
+	public $old_ver_bgn_dt;
+	public $old_gl_a;
+	public $old_mkbd_cd;
+	public $old_source;
+	//AH: #END search (datetime || date)  additional comparison
+	
+	public function __construct($scenario = 'insert')
+	{
+		parent::__construct($scenario);
+		$this->logRecord=true;
+	}
+	
+	public static function model($className=__CLASS__)
+	{
+		return parent::model($className);
+	}
+    
+
+	public function tableName()
+	{
+		return 'MST_MAP_MKBD';
+	}
+
+	public function rules()
+	{
+		return array(
+		
+			array('ver_bgn_dt, old_ver_bgn_dt,ver_end_dt, approved_dt', 'application.components.validator.ADatePickerSwitcherValidatorSP'),
+		
+			array('mkbd_cd', 'application.components.validator.ANumberSwitcherValidator'),
+			array('gl_a','cekgl_a'),
+			array('ver_bgn_dt','cek_ver_bgn_dt'),
+			array('ver_end_dt','cek_ver_end_dt'),
+			array('ver_bgn_dt,ver_end_dt,mkbd_cd,gl_a,source', 'required'),
+			array('user_id, upd_by, approved_by', 'length', 'max'=>10),
+			array('approved_stat', 'length', 'max'=>1),
+			array('upd_dt, cre_dt,old_source, old_mkbd_cd,old_gl_a,old_ver_bgn_dt,approved_dt,save_flg,cancel_flg', 'safe'),
+
+			// The following rule is used by search().
+			// Please remove those attributes that should not be searched.
+	
+			array('ver_bgn_dt, ver_end_dt, gl_a, mkbd_cd, source, upd_dt, cre_dt, user_id, upd_by, approved_dt, approved_by, approved_stat,ver_bgn_dt_date,ver_bgn_dt_month,ver_bgn_dt_year,ver_end_dt_date,ver_end_dt_month,ver_end_dt_year,upd_dt_date,upd_dt_month,upd_dt_year,cre_dt_date,cre_dt_month,cre_dt_year,approved_dt_date,approved_dt_month,approved_dt_year', 'safe', 'on'=>'search'),
+		);
+	}
+
+	public function relations()
+	{
+		return array(
+		);
+	}
+	public function cekgl_a(){
+		$gl_a= $this->gl_a;
+		$sql = "select distinct gl_a from MST_GL_ACCOUNT where GL_A = '$gl_a'";
+		$cek_gl_a = DAO::queryRowSql("$sql");
+		
+		if(!$cek_gl_a){
+			$this->addError('gl_a','Not found in chart of Account');
+		}
+		
+	}
+	public function cek_ver_bgn_dt(){
+		$ver_bgn =$this->ver_bgn_dt;
+		$sql = "select ver_bgn_dt,ver_end_dt from mst_map_mkbd where '$ver_bgn' between ver_bgn_dt and ver_end_dt and ver_bgn_dt <> '$this->ver_bgn_dt_date'";
+		$cek =DAO::queryRowSql($sql);
+		if($cek){
+			$this->addError('ver_bgn_dt',' Version Begin Date Overlap');
+		}
+	}
+	public function cek_ver_end_dt(){
+		$ver_end =$this->ver_end_dt;
+		$sql = "select ver_bgn_dt,ver_end_dt from mst_map_mkbd where '$ver_end' between ver_bgn_dt and ver_end_dt and ver_end_dt <> '$this->ver_bgn_dt_date'";
+		$cek =DAO::queryRowSql($sql);
+		if($cek){
+			$this->addError('ver_end_dt','Version End Date Overlap');
+		}
+	}
+
+	public function attributeLabels()
+	{
+		return array(
+			'ver_bgn_dt' => 'Version Date From',
+			'ver_end_dt' => 'Version Date To',
+			'gl_a' => 'GL A',
+			'mkbd_cd' => 'Mkbd Code',
+			'source' => 'Version',
+			'upd_dt' => 'Upd Date',
+			'cre_dt' => 'Cre Date',
+			'user_id' => 'User',
+			'upd_by' => 'Upd By',
+			'approved_dt' => 'Approved Date',
+			'approved_by' => 'Approved By',
+			'approved_stat' => 'Approved Stat',
+		);
+	} 
+	public function executeSp($exec_status,$old_ver_bgn_dt,$old_gl_a, $old_mkbd_cd, $old_source)
+	{
+		$connection  = Yii::app()->db;
+		
+		
+		try{
+			$query  = "CALL Sp_MST_MAP_MKBD_Upd(
+											TO_DATE(:P_SEARCH_VER_BGN_DT,'YYYY-MM-DD'),
+											:P_SEARCH_GL_A,
+											:P_SEARCH_MKBD_CD,
+											:P_SEARCH_SOURCE,
+											TO_DATE(:P_VER_BGN_DT,'YYYY-MM-DD'),
+											TO_DATE(:P_VER_END_DT,'YYYY-MM-DD'),
+											:P_GL_A,
+											:P_MKBD_CD,
+											:P_SOURCE,
+											TO_DATE(:P_UPD_DT,'YYYY-MM-DD HH24:MI:SS'),
+											TO_DATE(:P_CRE_DT,'YYYY-MM-DD HH24:MI:SS'),
+											:P_USER_ID,
+											:P_UPD_BY,
+											:P_UPD_STATUS,
+											:P_IP_ADDRESS,
+											:P_CANCEL_REASON,
+											:P_ERROR_CODE,
+											:P_ERROR_MSG )";
+						
+			$command = $connection->createCommand($query);
+			$command->bindValue(":P_SEARCH_VER_BGN_DT",$old_ver_bgn_dt,PDO::PARAM_STR);
+			$command->bindValue(":P_SEARCH_GL_A",$old_gl_a,PDO::PARAM_STR);
+			$command->bindValue(":P_SEARCH_MKBD_CD",$old_mkbd_cd,PDO::PARAM_STR);
+			$command->bindValue(":P_SEARCH_SOURCE",$old_source,PDO::PARAM_STR);
+			$command->bindValue(":P_VER_BGN_DT",$this->ver_bgn_dt,PDO::PARAM_STR);
+			$command->bindValue(":P_VER_END_DT",$this->ver_end_dt,PDO::PARAM_STR);
+			$command->bindValue(":P_GL_A",$this->gl_a,PDO::PARAM_STR);
+			$command->bindValue(":P_MKBD_CD",$this->mkbd_cd,PDO::PARAM_STR);
+			$command->bindValue(":P_SOURCE",$this->source,PDO::PARAM_STR);
+			$command->bindValue(":P_UPD_DT",$this->upd_dt,PDO::PARAM_STR);
+			$command->bindValue(":P_CRE_DT",$this->cre_dt,PDO::PARAM_STR);
+			$command->bindValue(":P_USER_ID",$this->user_id,PDO::PARAM_STR);
+			$command->bindValue(":P_UPD_BY",$this->upd_by,PDO::PARAM_STR);
+			$command->bindValue(":P_UPD_STATUS",$exec_status,PDO::PARAM_STR);
+			$command->bindValue(":P_IP_ADDRESS",$this->ip_address,PDO::PARAM_STR);
+			$command->bindValue(":P_CANCEL_REASON",$this->cancel_reason,PDO::PARAM_STR);
+			$command->bindParam(":P_ERROR_CODE",$this->error_code,PDO::PARAM_INT,10);
+			$command->bindParam(":P_ERROR_MSG",$this->error_msg,PDO::PARAM_STR,1000);
+
+			$command->execute();
+			
+		}catch(Exception $ex){
+			
+			if($this->error_code = -999)
+				$this->error_msg = $ex->getMessage();
+		}
+		
+		if($this->error_code < 0)
+			$this->addError('error_msg', 'Error '.$this->error_code.' '.$this->error_msg);
+		
+		return $this->error_code;
+	}
+
+	public function search()
+	{
+		$criteria = new CDbCriteria;
+
+		if(!empty($this->ver_bgn_dt_date))
+			$criteria->addCondition("TO_CHAR(t.ver_bgn_dt,'DD') LIKE '%".$this->ver_bgn_dt_date."%'");
+		if(!empty($this->ver_bgn_dt_month))
+			$criteria->addCondition("TO_CHAR(t.ver_bgn_dt,'MM') LIKE '%".$this->ver_bgn_dt_month."%'");
+		if(!empty($this->ver_bgn_dt_year))
+			$criteria->addCondition("TO_CHAR(t.ver_bgn_dt,'YYYY') LIKE '%".$this->ver_bgn_dt_year."%'");
+		if(!empty($this->ver_end_dt_date))
+			$criteria->addCondition("TO_CHAR(t.ver_end_dt,'DD') LIKE '%".$this->ver_end_dt_date."%'");
+		if(!empty($this->ver_end_dt_month))
+			$criteria->addCondition("TO_CHAR(t.ver_end_dt,'MM') LIKE '%".$this->ver_end_dt_month."%'");
+		if(!empty($this->ver_end_dt_year))
+			$criteria->addCondition("TO_CHAR(t.ver_end_dt,'YYYY') LIKE '%".$this->ver_end_dt_year."%'");		$criteria->compare('gl_a',$this->gl_a,true);
+		$criteria->compare('mkbd_cd',$this->mkbd_cd);
+		$criteria->compare('source',$this->source,true);
+
+		if(!empty($this->upd_dt_date))
+			$criteria->addCondition("TO_CHAR(t.upd_dt,'DD') LIKE '%".$this->upd_dt_date."%'");
+		if(!empty($this->upd_dt_month))
+			$criteria->addCondition("TO_CHAR(t.upd_dt,'MM') LIKE '%".$this->upd_dt_month."%'");
+		if(!empty($this->upd_dt_year))
+			$criteria->addCondition("TO_CHAR(t.upd_dt,'YYYY') LIKE '%".$this->upd_dt_year."%'");
+		if(!empty($this->cre_dt_date))
+			$criteria->addCondition("TO_CHAR(t.cre_dt,'DD') LIKE '%".$this->cre_dt_date."%'");
+		if(!empty($this->cre_dt_month))
+			$criteria->addCondition("TO_CHAR(t.cre_dt,'MM') LIKE '%".$this->cre_dt_month."%'");
+		if(!empty($this->cre_dt_year))
+			$criteria->addCondition("TO_CHAR(t.cre_dt,'YYYY') LIKE '%".$this->cre_dt_year."%'");		$criteria->compare('user_id',$this->user_id,true);
+		$criteria->compare('upd_by',$this->upd_by,true);
+
+		if(!empty($this->approved_dt_date))
+			$criteria->addCondition("TO_CHAR(t.approved_dt,'DD') LIKE '%".$this->approved_dt_date."%'");
+		if(!empty($this->approved_dt_month))
+			$criteria->addCondition("TO_CHAR(t.approved_dt,'MM') LIKE '%".$this->approved_dt_month."%'");
+		if(!empty($this->approved_dt_year))
+			$criteria->addCondition("TO_CHAR(t.approved_dt,'YYYY') LIKE '%".$this->approved_dt_year."%'");		$criteria->compare('approved_by',$this->approved_by,true);
+		$criteria->compare('approved_stat',$this->approved_stat,true);
+
+		return new CActiveDataProvider($this, array(
+			'criteria'=>$criteria,
+		));
+	}
+}

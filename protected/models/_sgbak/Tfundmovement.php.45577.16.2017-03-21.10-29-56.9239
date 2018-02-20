@@ -1,0 +1,457 @@
+<?php
+
+/**
+ * This is the model class for table "T_FUND_MOVEMENT".
+ *
+ * The followings are the available columns in table 'T_FUND_MOVEMENT':
+ * @property string $doc_num
+ * @property string $doc_date
+ * @property string $trx_type
+ * @property string $client_cd
+ * @property string $brch_cd
+ * @property string $source
+ * @property string $doc_ref_num
+ * @property integer $tal_id_ref
+ * @property string $gl_acct_cd
+ * @property string $sl_acct_cd
+ * @property string $bank_ref_num
+ * @property string $bank_mvmt_date
+ * @property string $acct_name
+ * @property string $remarks
+ * @property string $from_client
+ * @property string $from_acct
+ * @property string $from_bank
+ * @property string $to_client
+ * @property string $to_acct
+ * @property string $to_bank
+ * @property double $trx_amt
+ * @property string $cre_dt
+ * @property string $user_id
+ * @property string $approved_dt
+ * @property string $approved_sts
+ * @property string $approved_by
+ * @property string $cancel_dt
+ * @property string $cancel_by
+ * @property string $doc_ref_num2
+ * @property double $fee
+ * @property string $folder_cd
+ * @property string $fund_bank_cd
+ * @property string $fund_bank_acct
+ * @property string $reversal_jur
+ * @property string $upd_dt
+ * @property string $upd_by
+ */
+class Tfundmovement extends AActiveRecordSP
+{
+	//AH: #BEGIN search (datetime || date) additional comparison
+	public $doc_date_date;
+	public $doc_date_month;
+	public $doc_date_year;
+
+	public $bank_mvmt_date_date;
+	public $bank_mvmt_date_month;
+	public $bank_mvmt_date_year;
+
+	public $cre_dt_date;
+	public $cre_dt_month;
+	public $cre_dt_year;
+
+	public $approved_dt_date;
+	public $approved_dt_month;
+	public $approved_dt_year;
+
+	public $cancel_dt_date;
+	public $cancel_dt_month;
+	public $cancel_dt_year;
+
+	public $upd_dt_date;
+	public $upd_dt_month;
+	public $upd_dt_year;
+	public $nama;
+		
+	public $update_date;
+	public $update_seq;
+	public $no_rek;
+	public $push_client;
+	public $from_date;
+	public $to_date;
+	
+	public $print = 'Y'; // for report
+	
+	//AH: #END search (datetime || date)  additional comparison
+	
+	public function __construct($scenario = 'insert')
+	{
+		parent::__construct($scenario);
+		$this->logRecord=true;
+	}
+	
+	public static function model($className=__CLASS__)
+	{
+		return parent::model($className);
+	}
+    
+
+	public function tableName()
+	{
+		return 'T_FUND_MOVEMENT';
+	}
+
+	public function rules()
+	{
+		return array(
+		
+			array('doc_date,bank_mvmt_date, approved_dt, cancel_dt', 'application.components.validator.ADatePickerSwitcherValidatorSP'),
+		
+			array('tal_id_ref, trx_amt, fee', 'application.components.validator.ANumberSwitcherValidator'),
+			
+			array('client_cd,trx_type,trx_amt', 'required'),
+			array('tal_id_ref', 'numerical', 'integerOnly'=>true),
+			array('trx_amt, fee', 'numerical'),
+			array('doc_date','checkDate'),
+			array('client_cd','checkAcct'),
+			array('trx_amt','checkSaldo'),
+			array('trx_type, approved_sts', 'length', 'max'=>1),
+			array('client_cd, gl_acct_cd, sl_acct_cd, from_client, to_client', 'length', 'max'=>12),
+			array('brch_cd', 'length', 'max'=>2),
+			array('source, user_id, approved_by, cancel_by, upd_by', 'length', 'max'=>10),
+			array('doc_ref_num, doc_ref_num2, reversal_jur', 'length', 'max'=>17),
+			array('bank_ref_num', 'length', 'max'=>20),
+			array('acct_name, remarks', 'length', 'max'=>50),
+			array('from_acct, to_acct, fund_bank_acct', 'length', 'max'=>25),
+			array('from_bank, to_bank, fund_bank_cd', 'length', 'max'=>30),
+			array('folder_cd', 'length', 'max'=>8),
+			array('sl_acct_cd,trx_type,reversal_jur,fund_bank_cd,fund_bank_acct,fee,folder_cd,to_client,from_client,remarks,acct_name,from_date,to_date,source,doc_date, bank_mvmt_date, cre_dt, approved_dt,from_acct,to_acct,from_bank,to_bank, cancel_dt, upd_dt,bank_mvmt_date,nama', 'safe'),
+
+			array('doc_num, update_date, update_seq', 'safe', 'on'=>'report'),
+			
+			// The following rule is used by search().
+			// Please remove those attributes that should not be searched.
+	
+			array('doc_num, doc_date, trx_type, client_cd, brch_cd, source, doc_ref_num, tal_id_ref, gl_acct_cd, sl_acct_cd, bank_ref_num, bank_mvmt_date, acct_name, remarks, from_client, from_acct, from_bank, to_client, to_acct, to_bank, trx_amt, cre_dt, user_id, approved_dt, approved_sts, approved_by, cancel_dt, cancel_by, doc_ref_num2, fee, folder_cd, fund_bank_cd, fund_bank_acct, reversal_jur, upd_dt, upd_by,doc_date_date,doc_date_month,doc_date_year,bank_mvmt_date_date,bank_mvmt_date_month,bank_mvmt_date_year,cre_dt_date,cre_dt_month,cre_dt_year,approved_dt_date,approved_dt_month,approved_dt_year,cancel_dt_date,cancel_dt_month,cancel_dt_year,upd_dt_date,upd_dt_month,upd_dt_year', 'safe', 'on'=>'search'),
+		);
+	}
+
+	public function relations()
+	{
+		return array(
+		);
+	}
+	public function checkSaldo(){
+		
+		$cek_saldo = Sysparam::model()->find("param_id='FUND_MOVEMENT_ENTRY' and param_cd1='WHDR' AND PARAM_CD2='SALDO' ")->dflg1;
+
+		if(DateTime::createFromFormat('d/m/Y',$this->doc_date))$this->doc_date=DateTime::createFromFormat('d/m/Y',$this->doc_date)->format('Y-m-d');
+	
+	if($this->trx_type =='W' ){
+		$query3 ="SELECT NVL(F_FUND_BAL('$this->client_cd',to_date('$this->doc_date','YYYY-MM-DD')),0) as saldoku from dual";
+		$cek=DAO::queryRowSql($query3);
+		$amt=$this->trx_amt;
+		$saldo=$cek['saldoku'];
+		
+		if($cek_saldo =='Y' && $saldo < $amt)
+		{
+			$this->addError('trx_amt', "Saldo anda tidak mencukupi  ($saldo)");
+			
+		}
+		else if($cek_saldo =='N' && $saldo < $amt)
+		{
+			Yii::app()->user->setFlash('info', "Saldo anda tidak mencukupi  ($saldo)");
+		}
+	
+	}
+
+	}
+	
+	public function checkDate(){
+		if($this->doc_date ==''){
+			$this->addError('doc_date', 'Doc Date Can\'t be blank');
+		}
+	}
+	public function checkAcct(){
+		$query="SELECT BANK_ACCT_NUM FROM MST_CLIENT_FLACCT WHERE CLIENT_CD='$this->client_cd'";
+		$cek=DAO::queryRowSql($query);
+		
+		if(!$cek && ($this->trx_type != 'I' && $this->trx_type != 'O')){
+			$this->addError('client_cd', 'Harus punya rekening dana');
+		}
+		 
+	}
+	public function attributeLabels()
+	{
+		return array(
+			'doc_num' => 'Doc Num',
+			'doc_date' => 'Date',
+			'trx_type' => 'Movement Type',
+			'client_cd' => 'Client CD',
+			'brch_cd' => 'Brch Code',
+			'source' => 'Source',
+			'doc_ref_num' => 'Doc Ref Num',
+			'tal_id_ref' => 'Tal Id Ref',
+			'gl_acct_cd' => 'Gl Acct Code',
+			'sl_acct_cd' => 'Sl Acct Code',
+			'bank_ref_num' => 'Bank Ref Num',
+			'bank_mvmt_date' => 'Bank Movement Date',
+			'acct_name' => 'Acct Name',
+			'remarks' => 'Description',
+			'from_client' => 'From Client',
+			'from_acct' => 'From Acct',
+			'from_bank' => 'From Bank',
+			'to_client' => 'To Client',
+			'to_acct' => 'To Acct',
+			'to_bank' => 'To Bank',
+			'trx_amt' => 'Amount',
+			'cre_dt' => 'Cre Date',
+			'user_id' => 'User',
+			'approved_dt' => 'Approved Date',
+			'approved_sts' => 'Approved Sts',
+			'approved_by' => 'Approved By',
+			'cancel_dt' => 'Cancel Date',
+			'cancel_by' => 'Cancel By',
+			'doc_ref_num2' => 'Doc Ref Num2',
+			'fee' => 'Fee',
+			'folder_cd' => 'Folder Code',
+			'fund_bank_cd' => 'Fund Bank Code',
+			'fund_bank_acct' => 'Fund Bank Acct',
+			'reversal_jur' => 'Reversal Jur',
+			'upd_dt' => 'Upd Date',
+			'upd_by' => 'Upd By',
+		);
+	}
+/*
+public function executeSpHeader($exec_status,$menuName)
+	{
+		$connection  = Yii::app()->db;
+		
+		try{
+			$query  = "CALL SP_T_MANY_HEADER_INSERT(
+						:P_MENU_NAME,
+						:P_STATUS,
+						:P_USER_ID,
+						:P_IP_ADDRESS,
+						:P_CANCEL_REASON,
+						:P_UPDATE_DATE,
+						:P_UPDATE_SEQ,
+						:P_ERROR_CODE,
+						:P_ERROR_MSG)";
+			
+						
+			$command = $connection->createCommand($query);
+			$command->bindValue(":P_MENU_NAME",$menuName,PDO::PARAM_STR);
+			$command->bindValue(":P_STATUS",$exec_status,PDO::PARAM_STR);
+			$command->bindValue(":P_USER_ID",$this->user_id,PDO::PARAM_STR);			
+			$command->bindValue(":P_IP_ADDRESS",$this->ip_address,PDO::PARAM_STR);
+			$command->bindValue(":P_CANCEL_REASON",$this->cancel_reason,PDO::PARAM_STR);
+			
+			$command->bindParam(":P_UPDATE_DATE",$this->update_date,PDO::PARAM_STR,50);
+			$command->bindParam(":P_UPDATE_SEQ",$this->update_seq,PDO::PARAM_STR,10);
+			$command->bindParam(":P_ERROR_CODE",$this->error_code,PDO::PARAM_INT,10);
+			$command->bindParam(":P_ERROR_MSG",$this->error_msg,PDO::PARAM_STR,1000);
+
+			$command->execute();
+			
+			//Commit baru akan dijalankan saat semua transaksi INSERT sukses
+			
+		}catch(Exception $ex){
+			if($this->error_code = -999)
+				$this->error_msg = $ex->getMessage();
+		}
+		
+		if($this->error_code < 0)
+			$this->addError('error_msg', 'Error '.$this->error_code.' '.$this->error_msg);
+		
+		return $this->error_code;
+	}
+*/
+		public function executeSp($exec_status,$old_doc_num,$record_seq)
+	{
+		$connection  = Yii::app()->db;
+	
+		
+		try{
+			$query  = "CALL SP_T_FUND_MOVEMENT_UPD(
+						:P_SEARCH_DOC_NUM,
+						:P_DOC_NUM,
+						TO_DATE(:P_DOC_DATE,'YYYY-MM-DD'),
+						:P_TRX_TYPE,
+						:P_CLIENT_CD,
+						:P_BRCH_CD,
+						:P_SOURCE,
+						:P_DOC_REF_NUM,
+						:P_TAL_ID_REF,
+						:P_GL_ACCT_CD,
+						:P_SL_ACCT_CD,
+						:P_BANK_REF_NUM,
+						TO_DATE(:P_BANK_MVMT_DATE,'YYYY-MM-DD HH24:MI:SS'),
+						:P_ACCT_NAME,
+						:P_REMARKS,
+						:P_FROM_CLIENT,
+						:P_FROM_ACCT,
+						:P_FROM_BANK,
+						:P_TO_CLIENT,
+						:P_TO_ACCT,
+						:P_TO_BANK,
+						:P_TRX_AMT,
+						TO_DATE(:P_CRE_DT,'YYYY-MM-DD HH24:MI:SS'),
+						:P_USER_ID,
+						TO_DATE(:P_CANCEL_DT,'YYYY-MM-DD'),
+						:P_CANCEL_BY,
+						:P_FEE,
+						:P_FOLDER_CD,
+						:P_FUND_BANK_CD,
+						:P_FUND_BANK_ACCT,
+						TO_DATE(:P_UPD_DT,'YYYY-MM-DD HH24:MI:SS'),
+						:P_UPD_BY,
+						:P_UPD_STATUS,
+						:p_ip_address,
+						:p_cancel_reason,
+						TO_DATE(:p_update_date,'YYYY-MM-DD HH24:MI:SS'),
+						:p_update_seq,
+						:p_record_seq,
+						:p_error_code,
+						:p_error_msg)";
+			
+			$command = $connection->createCommand($query);
+			$command->bindValue(":P_SEARCH_DOC_NUM",$old_doc_num,PDO::PARAM_STR);
+			$command->bindValue(":P_DOC_NUM",$this->doc_num,PDO::PARAM_STR);
+			$command->bindValue(":P_DOC_DATE",$this->doc_date,PDO::PARAM_STR);
+			$command->bindValue(":P_TRX_TYPE",$this->trx_type,PDO::PARAM_STR);
+			$command->bindValue(":P_CLIENT_CD",$this->client_cd,PDO::PARAM_STR);
+			$command->bindValue(":P_BRCH_CD",$this->brch_cd,PDO::PARAM_STR);
+			$command->bindValue(":P_SOURCE",$this->source,PDO::PARAM_STR);
+			$command->bindValue(":P_DOC_REF_NUM",$this->doc_ref_num,PDO::PARAM_STR);
+			$command->bindValue(":P_TAL_ID_REF",$this->tal_id_ref,PDO::PARAM_STR);
+			$command->bindValue(":P_GL_ACCT_CD",$this->gl_acct_cd,PDO::PARAM_STR);
+			$command->bindValue(":P_SL_ACCT_CD",$this->sl_acct_cd,PDO::PARAM_STR);
+			$command->bindValue(":P_BANK_REF_NUM",$this->bank_ref_num,PDO::PARAM_STR);
+			$command->bindValue(":P_BANK_MVMT_DATE",$this->bank_mvmt_date,PDO::PARAM_STR);
+			$command->bindValue(":P_ACCT_NAME",$this->acct_name,PDO::PARAM_STR);
+			$command->bindValue(":P_REMARKS",$this->remarks,PDO::PARAM_STR);
+			$command->bindValue(":P_FROM_CLIENT",$this->from_client,PDO::PARAM_STR);
+			$command->bindValue(":P_FROM_ACCT",$this->from_acct,PDO::PARAM_STR);
+			$command->bindValue(":P_FROM_BANK",$this->from_bank,PDO::PARAM_STR);
+			$command->bindValue(":P_TO_CLIENT",$this->to_client,PDO::PARAM_STR);
+			$command->bindValue(":P_TO_ACCT",$this->to_acct,PDO::PARAM_STR);
+			$command->bindValue(":P_TO_BANK",$this->to_bank,PDO::PARAM_STR);
+			$command->bindValue(":P_TRX_AMT",$this->trx_amt,PDO::PARAM_STR);
+			$command->bindValue(":P_CRE_DT",$this->cre_dt,PDO::PARAM_STR);
+			$command->bindValue(":P_USER_ID",$this->user_id,PDO::PARAM_STR);
+			$command->bindValue(":P_CANCEL_DT",$this->cancel_dt,PDO::PARAM_STR);
+			$command->bindValue(":P_CANCEL_BY",$this->cancel_by,PDO::PARAM_STR);
+			$command->bindValue(":P_FEE",$this->fee,PDO::PARAM_STR);
+			$command->bindValue(":P_FOLDER_CD",$this->folder_cd,PDO::PARAM_STR);
+			$command->bindValue(":P_FUND_BANK_CD",$this->fund_bank_cd,PDO::PARAM_STR);
+			$command->bindValue(":P_FUND_BANK_ACCT",$this->fund_bank_acct,PDO::PARAM_STR);
+			$command->bindValue(":P_UPD_DT",$this->upd_dt,PDO::PARAM_STR);
+			$command->bindValue(":P_UPD_BY",$this->upd_by,PDO::PARAM_STR);
+			$command->bindValue(":P_UPD_STATUS",$exec_status,PDO::PARAM_STR);
+			$command->bindValue(":P_IP_ADDRESS",$this->ip_address,PDO::PARAM_STR);
+			$command->bindValue(":P_CANCEL_REASON",$this->cancel_reason,PDO::PARAM_STR);
+			$command->bindValue(":P_UPDATE_DATE",$this->update_date,PDO::PARAM_STR);
+			$command->bindValue(":P_UPDATE_SEQ",$this->update_seq,PDO::PARAM_STR);
+			$command->bindValue(":P_RECORD_SEQ",$record_seq,PDO::PARAM_STR);	
+			$command->bindParam(":P_ERROR_CODE",$this->error_code,PDO::PARAM_INT,10);
+			$command->bindParam(":P_ERROR_MSG",$this->error_msg,PDO::PARAM_STR,1000);
+
+			$command->execute();
+			
+		}catch(Exception $ex){
+		
+			if($this->error_code = -999)
+				$this->error_msg = $ex->getMessage();
+		}
+		
+		if($this->error_code < 0)
+			$this->addError('error_msg', 'Error '.$this->error_code.' '.$this->error_msg);
+		
+		return $this->error_code;
+	}
+
+
+	public function search()
+	{
+		
+		$criteria = new CDbCriteria;
+		$criteria->compare('lower(doc_num)',strtolower($this->doc_num),true);
+	//	$criteria->addCondition("doc_date between trunc(sysdate)-31 and trunc(sysdate)");
+		if(!empty($this->from_date) && !empty($this->to_date) )
+		$criteria->addCondition("doc_date between to_date('$this->from_date','dd/mm/yyyy') and to_date('$this->to_date','dd/mm/yyyy')");
+		
+		if(empty($this->source))
+			$criteria->addCondition("SOURCE <>'VCH' ");	
+		
+		if(!empty($this->source) )
+			$criteria->addCondition("SOURCE ='$this->source' ");
+		
+		$criteria->compare('trx_type',$this->trx_type,true);
+		$criteria->compare('lower(client_cd)',strtolower($this->client_cd),true);
+		$criteria->compare('brch_cd',$this->brch_cd,true);
+		//$criteria->compare('source',$this->source,true);
+		$criteria->compare('doc_ref_num',$this->doc_ref_num,true);
+		$criteria->compare('tal_id_ref',$this->tal_id_ref);
+		$criteria->compare('gl_acct_cd',$this->gl_acct_cd,true);
+		$criteria->compare('sl_acct_cd',$this->sl_acct_cd,true);
+		$criteria->compare('bank_ref_num',$this->bank_ref_num,true);
+
+		if(!empty($this->bank_mvmt_date_date))
+			$criteria->addCondition("TO_CHAR(t.bank_mvmt_date,'DD') LIKE '%".$this->bank_mvmt_date_date."%'");
+		if(!empty($this->bank_mvmt_date_month))
+			$criteria->addCondition("TO_CHAR(t.bank_mvmt_date,'MM') LIKE '%".$this->bank_mvmt_date_month."%'");
+		if(!empty($this->bank_mvmt_date_year))
+			$criteria->addCondition("TO_CHAR(t.bank_mvmt_date,'YYYY') LIKE '%".$this->bank_mvmt_date_year."%'");		
+			$criteria->compare('acct_name',$this->acct_name,true);
+		$criteria->compare('lower(remarks)',strtolower($this->remarks),true);
+		$criteria->compare('from_client',$this->from_client,true);
+		$criteria->compare('from_acct',$this->from_acct,true);
+		$criteria->compare('from_bank',$this->from_bank,true);
+		$criteria->compare('to_client',$this->to_client,true);
+		$criteria->compare('to_acct',$this->to_acct,true);
+		$criteria->compare('to_bank',$this->to_bank,true);
+		$criteria->compare('trx_amt',$this->trx_amt);
+
+		if(!empty($this->cre_dt_date))
+			$criteria->addCondition("TO_CHAR(t.cre_dt,'DD') LIKE '%".$this->cre_dt_date."%'");
+		if(!empty($this->cre_dt_month))
+			$criteria->addCondition("TO_CHAR(t.cre_dt,'MM') LIKE '%".$this->cre_dt_month."%'");
+		if(!empty($this->cre_dt_year))
+			$criteria->addCondition("TO_CHAR(t.cre_dt,'YYYY') LIKE '%".$this->cre_dt_year."%'");	
+			$criteria->compare('user_id',$this->user_id,true);
+
+		if(!empty($this->approved_dt_date))
+			$criteria->addCondition("TO_CHAR(t.approved_dt,'DD') LIKE '%".$this->approved_dt_date."%'");
+		if(!empty($this->approved_dt_month))
+			$criteria->addCondition("TO_CHAR(t.approved_dt,'MM') LIKE '%".$this->approved_dt_month."%'");
+		if(!empty($this->approved_dt_year))
+			$criteria->addCondition("TO_CHAR(t.approved_dt,'YYYY') LIKE '%".$this->approved_dt_year."%'");		$criteria->compare('approved_sts',$this->approved_sts,true);
+		$criteria->compare('approved_by',$this->approved_by,true);
+
+		if(!empty($this->cancel_dt_date))
+			$criteria->addCondition("TO_CHAR(t.cancel_dt,'DD') LIKE '%".$this->cancel_dt_date."%'");
+		if(!empty($this->cancel_dt_month))
+			$criteria->addCondition("TO_CHAR(t.cancel_dt,'MM') LIKE '%".$this->cancel_dt_month."%'");
+		if(!empty($this->cancel_dt_year))
+			$criteria->addCondition("TO_CHAR(t.cancel_dt,'YYYY') LIKE '%".$this->cancel_dt_year."%'");		$criteria->compare('cancel_by',$this->cancel_by,true);
+		$criteria->compare('doc_ref_num2',$this->doc_ref_num2,true);
+		$criteria->compare('fee',$this->fee);
+		$criteria->compare('folder_cd',$this->folder_cd,true);
+		$criteria->compare('fund_bank_cd',$this->fund_bank_cd,true);
+		$criteria->compare('fund_bank_acct',$this->fund_bank_acct,true);
+		$criteria->compare('reversal_jur',$this->reversal_jur,true);
+
+		if(!empty($this->upd_dt_date))
+			$criteria->addCondition("TO_CHAR(t.upd_dt,'DD') LIKE '%".$this->upd_dt_date."%'");
+		if(!empty($this->upd_dt_month))
+			$criteria->addCondition("TO_CHAR(t.upd_dt,'MM') LIKE '%".$this->upd_dt_month."%'");
+		if(!empty($this->upd_dt_year))
+			$criteria->addCondition("TO_CHAR(t.upd_dt,'YYYY') LIKE '%".$this->upd_dt_year."%'");		$criteria->compare('upd_by',$this->upd_by,true);
+			$criteria->compare('approved_sts',$this->approved_sts,true);
+			//$criteria->compare('source',$this->source,true);
+			//$criteria->addCondition("source LIKE '%".$this->source."%'");
+			$sort = new CSort();
+		$sort->defaultOrder = 'doc_date desc,client_cd';
+		return new CActiveDataProvider($this, array(
+			'criteria'=>$criteria,
+			'sort'=>$sort
+		));
+	}
+}

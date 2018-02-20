@@ -1,0 +1,169 @@
+<?php
+
+class SiteController extends AAdminController
+{
+	//public $expired = null;
+	public $layout = '//layouts/column1';	
+	
+	/**
+	 * This is the default 'index' action that is invoked
+	 * when an action is not explicitly requested by users.
+	 */
+	public function actionIndex()
+	{
+// 		if(Yii::app()->user->isGuest)
+// 			$this->redirect(array('/site/login'));
+// 		else
+			if(!Yii::app()->request->cookies['expdate']){
+				$curruser = Yii::app()->user->id;
+				$modeluser = DAO::queryRowSql("select (trunc(expiry_date) - trunc(sysdate)) as remains from mst_user where lower(user_id) = lower('$curruser')");
+				$expdate = $modeluser['remains']; // AS : Range between expiry date and current system date
+				Yii::app()->request->cookies['expdate'] = new CHttpCookie('expdate', $expdate);
+			}
+			//var_dump(Yii::app()->params['session_timeout']);
+			//die();
+			$this->render('index');
+	}
+
+	/**
+	 * This is the action to handle external exceptions.
+	 */
+	public function actionError()
+	{
+		if($error=Yii::app()->errorHandler->error)
+		{
+			if(Yii::app()->request->isAjaxRequest)
+				echo $error['message'];
+			else
+				$this->render('error', $error);
+		}
+	}
+	
+	/**
+	 * This is the action to handle external exceptions in popup window
+	 */
+	public function actionErrorpopup()
+	{
+		$this->layout = '//layouts/iframe1';
+		$this->actionError();
+	}
+
+	/**
+	 * Displays the login page
+	 */
+	public function actionLogin()
+	{
+		$model=new LoginForm;
+		$lastactivity = new DateTime();
+		
+		// if it is ajax validation request
+		if(isset($_POST['ajax']) && $_POST['ajax']==='login-form')
+		{
+			echo CActiveForm::validate($model);
+			Yii::app()->end();
+		}
+
+		// collect user input data
+		if(isset($_POST['LoginForm']))
+		{
+			$model->attributes=$_POST['LoginForm'];
+			// validate user input and redirect to the previous page if valid
+			if($model->validate() && $model->login()){
+				$curruser = Yii::app()->user->id;
+								
+				$modeluser = DAO::queryRowSql("select (trunc(expiry_date) - trunc(sysdate)) as remains from mst_user where lower(user_id) = lower('$curruser')");
+				$expdate = $modeluser['remains']; // AS : Range between expiry date and current system date
+				
+				$arrUsergroupId  		= Yii::app()->user->usergroup_id;
+			
+				// AH : getting first registered user group (high usually us better)
+				asort($arrUsergroupId);	
+				
+				$modelUserGroup 		= Usergroup::model()->findByPk($arrUsergroupId[0]);
+				$modelMenuAction 		= Menuaction::model()->findByPk($modelUserGroup->menuaction_id);
+				
+				if(!empty($modelMenuAction->menuaction_id))
+					$this->redirect(array($modelMenuAction->action_url));
+				else{						// AH: default redirect if not yet saved				
+					Yii::app()->request->cookies['curruser'] = new CHttpCookie('curruser', $curruser);
+					Yii::app()->request->cookies['lastactivity'] = new CHttpCookie('lastactivity', $lastactivity->getTimestamp());
+					Yii::app()->request->cookies['expdate'] = new CHttpCookie('expdate', $expdate);
+					$this->redirect(array('index'));
+				}
+				
+			}
+		}
+		
+		
+		// display the login form
+		$this->render('login',array('model'=>$model));
+	}
+
+	/**
+	 * Logs out the current user and redirect to homepage.
+	 */
+	public function actionLogout()
+	{
+		$modelLoginlog = new Loginlog();
+		
+		$ip = Yii::app()->request->userHostAddress;
+		if($ip=="::1")
+			$ip = '127.0.0.1';
+		
+		$modelLoginlog->user_id 	= Yii::app()->user->id;
+		$modelLoginlog->log_dt  	= new CDbExpression("TO_DATE( '".Yii::app()->datetime->getDateTimeNow()."', 'YYYY-MM-DD HH24:MI:SS')");
+		$modelLoginlog->log_type 	= 'OUT';
+		$modelLoginlog->ip_address  = $ip;
+		if(isset($modelLoginlog->user_id))
+			$modelLoginlog->save(FALSE);
+		Yii::app()->request->cookies->clear();
+		Yii::app()->user->logout(); 
+		$this->redirect(Yii::app()->homeUrl);
+	}
+	
+	public function actionTestpush() {
+		$soc = SocketToFront::getInstance();
+		//$ps=new SocketToFront();
+		 $connectRslt=$soc->connectFO();
+		 echo 'hasil connect'.$connectRslt;
+		 echo '<br> socketURL: '.$soc->socketURL();
+		 
+		 if($connectRslt!="OK"){
+				Yii::app()->user->setFlash('error', 'Error Connect Socket:  '.$connectRslt." ,socket url: ".$soc->socketURL());
+				return;
+			}
+		// echo '<br> pushclient result: '.$soc->pushClientCash('CHAN021R');
+		
+		 echo '<br> pushclient result: '.$soc->pushClientStock('CHAN021R','AAAB');
+		  $closeRslt=$soc->closeConnection();
+		 echo '<br> close socket result: '.$closeRslt;
+				 
+	}
+	
+	/**
+	 * Specifies the access control rules.
+	 * This method is used by the 'accessControl' filter.
+	 * @return array access control rules
+	 */
+	public function accessRules()
+	{
+		return array_merge(array(
+				array('deny',
+					'actions'=>array('login'),
+					'users'=>array('@'),
+				),
+				array('allow',
+					'actions'=>array('index','errorpopup','testpush'),
+					'users'=>array('@'),
+				),
+				array('allow',
+					'actions'=>array('error'),
+					'users'=>array('*'),
+				),
+				array('allow',
+					'actions' => array('login','logout'),
+					'users' => array('*'),
+				),
+		),parent::accessRules());
+	}
+}

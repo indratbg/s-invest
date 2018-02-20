@@ -1,0 +1,425 @@
+<?php
+
+/**
+ * This is the model class for table "T_BANK_MUTATION".
+ *
+ * The followings are the available columns in table 'T_BANK_MUTATION':
+ * @property string $kodeab
+ * @property string $namaab
+ * @property string $rdn
+ * @property string $sid
+ * @property string $sre
+ * @property string $namanasabah
+ * @property string $tanggalefektif
+ * @property string $tanggaltimestamp
+ * @property string $instructionfrom
+ * @property string $counterpartaccount
+ * @property string $typemutasi
+ * @property string $transactiontype
+ * @property string $currency
+ * @property double $beginningbalance
+ * @property double $transactionvalue
+ * @property double $closingbalance
+ * @property string $remark
+ * @property string $bankreference
+ * @property string $bankid
+ * @property integer $importseq
+ * @property string $importdate
+ */
+class Tbankmutation extends AActiveRecordSP
+{
+	//AH: #BEGIN search (datetime || date) additional comparison
+	public $tanggalefektif_date;
+	public $tanggalefektif_month;
+	public $tanggalefektif_year;
+
+	public $tanggaltimestamp_date;
+	public $tanggaltimestamp_month;
+	public $tanggaltimestamp_year;
+	public $import_type;
+	public $file_upload;
+	public $importdate_date;
+	public $importdate_month;
+	public $importdate_year;
+	public $save_flg='N';
+	public $p_bank_cd;
+	public $importseq;
+	public $data;
+	public $vo_fail;
+	public $vo_eff_dt;
+	public $client_cd;
+	public $branch_code;
+	public $cifs;
+	public $from_dt;
+	public $to_dt;
+	public $type_mutasi;
+	public $branch;
+	public $client_name;
+	public $update_date;
+	public $update_seq;
+	public $record_seq;
+	public $user_id;
+	public $ip_address;
+	public $typetext;
+	public $remark;
+	public $frombank;
+	public $input_remark;
+	public $importtype;
+	//AH: #END search (datetime || date)  additional comparison
+	
+	public function __construct($scenario = 'insert')
+	{
+		parent::__construct($scenario);
+		$this->logRecord=true;
+	}
+	
+	public static function model($className=__CLASS__)
+	{
+		return parent::model($className);
+	}
+    
+
+	public function tableName()
+	{
+		return 'T_BANK_MUTATION';
+	}
+
+	public function rules()
+	{
+		return array(
+		
+			array('tanggalefektif, tanggaltimestamp, importdate', 'application.components.validator.ADatePickerSwitcherValidatorSP'),
+		
+			array('beginningbalance, transactionvalue, closingbalance, importseq', 'application.components.validator.ANumberSwitcherValidator'),
+			array('file_upload','file','allowEmpty'=>false,'on'=>'upload'),
+			array('sid, sre, namanasabah, tanggaltimestamp, counterpartaccount, typemutasi, currency, remark', 'required','on'=>'post'),
+			
+			array('importseq', 'numerical', 'integerOnly'=>true),
+			array('beginningbalance, transactionvalue, closingbalance', 'numerical'),
+			array('kodeab', 'length', 'max'=>5),
+			array('namaab', 'length', 'max'=>50),
+			array('sid, instructionfrom, counterpartaccount', 'length', 'max'=>15),
+			array('sre', 'length', 'max'=>14),
+			array('namanasabah', 'length', 'max'=>25),
+			array('typemutasi', 'length', 'max'=>1),
+			array('currency', 'length', 'max'=>3),
+			array('remark', 'length', 'max'=>36),
+			array('importtype,input_remark,frombank,transactiontype,remark,namaab,kodeab,bankreference,rdn,bankid,importdate,save_flg,file_upload,import_type,client_cd,branch_code,cifs,from_dt,to_dt,type_mutasi,branch,client_name,typetext', 'safe'),
+
+			// The following rule is used by search().
+			// Please remove those attributes that should not be searched.
+	
+			array('kodeab, namaab, rdn, sid, sre, namanasabah, tanggalefektif, tanggaltimestamp, instructionfrom, counterpartaccount, typemutasi, transactiontype, currency, beginningbalance, transactionvalue, closingbalance, remark, bankreference, bankid, importseq, importdate,tanggalefektif_date,tanggalefektif_month,tanggalefektif_year,tanggaltimestamp_date,tanggaltimestamp_month,tanggaltimestamp_year,importdate_date,importdate_month,importdate_year', 'safe', 'on'=>'search'),
+		);
+	}
+
+	public function relations()
+	{
+		return array(
+		);
+	}
+
+	public function attributeLabels()
+	{
+		return array(
+			'kodeab' => 'Kodeab',
+			'namaab' => 'Namaab',
+			'rdn' => 'Rdn',
+			'sid' => 'Sid',
+			'sre' => 'Sre',
+			'namanasabah' => 'Nama Nasabah',
+			'tanggalefektif' => 'Tanggal Efektif',
+			'tanggaltimestamp' => 'Tanggal Timestamp',
+			'instructionfrom' => 'Instruction From',
+			'counterpartaccount' => 'Counterpartaccount',
+			'typemutasi' => 'Type Mutasi',
+			'transactiontype' => 'Transactiontype',
+			'currency' => 'Currency',
+			'beginningbalance' => 'Beginning Balance',
+			'transactionvalue' => 'Transaction Value',
+			'closingbalance' => 'Closing Balance',
+			'remark' => 'Remark',
+			'bankreference' => 'Bank Reference',
+			'bankid' => 'Bankid',
+			'importseq' => 'Importseq',
+			'importdate' => 'Importdate',
+			'file_upload' => '',
+			'typemutasi'=>'Type Mutasi'
+		);
+	}
+public function executeSpHeader($exec_status,$menuName)
+	{
+		$connection  = Yii::app()->db;
+		
+		try{
+			$query  = "CALL SP_T_MANY_HEADER_INSERT(
+						:P_MENU_NAME,
+						:P_STATUS,
+						:P_USER_ID,
+						:P_IP_ADDRESS,
+						:P_CANCEL_REASON,
+						:P_UPDATE_DATE,
+						:P_UPDATE_SEQ,
+						:P_ERROR_CODE,
+						:P_ERROR_MSG)";
+			
+						
+			$command = $connection->createCommand($query);
+			$command->bindValue(":P_MENU_NAME",$menuName,PDO::PARAM_STR);
+			$command->bindValue(":P_STATUS",$exec_status,PDO::PARAM_STR);
+			$command->bindValue(":P_USER_ID",$this->user_id,PDO::PARAM_STR);			
+			$command->bindValue(":P_IP_ADDRESS",$this->ip_address,PDO::PARAM_STR);
+			$command->bindValue(":P_CANCEL_REASON",$this->cancel_reason,PDO::PARAM_STR);
+			
+			$command->bindParam(":P_UPDATE_DATE",$this->update_date,PDO::PARAM_STR,30);
+			$command->bindParam(":P_UPDATE_SEQ",$this->update_seq,PDO::PARAM_STR,10);
+			$command->bindParam(":P_ERROR_CODE",$this->error_code,PDO::PARAM_INT,10);
+			$command->bindParam(":P_ERROR_MSG",$this->error_msg,PDO::PARAM_STR,1000);
+
+			$command->execute();
+			
+			//Commit baru akan dijalankan saat semua transaksi INSERT sukses
+			
+		}catch(Exception $ex){
+			if($this->error_code = -999)
+				$this->error_msg = $ex->getMessage();
+		}
+		
+		if($this->error_code < 0)
+			$this->addError('error_msg', 'Error '.$this->error_code.' '.$this->error_msg);
+		
+		return $this->error_code;
+	}
+
+ public function executeSp($bank_cd,$importseq,$data)
+	{
+		
+		$connection  = Yii::app()->db;
+		$connection->enableParamLogging = false; //WT disable save data to lo
+		$transaction = $connection->beginTransaction();
+
+		try{
+			$query  = "CALL Fund_Bank_Mvmt_Import(:p_bank_cd,
+												:p_importseq ,
+												:p_data,
+												:vo_eff_dt,
+												:VO_FAIL,
+												:vo_errcd,
+												:vo_errmsg)";
+
+			$command = $connection->createCommand($query);
+			
+			$command->bindValue(":p_bank_cd",$bank_cd,PDO::PARAM_STR);
+			$command->bindValue(":p_importseq",$importseq,PDO::PARAM_STR);
+			$command->bindValue(":p_data",$data,PDO::PARAM_STR);
+			$command->bindParam(":vo_eff_dt",$this->vo_eff_dt,PDO::PARAM_STR,10);
+			$command->bindParam(":vo_fail",$this->vo_fail,PDO::PARAM_INT,10);
+			$command->bindParam(":vo_errcd",$this->error_code,PDO::PARAM_INT,10);
+			$command->bindParam(":vo_errmsg",$this->error_msg,PDO::PARAM_STR,100);
+			
+			$command->execute();
+			$transaction->commit();
+		}catch(Exception $ex){
+			$transaction->rollback();
+			if($this->error_code == -999)
+				$this->error_msg = $ex->getMessage();
+		}
+		
+		 if($this->error_code < 0)
+			$this->addError('vo_errmsg', 'Error '.$this->error_code.' '.$this->error_msg);
+		
+		
+		return $this->error_code;
+	}
+	
+	public function executeSpInbox($exec_status,$record_seq)
+	{ //echo "<script>alert('test')</script>";
+		$connection  = Yii::app()->db;
+		
+		$this->user_id    = Yii::app()->user->id;
+		try{
+			$query  = "CALL Sp_MUTASI_RDI_UPD(
+									:P_CLIENT_CD,
+									:P_BRCH_CD,
+									:P_FROMBANK,
+									:P_KODEAB,
+									:P_NAMAAB,
+									:P_RDN,
+									:P_SID,
+									:P_SRE,
+									:P_NAMANASABAH,
+									TO_DATE(:P_TANGGALEFEKTIF,'YYYY-MM-DD'),
+									TO_DATE(:P_TANGGALTIMESTAMP,'YYYY-MM-DD HH24:MI:SS'),
+									:P_INSTRUCTIONFROM,
+									:P_COUNTERPARTACCOUNT,
+									:P_TYPEMUTASI,
+									:P_TRANSACTIONTYPE,
+									:P_CURRENCY,
+									:P_BEGINNINGBALANCE,
+									:P_TRANSACTIONVALUE,
+									:P_CLOSINGBALANCE,
+									:P_REMARK,
+									:P_BANKREFERENCE,
+									:P_BANKID,
+									:P_IMPORTSEQ,
+									TO_DATE(:P_IMPORTDATE,'YYYY-MM-DD'),
+									:P_USER_ID,
+									:P_UPD_STATUS,
+									:p_ip_address,
+									:p_cancel_reason,
+									TO_DATE(:p_update_date,'YYYY-MM-DD HH24:MI:SS'),
+									:p_update_seq,
+									:p_record_seq,
+									:p_error_code,
+									:p_error_msg)";
+						
+			$command = $connection->createCommand($query);
+			$command->bindValue(":P_SEARCH_RDN",$this->rdn,PDO::PARAM_STR);
+			$command->bindValue(":P_SEARCH_BANKREFERENCE",$this->bankreference,PDO::PARAM_STR);
+			$command->bindValue(":P_SEARCH_TANGGALEFEKTIF",$this->tanggalefektif,PDO::PARAM_STR);
+			$command->bindValue(":P_SEARCH_BANKID",$this->bankid,PDO::PARAM_STR);
+			$command->bindValue(":P_SEARCH_TRANSACTIONTYPE",$this->transactiontype,PDO::PARAM_STR);
+			$command->bindValue(":P_CLIENT_CD",$this->client_cd,PDO::PARAM_STR);
+			$command->bindValue(":P_BRCH_CD",trim($this->branch_code),PDO::PARAM_STR);
+			$command->bindValue(":P_FROMBANK",$this->frombank,PDO::PARAM_STR);
+			$command->bindValue(":P_KODEAB",$this->kodeab,PDO::PARAM_STR);
+			$command->bindValue(":P_NAMAAB",$this->namaab,PDO::PARAM_STR);
+			$command->bindValue(":P_RDN",$this->rdn,PDO::PARAM_STR);
+			$command->bindValue(":P_SID",$this->sid,PDO::PARAM_STR);
+			$command->bindValue(":P_SRE",$this->sre,PDO::PARAM_STR);
+			$command->bindValue(":P_NAMANASABAH",$this->namanasabah,PDO::PARAM_STR);
+			$command->bindValue(":P_TANGGALEFEKTIF",$this->tanggalefektif,PDO::PARAM_STR);
+			$command->bindValue(":P_TANGGALTIMESTAMP",$this->tanggaltimestamp,PDO::PARAM_STR);
+			$command->bindValue(":P_INSTRUCTIONFROM",$this->instructionfrom,PDO::PARAM_STR);
+			$command->bindValue(":P_COUNTERPARTACCOUNT",$this->counterpartaccount,PDO::PARAM_STR);
+			$command->bindValue(":P_TYPEMUTASI",trim($this->typemutasi),PDO::PARAM_STR);
+			$command->bindValue(":P_TRANSACTIONTYPE",$this->transactiontype,PDO::PARAM_STR);
+			$command->bindValue(":P_CURRENCY",$this->currency,PDO::PARAM_STR);
+			$command->bindValue(":P_BEGINNINGBALANCE",$this->beginningbalance,PDO::PARAM_STR);
+			$command->bindValue(":P_TRANSACTIONVALUE",$this->transactionvalue,PDO::PARAM_STR);
+			$command->bindValue(":P_CLOSINGBALANCE",$this->closingbalance,PDO::PARAM_STR);
+			$command->bindValue(":P_REMARK",$this->input_remark,PDO::PARAM_STR);
+			$command->bindValue(":P_BANKREFERENCE",$this->bankreference,PDO::PARAM_STR);
+			$command->bindValue(":P_BANKID",$this->bankid,PDO::PARAM_STR);
+			$command->bindValue(":P_IMPORTSEQ",$this->importseq,PDO::PARAM_STR);
+			$command->bindValue(":P_IMPORTDATE",$this->importdate,PDO::PARAM_STR);
+			$command->bindValue(":P_USER_ID",$this->user_id,PDO::PARAM_STR);
+			$command->bindValue(":P_UPD_STATUS",$exec_status,PDO::PARAM_STR);
+			$command->bindValue(":P_IP_ADDRESS",$this->ip_address,PDO::PARAM_STR);
+			$command->bindValue(":P_CANCEL_REASON",$this->cancel_reason,PDO::PARAM_STR);
+			$command->bindValue(":P_UPDATE_DATE",$this->update_date,PDO::PARAM_STR);
+			$command->bindValue(":P_UPDATE_SEQ",$this->update_seq,PDO::PARAM_STR);
+			$command->bindValue(":P_RECORD_SEQ",$record_seq,PDO::PARAM_STR);	
+			$command->bindParam(":P_ERROR_CODE",$this->error_code,PDO::PARAM_INT,10);
+			$command->bindParam(":P_ERROR_MSG",$this->error_msg,PDO::PARAM_STR,1000);
+
+			$command->execute();
+			
+		}catch(Exception $ex){
+			
+			if($this->error_code = -999)
+				$this->error_msg = $ex->getMessage();
+		}
+		
+		if($this->error_code < 0)
+			$this->addError('error_msg', 'Error '.$this->error_code.' '.$this->error_msg);
+		
+		return $this->error_code;
+	}
+	
+public function approveMutasiBca()
+	{
+		$connection  = Yii::app()->db;
+		//$transaction = $connection->beginTransaction();	
+		$menuName = 'UPLOAD RDN MUTATION';
+		try{
+			$this->logRecord();
+			$query  = "CALL SP_FL_BCA_INTEREST_APPROVE(
+						TO_DATE(:p_tanggalefektif,'YYYY-MM-DD'),
+						:P_CLIENT_CD,
+						:P_TRANSACTIONTYPE,
+						:P_MENU_NAME,
+						TO_DATE(:P_UPDATE_DATE,'YYYY-MM-DD HH24:MI:SS'),
+						:P_UPDDATE_SEQ,
+						:P_APPROVED_USER_ID,
+						:P_APPROVED_IP_ADDRESS,
+						:P_ERROR_CODE,
+						:P_ERROR_MSG)";
+			$command = $connection->createCommand($query);
+			$command->bindValue(":p_tanggalefektif",$this->tanggalefektif,PDO::PARAM_STR);
+			$command->bindValue(":P_CLIENT_CD",$this->client_cd,PDO::PARAM_STR);
+			$command->bindValue(":P_TRANSACTIONTYPE",$this->transactiontype,PDO::PARAM_STR);
+			$command->bindValue(":P_MENU_NAME",$menuName,PDO::PARAM_STR);
+			$command->bindValue(":P_UPDATE_DATE",$this->update_date,PDO::PARAM_STR);
+			$command->bindValue(":P_UPDDATE_SEQ",$this->update_seq,PDO::PARAM_STR);
+			$command->bindValue(":P_APPROVED_USER_ID",$this->user_id,PDO::PARAM_STR);
+			$command->bindValue(":P_APPROVED_IP_ADDRESS",$this->ip_address,PDO::PARAM_STR);
+			$command->bindParam(":P_ERROR_CODE",$this->error_code,PDO::PARAM_STR,10);
+			$command->bindParam(":P_ERROR_MSG",$this->error_msg,PDO::PARAM_STR,200);
+			$command->execute();
+			//$transaction->commit();
+		}catch(Exception $ex){
+			//$transaction->rollback();
+			if($this->error_code = -999)
+				$this->error_msg = $ex->getMessage();
+		}
+		
+		if($this->error_code < 0)
+			$this->addError('error_msg', 'Error '.$this->error_code.' '.$this->error_msg);
+		
+		return $this->error_code;
+	}
+	private function logRecord()
+	{
+		$ip = Yii::app()->request->userHostAddress;
+		if($ip=="::1")
+			$ip = '127.0.0.1';
+		
+		$this->ip_address = $ip;
+		$this->user_id    = Yii::app()->user->id;
+	}
+	public function search()
+	{
+		$criteria = new CDbCriteria;
+		$criteria->compare('kodeab',$this->kodeab,true);
+		$criteria->compare('namaab',$this->namaab,true);
+		$criteria->compare('rdn',$this->rdn,true);
+		$criteria->compare('sid',$this->sid,true);
+		$criteria->compare('sre',$this->sre,true);
+		$criteria->compare('namanasabah',$this->namanasabah,true);
+
+		if(!empty($this->tanggalefektif_date))
+			$criteria->addCondition("TO_CHAR(t.tanggalefektif,'DD') LIKE '%".$this->tanggalefektif_date."%'");
+		if(!empty($this->tanggalefektif_month))
+			$criteria->addCondition("TO_CHAR(t.tanggalefektif,'MM') LIKE '%".$this->tanggalefektif_month."%'");
+		if(!empty($this->tanggalefektif_year))
+			$criteria->addCondition("TO_CHAR(t.tanggalefektif,'YYYY') LIKE '%".$this->tanggalefektif_year."%'");
+		if(!empty($this->tanggaltimestamp_date))
+			$criteria->addCondition("TO_CHAR(t.tanggaltimestamp,'DD') LIKE '%".$this->tanggaltimestamp_date."%'");
+		if(!empty($this->tanggaltimestamp_month))
+			$criteria->addCondition("TO_CHAR(t.tanggaltimestamp,'MM') LIKE '%".$this->tanggaltimestamp_month."%'");
+		if(!empty($this->tanggaltimestamp_year))
+			$criteria->addCondition("TO_CHAR(t.tanggaltimestamp,'YYYY') LIKE '%".$this->tanggaltimestamp_year."%'");		$criteria->compare('instructionfrom',$this->instructionfrom,true);
+		$criteria->compare('counterpartaccount',$this->counterpartaccount,true);
+		$criteria->compare('typemutasi',$this->typemutasi,true);
+		$criteria->compare('transactiontype',$this->transactiontype,true);
+		$criteria->compare('currency',$this->currency,true);
+		$criteria->compare('beginningbalance',$this->beginningbalance);
+		$criteria->compare('transactionvalue',$this->transactionvalue);
+		$criteria->compare('closingbalance',$this->closingbalance);
+		$criteria->compare('remark',$this->remark,true);
+		$criteria->compare('bankreference',$this->bankreference,true);
+		$criteria->compare('bankid',$this->bankid,true);
+		$criteria->compare('importseq',$this->importseq);
+
+		if(!empty($this->importdate_date))
+			$criteria->addCondition("TO_CHAR(t.importdate,'DD') LIKE '%".$this->importdate_date."%'");
+		if(!empty($this->importdate_month))
+			$criteria->addCondition("TO_CHAR(t.importdate,'MM') LIKE '%".$this->importdate_month."%'");
+		if(!empty($this->importdate_year))
+			$criteria->addCondition("TO_CHAR(t.importdate,'YYYY') LIKE '%".$this->importdate_year."%'");
+		return new CActiveDataProvider($this, array(
+			'criteria'=>$criteria,
+		));
+	}
+}

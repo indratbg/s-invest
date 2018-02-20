@@ -1,0 +1,130 @@
+<?php /* @var $this Controller */ ?>
+<?php
+	//$inbox_flg = substr(Yii::app()->urlManager->parseUrl(Yii::app()->request),0,5)=='inbox'?true:false;
+?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="language" content="en" />
+
+	<!--<link rel="shortcut icon" href="<?php //echo Yii::app()->request->baseUrl; ?>/kodam1.ico" type="image/x-icon" />-->
+	
+	<!-- blueprint CSS framework -->
+	<link rel="stylesheet" type="text/css" href="<?php echo Yii::app()->request->baseUrl; ?>/css/screen.css" media="screen, projection" />
+	<link rel="stylesheet" type="text/css" href="<?php echo Yii::app()->request->baseUrl; ?>/css/print.css" media="print" />
+	
+	
+	<!--[if lt IE 8]>
+	<link rel="stylesheet" type="text/css" href="<?php echo Yii::app()->request->baseUrl; ?>/css/ie.css" media="screen, projection" />
+	<![endif]-->
+
+	<link rel="stylesheet" type="text/css" href="<?php echo Yii::app()->request->baseUrl; ?>/css/main.css" />
+	
+
+	<title><?php echo CHtml::encode($this->pageTitle); ?></title>
+	<style>
+	   	.modal-header{
+			padding:2px 15px 2px 15px;
+			background-color: rgb(229, 229, 229);
+			color: rgb(153, 153, 153);
+	   	}
+	   	/*untuk live uncomment style di bawah */
+	   	/*
+						   .navbar-static-top .container, .navbar-fixed-top .container, .navbar-fixed-bottom .container {
+				   width: 90%;
+				   }*/
+		   
+	</style>
+	<link rel="stylesheet" type="text/css" href="<?php echo Yii::app()->theme->baseUrl; ?>/css/small-scale.css" />
+	<?php Yii::app()->db->schema->getTables(); ?>
+</head>
+
+<body>
+<script type="text/javascript"> 
+
+	function stopRKey(evt) { 
+	  var evt = (evt) ? evt : ((event) ? event : null); 
+	  var node = (evt.target) ? evt.target : ((evt.srcElement) ? evt.srcElement : null); 
+	  if ((evt.keyCode == 13) && (node.type=="text"))  {return false;} 
+	} 
+	
+	document.onkeypress = stopRKey; 
+	
+	$(document).ready(function()
+	{
+		$("#btnApproveInbox, #btnRejectInbox,#btnApproveKbbInbox, a[title=approve]").on('click', function()
+		{
+			$(this).css('visibility','hidden');
+			$("#showloading").show();
+			//$(this).prop('disabled',true);
+		});
+	});
+
+</script>
+<?php
+    $logo_path  = AConstant::getImagePath().'header-logo.png';
+   
+    
+	if(Yii::app()->user->isGuest):
+	    $this->widget('bootstrap.widgets.TbNavbar', array(
+	        'type'=>null, 
+	        'brand' => 'INSISTPRO 1.0.0',
+	        'brandUrl'=> array('/site/index'),
+	        'fixed' => 'top',
+	        'collapse'=>true, // requires bootstrap-responsive.css
+	        'items'=>array(
+	            array(
+	                'class'=>'bootstrap.widgets.TbMenu',
+	                'items'=>array(),
+	            )
+	        ),
+	    )); 
+	else:
+		$menu = new AMenuBar();
+		$arr  = $menu->generateMenu(0);
+	 	$this->widget('bootstrap.widgets.TbNavbar', array(
+	        'type'=>null, 
+	        'brand' => 'INSISTPRO 1.0.0',
+	        'brandUrl'=> array('/site/index'),
+	        'fixed' => 'top',
+	        'items' =>array(
+	            array(
+	                'class'=>'bootstrap.widgets.TbMenu',
+	                'items'=>$arr,
+	            ),
+    		    array(
+        			'class'=>'bootstrap.widgets.TbMenu',
+        			'htmlOptions'=>array('class'=>'pull-right'),
+        			'items'=>array(
+        				//'---',
+        				array('label'=>trim(User::model()->findByPk(Yii::app()->user->id)->short_name), 'url'=>array('/core/user/changepassword'),'icon'=>'user'),
+        				'---',
+        				array('label'=>'', 'url'=>array('/site/logout'),'icon'=>'off'),
+        			),
+    		     ),
+	        ),
+	    ));
+	endif;     
+?>
+	<div class="container" style="background-color: white;padding-top:20px;">
+		<?php echo $content; ?>
+	</div>
+	<div id="showloading" style="display:none;margin: auto; width: auto; text-align: center;">
+		Please wait...<br />
+		<img src="<?php echo Yii::app()->request->baseUrl ?>/images/loading2.gif" width="25px">
+		
+	</div>
+	
+<!--	
+<div id="footer" class="navbar-fixed-bottom">
+    <div class="container">
+        <p class="copy">
+        	Copyright &copy 2013 by <a href="http://karltigo.com">Karlwei Multi Global</a> 
+        </p>
+    </div>
+</div>
+-->
+	
+</body>
+</html>

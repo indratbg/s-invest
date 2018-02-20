@@ -1,0 +1,206 @@
+<?php
+
+Class GenXmlSettleCustody extends CFormModel
+{
+	public $ip_address;
+	public $error_code 	  = -999;
+	public $error_msg  	  = 'Initial Value';
+	
+	public $trx_date;
+	public $due_date;
+	public $transfer_type;
+	public $settle_date;
+	public $client_cd;
+	public $beli_jual;
+	public $stk_cd;
+	public $price;
+	public $qty;
+	public $trx_amt;
+	public $trf_amt;
+	public $custodian_cd;
+	public $instruction_type;
+	public $trf_qty;
+	public $contr_num;
+	public $sum_flg;
+	public $net_flg;
+	public $trading_ref;
+	
+	public $cre_dt;
+	public $user_id;
+	
+	function setInitAttributes()
+	{
+		$this->due_date = date('d/m/Y');
+		$sql = "SELECT TO_CHAR(GET_DOC_DATE(F_GET_SETTDAYS(TO_DATE('$this->due_date','DD/MM/YYYY')),TO_DATE('$this->due_date','DD/MM/YYYY')),'DD/MM/YYYY') trx_date FROM dual";
+		
+		$result = DAO::queryRowSql($sql);
+		$this->trx_date = $result['trx_date'];
+		
+		$this->transfer_type = '%';
+	}
+	
+	function getTrxSql()
+	{
+		$sql = "SELECT settle_date, client_Cd, beli_jual, stk_Cd, price, Qty, trx_amt, trf_amt, custodian_cd, instruction_type, trf_qty, contr_num, sum_flg, net_flg, trading_ref			
+				FROM T_SETTLE_TRX_CUSTODY			
+				WHERE settle_date = TO_DATE('$this->due_date','DD/MM/YYYY')
+				AND contr_dt = TO_DATE('$this->trx_date','DD/MM/YYYY')			
+				AND instruction_type LIKE '%$this->transfer_type'
+				ORDER BY client_cd, stk_cd, beli_jual, instruction_type";
+		
+		return $sql;
+	}
+	
+	function getTrxXMLSql($instruction_type)
+	{
+		$selectSql = substr($instruction_type,1) == 'FOP' ? 
+					"'EXCHG' \"purpose\", '' \"settlement Reason\", TRADING_REF AS \"trading Reference\"," :
+					"";
+		
+		$sql = "SELECT  TO_CHAR(TO_DATE('$this->due_date','DD/MM/YYYY'),'yyyymmdd')||'_'||client_cd||'_'||stk_cd||DECODE(cnt,1,'',TO_CHAR(seqno)) AS \"external Reference\",
+					instruction_type \"instruction Type\",
+					broker_cd AS \"participant Code\",
+					DECODE(SUBSTR(custodian_cd,3,3),'001',NVL(subrek001,broker_001),broker_001) AS \"participant Account\",
+					custodian_cd AS \"counterpart Code\",
+					'LOCAL' AS \"security Code Type\",
+					stk_Cd AS \"security Code\", 
+					TO_CHAR(ABS(trf_qty)) \"number Of Securities\",
+					TO_CHAR(TO_DATE('$this->trx_date','DD/MM/YYYY'),'yyyymmdd') AS \"trade Date\",
+					'IDR' AS \"currency Code\",
+					DECODE('$instruction_type','RFOP','','DFOP','',TO_CHAR(ABS(trf_amt))) AS \"settlement Amount\",
+					TO_CHAR(TO_DATE('$this->due_date','DD/MM/YYYY'),'yyyymmdd') AS \"settlement Date\",
+					$selectSql
+					DECODE(SUBSTR(instruction_type,1,1),'D','TRANSFER TO ','RECEIVE FROM ')||custodian_cd AS \"description\"
+				FROM
+				( 
+					SELECT t.client_Cd, t.custodian_cd, stk_Cd, 
+						trf_qty, price, beli_jual,
+						trf_amt,
+						instruction_type, v.subrek001, t.TRADING_REF,
+						COUNT(1) over (PARTITION BY t.client_cd, stk_cd ORDER BY t.client_cd, stk_cd) cnt,
+						row_number() over (PARTITION BY t.client_cd, stk_cd ORDER BY t.client_cd, stk_cd, beli_jual, price) seqno
+					FROM T_SETTLE_TRX_CUSTODY t, v_client_subrek14 v
+					WHERE settle_Date = TO_DATE('$this->due_date','DD/MM/YYYY')
+					AND contr_dt = TO_DATE('$this->trx_date','DD/MM/YYYY')
+					AND instruction_type LIKE '$instruction_type'
+					AND trf_qty <> 0
+					AND t.client_cd = v.client_cd(+)
+				) t, v_broker_subrek v 
+				ORDER BY 1";
+		
+		return $sql;
+	}
+	
+	function getWtXMLSql()
+	{
+		$sql = "SELECT TO_CHAR(TO_DATE('$this->due_date','DD/MM/YYYY'), 'yyyymmdd')||'_'||a.client_cd AS \"external Reference\",			
+					broker_cd AS \"participant Code\",			
+					v.broker_001 AS \"participant Account\",	
+					'4583009526' AS \"beneficiary Account\",	
+					'BCA02' AS \"beneficiary Institution\",	
+					TO_CHAR(TO_DATE('$this->due_date','DD/MM/YYYY'), 'yyyymmdd') AS \"value Date\",	
+					'IDR' AS \"currency Code\",	
+					TO_CHAR(a.net_amt) AS \"cash Amount\",	
+					'TRX '||TO_CHAR(TO_DATE('$this->trx_date','DD/MM/YYYY'), 'yyyymmdd')||' '||a.client_cd AS \"description\"
+				FROM
+				(
+					SELECT t.client_cd, round(sum(decode(substr(contr_num,5,1),'B',1,-1) * amt_for_curr),0) net_amt			
+					FROM t_contracts t, mst_client m			
+					WHERE contr_dt = TO_DATE('$this->trx_date','DD/MM/YYYY')		
+					AND due_dt_for_amt = TO_DATE('$this->due_date','DD/MM/YYYY')		
+					AND contr_stat <> 'C'			
+					AND t.client_cd = m.client_cd			
+					AND m.custodian_cd is not null			
+					GROUP BY t.client_Cd			
+				) a,			
+				v_broker_subrek v			
+				WHERE net_amt > 0			
+				ORDER BY a.client_cd";
+		
+		return $sql;
+	}
+	
+	function save()
+	{
+		try
+		{
+			DAO::executeSql("
+				INSERT INTO T_SETTLE_TRX_CUSTODY
+				(
+					settle_date, client_cd, beli_jual, stk_cd, price, qty, 
+					trx_amt, trf_amt, custodian_cd, instruction_type, cre_dt, user_id, 
+					trf_qty, sum_flg, net_flg, contr_num, trading_ref, contr_dt)
+				VALUES
+				(
+					TO_DATE('$this->due_date','DD/MM/YYYY'), '$this->client_cd', '$this->beli_jual', '$this->stk_cd', '$this->price', '$this->qty',
+					'$this->trx_amt', '$this->trf_amt', '$this->custodian_cd', '$this->instruction_type', TO_DATE('$this->cre_dt','DD/MM/YYYY HH24:MI:SS'), '$this->user_id',
+					'$this->trf_qty', '$this->sum_flg', '$this->net_flg', '$this->contr_num', '$this->trading_ref', TO_DATE('$this->trx_date','DD/MM/YYYY')
+				)
+			");
+			
+			return 1;
+		}
+		catch(Exception $ex)
+		{
+			$this->add_error('error_msg', $ex->getMessage());
+			
+			return 0;
+		}
+	}
+	
+	function executeSp()
+	{
+		$connection  = Yii::app()->db;
+		
+		try{
+			$query  = "CALL SP_INSERT_SETTLE_CUSTODY(
+						TO_DATE(:P_CONTR_DT,'DD/MM/YYYY'),
+						TO_DATE(:P_DUE_DT,'DD/MM/YYYY'),
+						:P_USER_ID,
+						:P_ERROR_CODE,
+						:P_ERROR_MSG)";
+			
+			$command = $connection->createCommand($query);
+			$command->bindValue(":P_CONTR_DT",$this->trx_date,PDO::PARAM_STR);
+			$command->bindValue(":P_DUE_DT",$this->due_date,PDO::PARAM_STR);
+			$command->bindValue(":P_USER_ID",Yii::app()->user->id,PDO::PARAM_STR);
+						
+			$command->bindParam(":P_ERROR_CODE",$this->error_code,PDO::PARAM_INT,10);
+			$command->bindParam(":P_ERROR_MSG",$this->error_msg,PDO::PARAM_STR,200);
+
+			$command->execute();
+			
+		}catch(Exception $ex){
+			if($this->error_code = -999)
+				$this->error_msg = $ex->getMessage();
+		}
+		
+		if($this->error_code < 0)
+			$this->addError('error_msg', 'Error '.$this->error_code.' '.$this->error_msg);
+		
+		return $this->error_code;
+	}
+		
+	function rules()
+	{
+		return array(
+			array('price, qty, trx_amt, trf_amt, trf_qty', 'application.components.validator.ANumberSwitcherValidator'),
+			array('trx_date, due_date, transfer_type','required','on'=>'header'),
+			array('trf_amt, trf_qty, instruction_type', 'required','on'=>'detail'),
+			
+			array('settle_date, client_cd, beli_jual, stk_cd, price, qty, trx_amt, trf_amt, custodian_cd, instruction_type, trf_qty, contr_num, sum_flg, net_flg, trading_ref','safe')
+		);
+	}
+	
+	function attributeLabels()
+	{
+		return array(
+			'trx_date' => 'Transaction Date',
+			'due_date' => 'Due Date',
+			'transfer_type' => 'Transfer',
+			'trf_amt' => 'Transfer Amount',
+			'trf_qty' => 'Transfer Quantity',
+			'instruction_type' => 'Instruction Type',
+		);
+	}
+}

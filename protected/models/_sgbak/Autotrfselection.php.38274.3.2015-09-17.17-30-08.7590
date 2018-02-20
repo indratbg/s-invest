@@ -1,0 +1,129 @@
+<?php
+class Autotrfselection extends Tfundmovement
+{
+public $tahap;
+public $folder_cd;
+public $gl_acct_bank;
+public $sl_acct_bank;
+public $gl_acct_hutang;
+public $sl_acct_hutang;
+public $remarks;
+public $client_cd;
+public $branch_code;
+public $save_flg='N';
+public $client_name;
+public $auto_trf;
+public $trf_id;
+public $trf_type;
+public $trf_flg_ori;
+public $new_trf_flg;
+public $upd_mode;
+public static function model($className=__CLASS__)
+{
+	return parent::model($className);
+}
+
+public function rules()
+{
+	return array_merge(
+	array(
+	
+		array('doc_num,trf_flg_ori,trf_type,trf_id,auto_trf,save_flg,branch_code,client_name','safe'),
+	
+	),parent::rules());	
+}
+
+
+public static function getAutotrf($doc_date,$fund_bank_cd,$branch_grp,$reselect)
+{
+	$sql="select t.doc_date, t.client_cd, 					
+				decode(t.brch,t.branch_code,t.branch_code,t.brch||'/'||t.branch_code)  branch_code,					
+				t.client_name, t.trx_amt,					
+				to_bank, to_acct, b.prm_desc2 as bank_name,					
+				t.acct_name, t.fee,					
+				decode(f.trf_flg,null,'Y','N','Y','Y','N') auto_trf, t.doc_num,					
+				t.folder_cd, f.trf_flg as trf_flg_ori 					
+				from( select doc_date, brch, trim(branch_code) branch_code,					
+						T_FUND_MOVEMENT.client_cd, client_name,trx_amt, 			
+						to_bank, to_acct,  doc_num, T_FUND_MOVEMENT.acct_name, 			
+						cifs, t_payrech.folder_cd, fee			
+						from( select client_cd, client_name,cifs, 			
+						 	  		 decode(trim(mst_client.rem_cd), 'LOT','LOT',
+				                       decode(trim(mst_client.olt),'N',trim(branch_code),'LOT')) as brch,					
+									 branch_code
+						      from mst_client ) mst_client,			
+						T_FUND_MOVEMENT,  t_payrech			
+						where T_FUND_MOVEMENT.Approved_sts = 'A'			
+						and from_client = 'FUND'			
+						and to_client = 'LUAR'			
+						and doc_date = '$doc_date'			
+						and to_bank is not null			
+						and to_acct is not null			
+						and trx_type = 'W'			
+				      and fund_bank_cd = '$fund_bank_cd'					
+						and T_FUND_MOVEMENT.client_cd = mst_client.client_cd 			
+						and instr('$branch_grp',substr(mst_client.brch,1,2)) >0			
+						and T_FUND_MOVEMENT.doc_ref_num2 = t_payrech.payrec_num(+)			
+				) t,					
+				(					
+				select distinct doc_num, trf_flg					
+				from t_fund_trf					
+				where trf_date = '$doc_date'					
+					) f,				
+				( select prm_cd_2, prm_desc2					
+				from mst_parameter					
+				where prm_cd_1 = 'BANKCD' ) b,					
+				mst_client_bank c					
+				where t.to_bank = b.prm_cd_2 (+)					
+				and t.cifs = c.cifs (+)					
+				and t.to_acct = c.bank_acct_num (+)					
+				and t.doc_num =f.doc_num(+) 					
+				and (( '$reselect' ='N' and nvl(f.trf_flg,'N') = 'N' ) or					
+						( f.doc_num is not null and '$reselect' ='Y'))
+				ORDER BY branch_code,T.CLIENT_CD";
+	return $sql;
+}
+
+
+public function executeSpTrf()
+	{ 
+		$connection  = Yii::app()->db;
+				
+		try{
+			$query  = "CALL SP_T_Fund_Trf_Upd( :p_doc_num,
+	   	  		  							 :p_trf_id,
+	   	  		  							 :p_trf_type,
+	   	  		  							 :p_upd_mode,
+				                             :p_trf_flg,
+				                             :p_user_id,
+				                             :p_error_code,
+				                             :p_error_msg)";
+			
+			$command = $connection->createCommand($query);
+			$command->bindValue(":p_doc_num",$this->doc_num,PDO::PARAM_STR);
+			$command->bindValue(":p_trf_id",$this->trf_id,PDO::PARAM_STR);
+			$command->bindValue(":p_trf_type",$this->trf_type,PDO::PARAM_STR);
+			$command->bindValue(":p_upd_mode",$this->upd_mode,PDO::PARAM_STR);
+			$command->bindValue(":p_trf_flg",$this->new_trf_flg,PDO::PARAM_STR);
+			$command->bindValue(":p_user_id",$this->user_id,PDO::PARAM_STR);		
+			$command->bindParam(":p_error_code",$this->error_code,PDO::PARAM_INT,10);
+			$command->bindParam(":p_error_msg",$this->error_msg,PDO::PARAM_STR,200);
+
+			$command->execute();
+			
+			//Commit baru akan dijalankan saat semua transaksi INSERT sukses
+			
+		}catch(Exception $ex){
+			if($this->error_code = -999)
+				$this->error_msg = $ex->getMessage();
+		}
+		
+		if($this->error_code < 0)
+			$this->addError('error_msg', 'Error '.$this->error_code.' '.$this->error_msg);
+		
+		return $this->error_code;
+	}
+
+}
+
+?>

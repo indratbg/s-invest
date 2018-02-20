@@ -1,0 +1,57 @@
+<?php $form=$this->beginWidget('bootstrap.widgets.TbActiveForm',array( 
+    'action'=>Yii::app()->createUrl($this->route), 
+    'method'=>'get', 
+    'type'=>'horizontal' 
+)); ?>
+
+<h4>Primary Attributes</h4> 
+    <?php echo $form->textFieldRow($model,'user_id',array('class'=>'span5','maxlength'=>8)); ?>
+    <?php echo $form->textFieldRow($model,'user_name',array('class'=>'span5','maxlength'=>40)); ?>
+    <div class="control-group">
+        <?php echo $form->label($model,'expiry_date',array('class'=>'control-label')); ?>
+        <div class="controls">
+            <?php echo $form->textField($model,'expiry_date_date',array('maxlength'=>'2','class'=>'span1','placeholder'=>'dd')); ?>
+            <?php echo $form->textField($model,'expiry_date_month',array('maxlength'=>'2','class'=>'span1','placeholder'=>'mm')); ?>
+            <?php echo $form->textField($model,'expiry_date_year',array('maxlength'=>'4','class'=>'span1','placeholder'=>'yyyy')); ?>
+        </div>
+    </div>
+    
+    <?php echo $form->textFieldRow($model,'dept',array('class'=>'span5','maxlength'=>1)); ?>
+    <?php echo $form->textFieldRow($model,'user_level',array('class'=>'span5','maxlength'=>3)); ?>
+    <?php echo $form->textFieldRow($model,'short_name',array('class'=>'span5','maxlength'=>10)); ?>
+    <?php echo $form->textFieldRow($model,'def_addr_1',array('class'=>'span5','maxlength'=>50)); ?>
+    <?php echo $form->textFieldRow($model,'def_addr_2',array('class'=>'span5','maxlength'=>50)); ?>
+    <?php echo $form->textFieldRow($model,'def_addr_3',array('class'=>'span5','maxlength'=>50)); ?>
+    <?php echo $form->textFieldRow($model,'post_cd',array('class'=>'span5','maxlength'=>6)); ?>
+    <?php echo $form->textFieldRow($model,'regn_cd',array('class'=>'span5','maxlength'=>3)); ?>
+    <?php echo $form->textFieldRow($model,'phone_num',array('class'=>'span5','maxlength'=>15)); ?>
+    <?php echo $form->textFieldRow($model,'ic_type',array('class'=>'span5','maxlength'=>1)); ?>
+    <?php echo $form->textFieldRow($model,'ic_num',array('class'=>'span5','maxlength'=>25)); ?>
+    <?php echo $form->textFieldRow($model,'user_cre_id',array('class'=>'span5','maxlength'=>8)); ?>
+    
+    <div class="control-group">
+        <?php echo $form->label($model,'cre_dt',array('class'=>'control-label')); ?>
+        <div class="controls">
+            <?php echo $form->textField($model,'cre_dt_date',array('maxlength'=>'2','class'=>'span1','placeholder'=>'dd')); ?>
+            <?php echo $form->textField($model,'cre_dt_month',array('maxlength'=>'2','class'=>'span1','placeholder'=>'mm')); ?>
+            <?php echo $form->textField($model,'cre_dt_year',array('maxlength'=>'4','class'=>'span1','placeholder'=>'yyyy')); ?>
+        </div>
+    </div>
+    <div class="control-group">
+        <?php echo $form->label($model,'upd_dt',array('class'=>'control-label')); ?>
+        <div class="controls">
+            <?php echo $form->textField($model,'upd_dt_date',array('maxlength'=>'2','class'=>'span1','placeholder'=>'dd')); ?>
+            <?php echo $form->textField($model,'upd_dt_month',array('maxlength'=>'2','class'=>'span1','placeholder'=>'mm')); ?>
+            <?php echo $form->textField($model,'upd_dt_year',array('maxlength'=>'4','class'=>'span1','placeholder'=>'yyyy')); ?>
+        </div>
+    </div>
+    <?php echo $form->radioButtonListInlineRow($model, 'sts_suspended', AConstant::$susp_status ); ?>
+    <div class="form-actions"> 
+        <?php $this->widget('bootstrap.widgets.TbButton', array( 
+            'buttonType' => 'submit', 
+            'type'=>'primary', 
+            'label'=>'Search', 
+        )); ?>
+    </div> 
+
+<?php $this->endWidget(); ?>

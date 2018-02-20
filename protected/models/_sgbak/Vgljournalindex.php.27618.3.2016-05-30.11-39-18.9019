@@ -1,0 +1,107 @@
+<?php
+
+/**
+ * This is the model class for table "V_GL_JOURNAL_INDEX".
+ *
+ * The followings are the available columns in table 'V_GL_JOURNAL_INDEX':
+ * @property string $jvch_date
+ * @property string $remarks
+ * @property string $folder_cd
+ * @property string $jvch_num
+ * @property string $user_id
+ */
+class Vgljournalindex extends AActiveRecordSP
+{
+	//AH: #BEGIN search (datetime || date) additional comparison
+	public $jvch_date_date;
+	public $jvch_date_month;
+	public $jvch_date_year;
+	public $from_date;
+	public $to_date;
+	public $budget_cd;
+	//AH: #END search (datetime || date)  additional comparison
+	
+	public function __construct($scenario = 'insert')
+	{
+		parent::__construct($scenario);
+		$this->logRecord=true;
+	}
+	
+	public static function model($className=__CLASS__)
+	{
+		return parent::model($className);
+	}
+    
+
+	public function tableName()
+	{
+		return 'V_GL_JOURNAL_INDEX';
+	}
+
+	public function rules()
+	{
+		return array(
+		
+			array('jvch_date', 'application.components.validator.ADatePickerSwitcherValidatorSP'),
+			
+			array('jvch_num', 'required'),
+			array('remarks', 'length', 'max'=>50),
+			array('folder_cd', 'length', 'max'=>8),
+			array('jvch_num', 'length', 'max'=>17),
+			array('user_id', 'length', 'max'=>10),
+			array('budget_cd,from_date,to_date,jvch_date', 'safe'),
+
+			// The following rule is used by search().
+			// Please remove those attributes that should not be searched.
+	
+			array('budget_cd,jvch_date, remarks, folder_cd, jvch_num, user_id,jvch_date_date,jvch_date_month,jvch_date_year', 'safe', 'on'=>'search'),
+		);
+	}
+
+	public function relations()
+	{
+		return array(
+		);
+	}
+
+	public function attributeLabels()
+	{
+		return array(
+			'jvch_date' => 'Date',
+			'remarks' => 'Remarks',
+			'folder_cd' => 'File No.',
+			'jvch_num' => 'Journal Number',
+			'user_id' => 'User ID',
+			'from_date'=>'From Date',
+			'to_date'=>'To Date',
+			'budget_cd'=>'Budget Cd'
+		);
+	}
+
+
+	public function search()
+	{
+		$criteria = new CDbCriteria;
+		if(!empty($this->from_date) && !empty($this->to_date) )
+			$criteria->addCondition("jvch_date between to_date('$this->from_date','dd/mm/yyyy') and to_date('$this->to_date','dd/mm/yyyy')");
+
+
+		if(!empty($this->jvch_date_date))
+			$criteria->addCondition("TO_CHAR(t.jvch_date,'DD') LIKE '%".$this->jvch_date_date."%'");
+		if(!empty($this->jvch_date_month))
+			$criteria->addCondition("TO_CHAR(t.jvch_date,'MM') LIKE '%".$this->jvch_date_month."%'");
+		if(!empty($this->jvch_date_year))
+			$criteria->addCondition("TO_CHAR(t.jvch_date,'YYYY') LIKE '%".$this->jvch_date_year."%'");		
+			$criteria->compare('lower(remarks)',strtolower($this->remarks),true);
+			$criteria->compare('folder_cd',$this->folder_cd,true);
+				$criteria->compare('lower(budget_cd)',strtolower($this->budget_cd),true);
+			$criteria->compare('lower(jvch_num)',strtolower($this->jvch_num),true);
+			$criteria->compare('lower(user_id)',strtolower($this->user_id),true);
+		$sort = new CSort();
+		$sort->defaultOrder = 'jvch_date desc';
+		return new CActiveDataProvider($this, array(
+			'criteria'=>$criteria,
+			'sort'=>$sort
+		));
+	}
+}

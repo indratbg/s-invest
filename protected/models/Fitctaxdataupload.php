@@ -1,0 +1,190 @@
+<?php
+
+/**
+ * This is the model class for table "FI_TC_TAX_DATA_UPLOAD".
+ *
+ * The followings are the available columns in table 'FI_TC_TAX_DATA_UPLOAD':
+ * @property string $transaction_status
+ * @property string $data_type
+ * @property string $tc_reference_no
+ * @property string $trade_date
+ * @property string $settlement_date
+ * @property string $im_code
+ * @property string $im_name
+ * @property string $br_code
+ * @property string $br_name
+ * @property string $security_code
+ * @property string $security_name
+ * @property double $face_value
+ * @property string $acquisition_date
+ * @property string $acquisition_price
+ * @property double $acquisition_amount
+ * @property double $capital_gain
+ * @property integer $days_of_holding_interest
+ * @property double $holding_interest_amount
+ * @property double $total_taxable_income
+ * @property double $tax_rate_in_perc
+ * @property double $tax_amount
+ * @property string $cre_dt
+ * @property string $user_id
+ */
+class Fitctaxdataupload extends AActiveRecordSP
+{
+	//AH: #BEGIN search (datetime || date) additional comparison
+	public $trade_date_date;
+	public $trade_date_month;
+	public $trade_date_year;
+
+	public $settlement_date_date;
+	public $settlement_date_month;
+	public $settlement_date_year;
+
+	public $acquisition_date_date;
+	public $acquisition_date_month;
+	public $acquisition_date_year;
+
+	public $acquisition_price_date;
+	public $acquisition_price_month;
+	public $acquisition_price_year;
+
+	public $cre_dt_date;
+	public $cre_dt_month;
+	public $cre_dt_year;
+	//AH: #END search (datetime || date)  additional comparison
+	
+	public function __construct($scenario = 'insert')
+	{
+		parent::__construct($scenario);
+		$this->logRecord=true;
+	}
+	
+	public static function model($className=__CLASS__)
+	{
+		return parent::model($className);
+	}
+    
+
+	public function tableName()
+	{
+		return 'FI_TC_TAX_DATA_UPLOAD';
+	}
+
+	public function rules()
+	{
+		return array(
+		
+			array('trade_date, settlement_date, acquisition_date, acquisition_price', 'application.components.validator.ADatePickerSwitcherValidatorSP'),
+		
+			array('face_value, acquisition_amount, capital_gain, days_of_holding_interest, holding_interest_amount, total_taxable_income, tax_rate_in_perc, tax_amount', 'application.components.validator.ANumberSwitcherValidator'),
+			
+			array('days_of_holding_interest', 'numerical', 'integerOnly'=>true),
+			array('face_value, acquisition_amount, capital_gain, holding_interest_amount, total_taxable_income, tax_rate_in_perc, tax_amount', 'numerical'),
+			array('transaction_status', 'length', 'max'=>4),
+			array('data_type', 'length', 'max'=>1),
+			array('tc_reference_no', 'length', 'max'=>20),
+			array('im_code, br_code', 'length', 'max'=>5),
+			array('im_name, br_name, security_name', 'length', 'max'=>100),
+			array('security_code', 'length', 'max'=>35),
+			array('user_id', 'length', 'max'=>10),
+			array('trade_date, settlement_date, acquisition_date, acquisition_price, cre_dt', 'safe'),
+
+			// The following rule is used by search().
+			// Please remove those attributes that should not be searched.
+	
+			array('transaction_status, data_type, tc_reference_no, trade_date, settlement_date, im_code, im_name, br_code, br_name, security_code, security_name, face_value, acquisition_date, acquisition_price, acquisition_amount, capital_gain, days_of_holding_interest, holding_interest_amount, total_taxable_income, tax_rate_in_perc, tax_amount, cre_dt, user_id,trade_date_date,trade_date_month,trade_date_year,settlement_date_date,settlement_date_month,settlement_date_year,acquisition_date_date,acquisition_date_month,acquisition_date_year,acquisition_price_date,acquisition_price_month,acquisition_price_year,cre_dt_date,cre_dt_month,cre_dt_year', 'safe', 'on'=>'search'),
+		);
+	}
+
+	public function relations()
+	{
+		return array(
+		);
+	}
+
+	public function attributeLabels()
+	{
+		return array(
+			'transaction_status' => 'Transaction Status',
+			'data_type' => 'Data Type',
+			'tc_reference_no' => 'Tc Reference No',
+			'trade_date' => 'Trade Date',
+			'settlement_date' => 'Settlement Date',
+			'im_code' => 'Im Code',
+			'im_name' => 'Im Name',
+			'br_code' => 'Br Code',
+			'br_name' => 'Br Name',
+			'security_code' => 'Security Code',
+			'security_name' => 'Security Name',
+			'face_value' => 'Face Value',
+			'acquisition_date' => 'Acquisition Date',
+			'acquisition_price' => 'Acquisition Price',
+			'acquisition_amount' => 'Acquisition Amount',
+			'capital_gain' => 'Capital Gain',
+			'days_of_holding_interest' => 'Days Of Holding Interest',
+			'holding_interest_amount' => 'Holding Interest Amount',
+			'total_taxable_income' => 'Total Taxable Income',
+			'tax_rate_in_perc' => 'Tax Rate In Perc',
+			'tax_amount' => 'Tax Amount',
+			'cre_dt' => 'Cre Date',
+			'user_id' => 'User',
+		);
+	}
+
+
+	public function search()
+	{
+		$criteria = new CDbCriteria;
+		$criteria->compare('transaction_status',$this->transaction_status,true);
+		$criteria->compare('data_type',$this->data_type,true);
+		$criteria->compare('tc_reference_no',$this->tc_reference_no,true);
+
+		if(!empty($this->trade_date_date))
+			$criteria->addCondition("TO_CHAR(t.trade_date,'DD') LIKE '%".$this->trade_date_date."%'");
+		if(!empty($this->trade_date_month))
+			$criteria->addCondition("TO_CHAR(t.trade_date,'MM') LIKE '%".$this->trade_date_month."%'");
+		if(!empty($this->trade_date_year))
+			$criteria->addCondition("TO_CHAR(t.trade_date,'YYYY') LIKE '%".$this->trade_date_year."%'");
+		if(!empty($this->settlement_date_date))
+			$criteria->addCondition("TO_CHAR(t.settlement_date,'DD') LIKE '%".$this->settlement_date_date."%'");
+		if(!empty($this->settlement_date_month))
+			$criteria->addCondition("TO_CHAR(t.settlement_date,'MM') LIKE '%".$this->settlement_date_month."%'");
+		if(!empty($this->settlement_date_year))
+			$criteria->addCondition("TO_CHAR(t.settlement_date,'YYYY') LIKE '%".$this->settlement_date_year."%'");		$criteria->compare('im_code',$this->im_code,true);
+		$criteria->compare('im_name',$this->im_name,true);
+		$criteria->compare('br_code',$this->br_code,true);
+		$criteria->compare('br_name',$this->br_name,true);
+		$criteria->compare('security_code',$this->security_code,true);
+		$criteria->compare('security_name',$this->security_name,true);
+		$criteria->compare('face_value',$this->face_value);
+
+		if(!empty($this->acquisition_date_date))
+			$criteria->addCondition("TO_CHAR(t.acquisition_date,'DD') LIKE '%".$this->acquisition_date_date."%'");
+		if(!empty($this->acquisition_date_month))
+			$criteria->addCondition("TO_CHAR(t.acquisition_date,'MM') LIKE '%".$this->acquisition_date_month."%'");
+		if(!empty($this->acquisition_date_year))
+			$criteria->addCondition("TO_CHAR(t.acquisition_date,'YYYY') LIKE '%".$this->acquisition_date_year."%'");
+		if(!empty($this->acquisition_price_date))
+			$criteria->addCondition("TO_CHAR(t.acquisition_price,'DD') LIKE '%".$this->acquisition_price_date."%'");
+		if(!empty($this->acquisition_price_month))
+			$criteria->addCondition("TO_CHAR(t.acquisition_price,'MM') LIKE '%".$this->acquisition_price_month."%'");
+		if(!empty($this->acquisition_price_year))
+			$criteria->addCondition("TO_CHAR(t.acquisition_price,'YYYY') LIKE '%".$this->acquisition_price_year."%'");		$criteria->compare('acquisition_amount',$this->acquisition_amount);
+		$criteria->compare('capital_gain',$this->capital_gain);
+		$criteria->compare('days_of_holding_interest',$this->days_of_holding_interest);
+		$criteria->compare('holding_interest_amount',$this->holding_interest_amount);
+		$criteria->compare('total_taxable_income',$this->total_taxable_income);
+		$criteria->compare('tax_rate_in_perc',$this->tax_rate_in_perc);
+		$criteria->compare('tax_amount',$this->tax_amount);
+
+		if(!empty($this->cre_dt_date))
+			$criteria->addCondition("TO_CHAR(t.cre_dt,'DD') LIKE '%".$this->cre_dt_date."%'");
+		if(!empty($this->cre_dt_month))
+			$criteria->addCondition("TO_CHAR(t.cre_dt,'MM') LIKE '%".$this->cre_dt_month."%'");
+		if(!empty($this->cre_dt_year))
+			$criteria->addCondition("TO_CHAR(t.cre_dt,'YYYY') LIKE '%".$this->cre_dt_year."%'");		$criteria->compare('user_id',$this->user_id,true);
+
+		return new CActiveDataProvider($this, array(
+			'criteria'=>$criteria,
+		));
+	}
+}

@@ -1,0 +1,695 @@
+<?php
+
+/**
+ * This is the model class for table "T_CONTRACTS".
+ *
+ * The followings are the available columns in table 'T_CONTRACTS':
+ * @property string $adv_paymt_flg
+ * @property string $adv_scrip_flg
+ * @property string $amend_dt
+ * @property string $kpei_due_dt
+ * @property string $ksei_due_dt
+ * @property double $amt_for_curr
+ * @property string $brch_cd
+ * @property double $brok
+ * @property double $brok_perc
+ * @property string $can_amd_flg
+ * @property string $client_cd
+ * @property string $client_type
+ * @property double $commission
+ * @property string $contr_dt
+ * @property string $contr_num
+ * @property string $contr_stat
+ * @property string $contra_flag
+ * @property string $contra_num
+ * @property string $cre_dt
+ * @property string $curr_cd
+ * @property string $due_dt_for_amt
+ * @property string $due_dt_for_cert
+ * @property string $exch_cd
+ * @property double $gain_loss_amt
+ * @property string $gain_loss_ind
+ * @property double $levy_perc
+ * @property integer $lot_size
+ * @property string $mrkt_type
+ * @property double $net
+ * @property string $odd_lot_ind
+ * @property double $par_val
+ * @property string $paymt_last_dt
+ * @property double $pph
+ * @property double $pph_perc
+ * @property double $price
+ * @property integer $qty
+ * @property string $rem_cd
+ * @property integer $scrip_days_c
+ * @property string $scrip_last_dt
+ * @property integer $sess_no
+ * @property double $sett_for_curr
+ * @property integer $sett_qty
+ * @property double $sett_val
+ * @property double $settle_curr_tmp
+ * @property string $status
+ * @property string $stk_cd
+ * @property double $trans_levy
+ * @property string $upd_dt
+ * @property string $user_id
+ * @property double $val
+ * @property string $val_stat
+ * @property double $vat
+ * @property double $pph_other_val
+ * @property string $main_rem_cd
+ * @property string $recov_charge_flg
+ * @property string $record_source
+ * @property string $rvpv_number
+ * @property string $doc_ref_num
+ * @property double $levy_tax
+ * @property string $buy_broker_cd
+ * @property string $sell_broker_cd
+ * @property string $approved_dt
+ * @property string $approved_by
+ * @property string $approved_stat
+ * @property integer $broker_lawan_perc
+ */
+class Tcontracts extends AActiveRecordSP
+{
+	//AH: #BEGIN search (datetime || date) additional comparison
+	public $amend_dt_date;
+	public $amend_dt_month;
+	public $amend_dt_year;
+
+	public $kpei_due_dt_date;
+	public $kpei_due_dt_month;
+	public $kpei_due_dt_year;
+
+	public $ksei_due_dt_date;
+	public $ksei_due_dt_month;
+	public $ksei_due_dt_year;
+
+	public $contr_dt_date;
+	public $contr_dt_month;
+	public $contr_dt_year;
+
+	public $cre_dt_date;
+	public $cre_dt_month;
+	public $cre_dt_year;
+
+	public $due_dt_for_amt_date;
+	public $due_dt_for_amt_month;
+	public $due_dt_for_amt_year;
+
+	public $due_dt_for_cert_date;
+	public $due_dt_for_cert_month;
+	public $due_dt_for_cert_year;
+
+	public $paymt_last_dt_date;
+	public $paymt_last_dt_month;
+	public $paymt_last_dt_year;
+
+	public $scrip_last_dt_date;
+	public $scrip_last_dt_month;
+	public $scrip_last_dt_year;
+
+	public $upd_dt_date;
+	public $upd_dt_month;
+	public $upd_dt_year;
+
+	public $approved_dt_date;
+	public $approved_dt_month;
+	public $approved_dt_year;
+	
+	public $belijual;
+	public $lawan_perc;
+	public $stk_desc;
+	public $avg_price;
+	
+	public $correction_reason;
+	
+	//AH: #END search (datetime || date)  additional comparison
+	public $seqno; //seqno used for sp SP_CONTRACT_CORRECTION_UPD
+	public $update_date; //update date for t_many_header
+	public $update_seq; // update seq for t_many_header
+	public $trx_dt;
+	public $grp;
+	public $descrip;
+	public $beli;
+	public $jual;
+	public $entry_qty;
+	public $cancel_flg = 'N';
+	public $save_flg='N';
+	
+	public function __construct($scenario = 'insert')
+	{
+		parent::__construct($scenario);
+		$this->logRecord=true;
+	}
+	
+	public static function model($className=__CLASS__)
+	{
+		return parent::model($className);
+	}
+    
+	protected function afterFind()
+	{
+		$this->contr_dt = Yii::app()->format->cleanDate($this->contr_dt);
+		$this->due_dt_for_amt = Yii::app()->format->cleanDate($this->due_dt_for_amt);
+	}
+
+	public function tableName()
+	{
+		return 'T_CONTRACTS';
+	}
+
+	public function rules()
+	{
+		return array(
+		
+			array('amend_dt, kpei_due_dt, ksei_due_dt, contr_dt, due_dt_for_amt, due_dt_for_cert, paymt_last_dt, scrip_last_dt, approved_dt', 'application.components.validator.ADatePickerSwitcherValidatorSP'),
+		
+			array('amt_for_curr, brok, brok_perc, commission, gain_loss_amt, levy_perc, lot_size, net, par_val, pph, pph_perc, avg_price, price, qty, scrip_days_c, sett_for_curr, sett_qty, sett_val, settle_curr_tmp, trans_levy, val, vat, pph_other_val, levy_tax', 'application.components.validator.ANumberSwitcherValidator'),
+			
+			array('lot_size, qty, scrip_days_c, sess_no, sett_qty', 'numerical', 'integerOnly'=>true),
+			array('correction_reason','required','on'=>'splitting'),
+			array('correction_reason', 'length', 'max'=>200),
+			array('amt_for_curr, brok, brok_perc, broker_lawan_perc, commission, gain_loss_amt, levy_perc, net, par_val, pph, pph_perc, price, sett_for_curr, sett_val, settle_curr_tmp, trans_levy, val, vat, pph_other_val, levy_tax', 'numerical'),
+			array('adv_paymt_flg, adv_scrip_flg, can_amd_flg, contr_stat, contra_flag, gain_loss_ind, odd_lot_ind, status, val_stat, recov_charge_flg, approved_stat', 'length', 'max'=>1),
+			array('brch_cd, curr_cd, exch_cd, rem_cd, main_rem_cd', 'length', 'max'=>3),
+			array('buy_broker_cd, sell_broker_cd', 'length', 'max'=>2),
+			array('client_cd', 'length', 'max'=>12),
+			array('client_type', 'length', 'max'=>4),
+			array('contra_num', 'length', 'max'=>13),
+			array('mrkt_type, record_source', 'length', 'max'=>2),
+			array('stk_cd', 'length', 'max'=>50),
+			array('user_id', 'length', 'max'=>8),
+			array('rvpv_number, doc_ref_num', 'length', 'max'=>17),
+			array('approved_by', 'length', 'max'=>10),
+			array('save_flg,entry_qty,trx_dt,grp,cancel_flg, avg_price,amend_dt, kpei_due_dt, ksei_due_dt, contr_dt, cre_dt, due_dt_for_amt, due_dt_for_cert, paymt_last_dt, scrip_last_dt, upd_dt, approved_dt, lawan_perc, stk_desc, contr_num, belijual', 'safe'),
+			array('due_dt_for_amt, contr_dt, qty, price, stk_cd, client_cd, brok_perc, lawan_perc','required'),
+			// The following rule is used by search().
+			// Please remove those attributes that should not be searched.
+	
+			array('broker_lawan_perc,cancel_flg,avg_price,adv_paymt_flg, adv_scrip_flg, amend_dt, kpei_due_dt, ksei_due_dt, amt_for_curr, brch_cd, brok, brok_perc, can_amd_flg, client_cd, client_type, commission, contr_dt, 
+				contr_num, contr_stat, contra_flag, contr_num, cre_dt, curr_cd, due_dt_for_amt, due_dt_for_cert, exch_cd, gain_loss_amt, gain_loss_ind, levy_perc, lot_size, mrkt_type, 
+				net, odd_lot_ind, par_val, paymt_last_dt, pph, pph_perc, price, qty, rem_cd, scrip_days_c, scrip_last_dt, sess_no, sett_for_curr, sett_qty, sett_val, settle_curr_tmp, 
+				status, stk_cd, trans_levy, upd_dt, user_id, val, val_stat, vat, pph_other_val, main_rem_cd, recov_charge_flg, record_source, rvpv_number, doc_ref_num, levy_tax, 
+				buy_broker_cd, sell_broker_cd, approved_dt, approved_by, approved_stat,amend_dt_date,amend_dt_month,amend_dt_year,kpei_due_dt_date,kpei_due_dt_month,kpei_due_dt_year,
+				ksei_due_dt_date,ksei_due_dt_month,ksei_due_dt_year,contr_dt_date,contr_dt_month,contr_dt_year,cre_dt_date,cre_dt_month,cre_dt_year,due_dt_for_amt_date,
+				due_dt_for_amt_month,due_dt_for_amt_year,due_dt_for_cert_date,due_dt_for_cert_month,due_dt_for_cert_year,paymt_last_dt_date,paymt_last_dt_month,paymt_last_dt_year,
+				scrip_last_dt_date,scrip_last_dt_month,scrip_last_dt_year,upd_dt_date,upd_dt_month,upd_dt_year,approved_dt_date,approved_dt_month,approved_dt_year', 'safe', 'on'=>'search'),
+		);
+	}
+
+	public function relations()
+	{
+		return array(
+			'counter' => array(self::BELONGS_TO, 'Counter', array('stk_cd'=>'stk_cd')),
+			'client' => array(self::BELONGS_TO, 'Client', array('client_cd'=>'client_cd')),
+			'sellbroker' => array(self::BELONGS_TO, 'Client', array('sell_broker_cd'=>'client_cd')),
+			'buybroker' => array(self::BELONGS_TO, 'Client', array('buy_broker_cd'=>'client_cd'))
+		);
+	}
+
+	public function attributeLabels()
+	{
+		return array(
+			'correction_reason'=>'Correction Reason',
+			'adv_paymt_flg' => 'Adv Paymt Flg',
+			'adv_scrip_flg' => 'Adv Scrip Flg',
+			'amend_dt' => 'Amend Date',
+			'kpei_due_dt' => 'Kpei Due Date',
+			'ksei_due_dt' => 'Ksei Due Date',
+			'amt_for_curr' => 'Amt For Curr',
+			'brch_cd' => 'Brch Code',
+			'brok' => 'Brok',
+			'brok_perc' => 'Commission %',
+			'lawan_perc' => 'Commission %',
+			'can_amd_flg' => 'Can Amd Flg',
+			'client_cd' => 'Client Code',
+			'client_type' => 'Client Type',
+			'commission' => 'Commission',
+			'contr_dt' => 'Transaction Date',
+			'contr_num' => 'Contr Num',
+			'contr_stat' => 'Contr Stat',
+			'contra_flag' => 'Contra Flag',
+			'contra_num' => 'Contra Num',
+			'cre_dt' => 'Cre Date',
+			'curr_cd' => 'Curr Code',
+			'due_dt_for_amt' => 'Due Date',
+			'due_dt_for_cert' => 'Due Date For Cert',
+			'exch_cd' => 'Exch Code',
+			'gain_loss_amt' => 'Broker Lawan %',
+			'gain_loss_ind' => 'Gain Loss Ind',
+			'levy_perc' => 'Levy Perc',
+			'lot_size' => 'Lot Size',
+			'mrkt_type' => 'Market',
+			'net' => 'Net',
+			'odd_lot_ind' => 'Odd Lot Ind',
+			'par_val' => 'Par Val',
+			'paymt_last_dt' => 'Paymt Last Date',
+			'pph' => 'Pph',
+			'pph_perc' => 'Pph Perc',
+			'price' => 'Price',
+			'qty' => 'Quantity',
+			'rem_cd' => 'Sales',
+			'scrip_days_c' => 'Scrip Days C',
+			'scrip_last_dt' => 'Scrip Last Date',
+			'sess_no' => 'Sess No',
+			'sett_for_curr' => 'Sett For Curr',
+			'sett_qty' => 'Sett Qty',
+			'sett_val' => 'Sett Val',
+			'settle_curr_tmp' => 'Settle Curr Tmp',
+			'status' => 'Status',
+			'stk_cd' => 'Stock',
+			'trans_levy' => 'Trans Levy',
+			'upd_dt' => 'Upd Date',
+			'user_id' => 'User',
+			'val' => 'Val',
+			'val_stat' => 'Val Stat',
+			'vat' => 'Vat',
+			'pph_other_val' => 'Pph Other Val',
+			'main_rem_cd' => 'Main Rem Code',
+			'recov_charge_flg' => 'Recov Charge Flg',
+			'record_source' => 'Record Source',
+			'rvpv_number' => 'Rvpv Number',
+			'doc_ref_num' => 'Doc Ref Num',
+			'levy_tax' => 'Levy Tax',
+			'buy_broker_cd' => 'Buy Broker Code',
+			'sell_broker_cd' => 'Sell Broker Code',
+			'approved_dt' => 'Approved Date',
+			'approved_by' => 'Approved By',
+			'approved_stat' => 'Approved Sts',
+			'belijual' => 'Beli / Jual',
+			'stk_desc' => 'Stock Desc',
+			'avg_price' => 'Average Price',
+			'broker_lawan_perc' => 'Broker Commission %'
+		);
+	}
+
+
+	public function search()
+	{
+		$criteria = new CDbCriteria;
+		$criteria->compare('adv_paymt_flg',$this->adv_paymt_flg,true);
+		$criteria->compare('adv_scrip_flg',$this->adv_scrip_flg,true);
+
+		if(!empty($this->amend_dt_date))
+			$criteria->addCondition("TO_CHAR(t.amend_dt,'DD') LIKE '%".($this->amend_dt_date)."%'");
+		if(!empty($this->amend_dt_month))
+			$criteria->addCondition("TO_CHAR(t.amend_dt,'MM') LIKE '%".($this->amend_dt_month)."%'");
+		if(!empty($this->amend_dt_year))
+			$criteria->addCondition("TO_CHAR(t.amend_dt,'YYYY') LIKE '%".($this->amend_dt_year)."%'");
+		if(!empty($this->kpei_due_dt_date))
+			$criteria->addCondition("TO_CHAR(t.kpei_due_dt,'DD') LIKE '%".($this->kpei_due_dt_date)."%'");
+		if(!empty($this->kpei_due_dt_month))
+			$criteria->addCondition("TO_CHAR(t.kpei_due_dt,'MM') LIKE '%".($this->kpei_due_dt_month)."%'");
+		if(!empty($this->kpei_due_dt_year))
+			$criteria->addCondition("TO_CHAR(t.kpei_due_dt,'YYYY') LIKE '%".($this->kpei_due_dt_year)."%'");
+		if(!empty($this->ksei_due_dt_date))
+			$criteria->addCondition("TO_CHAR(t.ksei_due_dt,'DD') LIKE '%".($this->ksei_due_dt_date)."%'");
+		if(!empty($this->ksei_due_dt_month))
+			$criteria->addCondition("TO_CHAR(t.ksei_due_dt,'MM') LIKE '%".($this->ksei_due_dt_month)."%'");
+		if(!empty($this->ksei_due_dt_year))
+			$criteria->addCondition("TO_CHAR(t.ksei_due_dt,'YYYY') LIKE '%".($this->ksei_due_dt_year)."%'");		$criteria->compare('amt_for_curr',$this->amt_for_curr);
+		$criteria->compare('brch_cd',$this->brch_cd,true);
+		$criteria->compare('brok',$this->brok);
+		$criteria->compare('brok_perc',$this->brok_perc);
+		$criteria->compare('can_amd_flg',$this->can_amd_flg,true);
+		$criteria->compare('client_cd',$this->client_cd,true);
+		$criteria->compare('client_type',$this->client_type,true);
+		$criteria->compare('commission',$this->commission);
+
+		if(!empty($this->contr_dt_date))
+			$criteria->addCondition("TO_CHAR(t.contr_dt,'DD') LIKE '%".($this->contr_dt_date)."%'");
+		if(!empty($this->contr_dt_month))
+			$criteria->addCondition("TO_CHAR(t.contr_dt,'MM') LIKE '%".($this->contr_dt_month)."%'");
+		if(!empty($this->contr_dt_year))
+			$criteria->addCondition("TO_CHAR(t.contr_dt,'YYYY') LIKE '%".($this->contr_dt_year)."%'");		$criteria->compare('contr_num',$this->contr_num,true);
+		$criteria->compare('contr_stat',$this->contr_stat,true);
+		$criteria->compare('contra_flag',$this->contra_flag,true);
+		$criteria->compare('contra_num',$this->contra_num,true);
+
+		if(!empty($this->cre_dt_date))
+			$criteria->addCondition("TO_CHAR(t.cre_dt,'DD') LIKE '%".($this->cre_dt_date)."%'");
+		if(!empty($this->cre_dt_month))
+			$criteria->addCondition("TO_CHAR(t.cre_dt,'MM') LIKE '%".($this->cre_dt_month)."%'");
+		if(!empty($this->cre_dt_year))
+			$criteria->addCondition("TO_CHAR(t.cre_dt,'YYYY') LIKE '%".($this->cre_dt_year)."%'");		$criteria->compare('curr_cd',$this->curr_cd,true);
+
+		if(!empty($this->due_dt_for_amt_date))
+			$criteria->addCondition("TO_CHAR(t.due_dt_for_amt,'DD') LIKE '%".($this->due_dt_for_amt_date)."%'");
+		if(!empty($this->due_dt_for_amt_month))
+			$criteria->addCondition("TO_CHAR(t.due_dt_for_amt,'MM') LIKE '%".($this->due_dt_for_amt_month)."%'");
+		if(!empty($this->due_dt_for_amt_year))
+			$criteria->addCondition("TO_CHAR(t.due_dt_for_amt,'YYYY') LIKE '%".($this->due_dt_for_amt_year)."%'");
+		if(!empty($this->due_dt_for_cert_date))
+			$criteria->addCondition("TO_CHAR(t.due_dt_for_cert,'DD') LIKE '%".($this->due_dt_for_cert_date)."%'");
+		if(!empty($this->due_dt_for_cert_month))
+			$criteria->addCondition("TO_CHAR(t.due_dt_for_cert,'MM') LIKE '%".($this->due_dt_for_cert_month)."%'");
+		if(!empty($this->due_dt_for_cert_year))
+			$criteria->addCondition("TO_CHAR(t.due_dt_for_cert,'YYYY') LIKE '%".($this->due_dt_for_cert_year)."%'");		$criteria->compare('exch_cd',$this->exch_cd,true);
+		$criteria->compare('gain_loss_amt',$this->gain_loss_amt);
+		$criteria->compare('gain_loss_ind',$this->gain_loss_ind,true);
+		$criteria->compare('levy_perc',$this->levy_perc);
+		$criteria->compare('lot_size',$this->lot_size);
+		$criteria->compare('mrkt_type',$this->mrkt_type,true);
+		$criteria->compare('net',$this->net);
+		$criteria->compare('odd_lot_ind',$this->odd_lot_ind,true);
+		$criteria->compare('par_val',$this->par_val);
+
+		if(!empty($this->paymt_last_dt_date))
+			$criteria->addCondition("TO_CHAR(t.paymt_last_dt,'DD') LIKE '%".($this->paymt_last_dt_date)."%'");
+		if(!empty($this->paymt_last_dt_month))
+			$criteria->addCondition("TO_CHAR(t.paymt_last_dt,'MM') LIKE '%".($this->paymt_last_dt_month)."%'");
+		if(!empty($this->paymt_last_dt_year))
+			$criteria->addCondition("TO_CHAR(t.paymt_last_dt,'YYYY') LIKE '%".($this->paymt_last_dt_year)."%'");		$criteria->compare('pph',$this->pph);
+		$criteria->compare('pph_perc',$this->pph_perc);
+		$criteria->compare('price',$this->price);
+		$criteria->compare('qty',$this->qty);
+		$criteria->compare('rem_cd',$this->rem_cd,true);
+		$criteria->compare('scrip_days_c',$this->scrip_days_c);
+
+		if(!empty($this->scrip_last_dt_date))
+			$criteria->addCondition("TO_CHAR(t.scrip_last_dt,'DD') LIKE '%".($this->scrip_last_dt_date)."%'");
+		if(!empty($this->scrip_last_dt_month))
+			$criteria->addCondition("TO_CHAR(t.scrip_last_dt,'MM') LIKE '%".($this->scrip_last_dt_month)."%'");
+		if(!empty($this->scrip_last_dt_year))
+			$criteria->addCondition("TO_CHAR(t.scrip_last_dt,'YYYY') LIKE '%".($this->scrip_last_dt_year)."%'");		$criteria->compare('sess_no',$this->sess_no);
+		$criteria->compare('sett_for_curr',$this->sett_for_curr);
+		$criteria->compare('sett_qty',$this->sett_qty);
+		$criteria->compare('sett_val',$this->sett_val);
+		$criteria->compare('settle_curr_tmp',$this->settle_curr_tmp);
+		$criteria->compare('status',$this->status,true);
+		$criteria->compare('stk_cd',$this->stk_cd,true);
+		$criteria->compare('trans_levy',$this->trans_levy);
+
+		if(!empty($this->upd_dt_date))
+			$criteria->addCondition("TO_CHAR(t.upd_dt,'DD') LIKE '%".($this->upd_dt_date)."%'");
+		if(!empty($this->upd_dt_month))
+			$criteria->addCondition("TO_CHAR(t.upd_dt,'MM') LIKE '%".($this->upd_dt_month)."%'");
+		if(!empty($this->upd_dt_year))
+			$criteria->addCondition("TO_CHAR(t.upd_dt,'YYYY') LIKE '%".($this->upd_dt_year)."%'");		$criteria->compare('user_id',$this->user_id,true);
+		$criteria->compare('val',$this->val);
+		$criteria->compare('val_stat',$this->val_stat,true);
+		$criteria->compare('vat',$this->vat);
+		$criteria->compare('pph_other_val',$this->pph_other_val);
+		$criteria->compare('main_rem_cd',$this->main_rem_cd,true);
+		$criteria->compare('recov_charge_flg',$this->recov_charge_flg,true);
+		$criteria->compare('record_source',$this->record_source,true);
+		$criteria->compare('rvpv_number',$this->rvpv_number,true);
+		$criteria->compare('doc_ref_num',$this->doc_ref_num,true);
+		$criteria->compare('levy_tax',$this->levy_tax);
+		$criteria->compare('buy_broker_cd',$this->buy_broker_cd,true);
+		$criteria->compare('sell_broker_cd',$this->sell_broker_cd,true);
+
+		if(!empty($this->approved_dt_date))
+			$criteria->addCondition("TO_CHAR(t.approved_dt,'DD') LIKE '%".($this->approved_dt_date)."%'");
+		if(!empty($this->approved_dt_month))
+			$criteria->addCondition("TO_CHAR(t.approved_dt,'MM') LIKE '%".($this->approved_dt_month)."%'");
+		if(!empty($this->approved_dt_year))
+			$criteria->addCondition("TO_CHAR(t.approved_dt,'YYYY') LIKE '%".($this->approved_dt_year)."%'");		$criteria->compare('approved_by',$this->approved_by,true);
+		$criteria->compare('approved_stat',$this->approved_stat,true);
+
+		return new CActiveDataProvider($this, array(
+			'criteria'=>$criteria,
+		));
+	}
+
+	public function executeSpIntra($exec_status)
+	{
+		$connection  = Yii::app()->db;
+		$transaction = $connection->beginTransaction();
+		
+		try{
+			$query  = "CALL SP_CONTR_INTRABROKER_UPD(:P_SEARCH_CONTR_NUM,TO_DATE(:P_CONTR_DT,'YYYY-MM-DD'),:P_BELI_JUAL,:P_CLIENT_CD,:P_STK_CD,:P_QTY,:P_PRICE,TO_DATE(:P_DUE_DT_FOR_AMT,'YYYY-MM-DD'), 
+						:P_BROKER_PERC,:P_BROKER,:P_LAWAN_PERC,:P_USER_ID,
+						:P_UPD_STATUS,:P_IP_ADDRESS,:P_CANCEL_REASON,:P_ERROR_CODE,:P_ERROR_MSG)";
+					
+			$command = $connection->createCommand($query);
+			
+			$command->bindValue(":P_SEARCH_CONTR_NUM",$this->contr_num,PDO::PARAM_STR);
+			$command->bindValue(":P_CONTR_DT",$this->contr_dt,PDO::PARAM_STR);
+			$command->bindValue(":P_BELI_JUAL",$this->belijual,PDO::PARAM_STR);
+			$command->bindValue(":P_CLIENT_CD",$this->client_cd,PDO::PARAM_STR);
+			$command->bindValue(":P_STK_CD",$this->stk_cd,PDO::PARAM_STR);
+			$command->bindValue(":P_QTY",$this->qty,PDO::PARAM_STR);
+			$command->bindValue(":P_PRICE",$this->price,PDO::PARAM_STR);
+			$command->bindValue(":P_DUE_DT_FOR_AMT",$this->due_dt_for_amt,PDO::PARAM_STR);
+			$command->bindValue(":P_BROKER_PERC",$this->brok_perc*100,PDO::PARAM_STR);
+			if($this->buy_broker_cd){
+				$command->bindValue(":P_BROKER",$this->buy_broker_cd,PDO::PARAM_STR);
+			}else{
+				$command->bindValue(":P_BROKER",$this->sell_broker_cd,PDO::PARAM_STR);
+			}
+			$command->bindValue(":P_LAWAN_PERC",$this->lawan_perc*100,PDO::PARAM_STR);
+			
+			$command->bindValue(":P_USER_ID",$this->user_id,PDO::PARAM_STR);			
+			$command->bindValue(":P_UPD_STATUS",$exec_status,PDO::PARAM_STR);
+			$command->bindValue(":P_IP_ADDRESS",$this->ip_address,PDO::PARAM_STR);
+			$command->bindValue(":P_CANCEL_REASON",$this->correction_reason,PDO::PARAM_STR);
+			
+			$command->bindParam(":P_ERROR_CODE",$this->error_code,PDO::PARAM_INT,10);
+			$command->bindParam(":P_ERROR_MSG",$this->error_msg,PDO::PARAM_STR,200);
+			
+			$command->execute();
+			$transaction->commit();
+		}catch(Exception $ex){
+			$transaction->rollback();
+			if($this->error_code == -999)
+				$this->error_msg = $ex->getMessage();
+		}
+		
+		if($this->error_code < 0)
+			$this->addError('error_msg', 'Error '.$this->error_code.' '.$this->error_msg);
+		
+		
+		return $this->error_code;
+	}
+	
+	public function executeSpManyHeader($exec_status,$menuName,&$transaction)
+	{
+		$connection  = Yii::app()->db;
+		$transaction = $connection->beginTransaction();	
+		
+		try{
+			$query  = "CALL SP_T_MANY_HEADER_INSERT(
+						:P_MENU_NAME,
+						:P_STATUS,
+						:P_USER_ID,
+						:P_IP_ADDRESS,
+						:P_CANCEL_REASON,
+						:P_UPDATE_DATE,
+						:P_UPDATE_SEQ,
+						:P_ERROR_CODE,
+						:P_ERROR_MSG)";
+			
+						
+			$command = $connection->createCommand($query);
+			$command->bindValue(":P_MENU_NAME",$menuName,PDO::PARAM_STR);
+			$command->bindValue(":P_STATUS",$exec_status,PDO::PARAM_STR);
+			$command->bindValue(":P_USER_ID",$this->user_id,PDO::PARAM_STR);			
+			$command->bindValue(":P_IP_ADDRESS",$this->ip_address,PDO::PARAM_STR);
+			$command->bindValue(":P_CANCEL_REASON",$this->correction_reason,PDO::PARAM_STR);
+			
+			$command->bindParam(":P_UPDATE_DATE",$this->update_date,PDO::PARAM_STR,30);
+			$command->bindParam(":P_UPDATE_SEQ",$this->update_seq,PDO::PARAM_STR,10);
+			$command->bindParam(":P_ERROR_CODE",$this->error_code,PDO::PARAM_INT,10);
+			$command->bindParam(":P_ERROR_MSG",$this->error_msg,PDO::PARAM_STR,200);
+
+			$command->execute();
+			
+			//Commit baru akan dijalankan saat semua transaksi INSERT sukses
+			
+		}catch(Exception $ex){
+			$transaction->rollback();
+			if($this->error_code = -999)
+				$this->error_msg = $ex->getMessage();
+		}
+		
+		if($this->error_code < 0)
+			$this->addError('error_msg', 'Error '.$this->error_code.' '.$this->error_msg);
+		
+		return $this->error_code;
+	}
+
+	public function executeSpAvgPrice($exec_status,$record_seq,$tot_qty,$tot_brok,$tot_commission,$tot_val,$tot_trans_levy,$tot_vat,$tot_pph,$bj,&$transaction)
+	{
+		$connection  = Yii::app()->db;
+		
+		try{
+			$query  = "CALL SP_CONTRACT_AVGPRICE_UPD(:P_SEARCH_CONTR_NUM,:P_BELIJUAL,:P_SEQNO,:P_CLIENT_CD,:P_QTY,
+						TO_DATE(:P_DUE_DT_FOR_AMT,'YYYY-MM-DD'),:P_BROKER_PERC,:P_PRICE,:P_TOT_QTY,:P_TOT_BROK,:P_TOT_COMMISSION,:P_TOT_KPEI,
+						:P_TOT_LEVY,:P_TOT_VAT,:P_TOT_PPH,:P_USER_ID, 
+						:P_UPD_STATUS,:P_IP_ADDRESS,:P_CANCEL_REASON,TO_DATE(:P_UPDATE_DATE,'YYYY-MM-DD HH24:MI:SS'),
+						:P_UPDATE_SEQ,:P_RECORD_SEQ,:P_ERROR_CODE,:P_ERROR_MSG)";
+					
+			$command = $connection->createCommand($query);
+			
+			$command->bindValue(":P_SEARCH_CONTR_NUM",$this->contr_num,PDO::PARAM_STR);
+			$command->bindValue(":P_BELIJUAL",$bj,PDO::PARAM_STR);
+			$command->bindValue(":P_SEQNO",$this->seqno,PDO::PARAM_STR);
+			$command->bindValue(":P_CLIENT_CD",$this->client_cd,PDO::PARAM_STR);
+			$command->bindValue(":P_QTY",$this->qty,PDO::PARAM_STR);
+			$command->bindValue(":P_DUE_DT_FOR_AMT",$this->due_dt_for_amt,PDO::PARAM_STR);
+			$command->bindValue(":P_BROKER_PERC",$this->brok_perc*100,PDO::PARAM_STR);
+			
+			$command->bindValue(":P_PRICE",$this->avg_price,PDO::PARAM_STR);
+			$command->bindValue(":P_TOT_QTY",$tot_qty,PDO::PARAM_STR);
+			$command->bindValue(":P_TOT_BROK",$tot_brok,PDO::PARAM_STR);
+			$command->bindValue(":P_TOT_COMMISSION",$tot_commission,PDO::PARAM_STR);
+			$command->bindValue(":P_TOT_KPEI",$tot_val,PDO::PARAM_STR);
+			$command->bindValue(":P_TOT_LEVY",$tot_trans_levy,PDO::PARAM_STR);
+			$command->bindValue(":P_TOT_VAT",$tot_vat,PDO::PARAM_STR);
+			$command->bindValue(":P_TOT_PPH",$tot_pph,PDO::PARAM_STR);
+			
+			$command->bindValue(":P_USER_ID",$this->user_id,PDO::PARAM_STR);			
+			$command->bindValue(":P_UPD_STATUS",$exec_status,PDO::PARAM_STR);
+			$command->bindValue(":P_IP_ADDRESS",$this->ip_address,PDO::PARAM_STR);
+			$command->bindValue(":P_CANCEL_REASON",$this->correction_reason,PDO::PARAM_STR);
+			$command->bindValue(":P_UPDATE_DATE",$this->update_date,PDO::PARAM_STR);
+			$command->bindValue(":P_UPDATE_SEQ",$this->update_seq,PDO::PARAM_STR);
+			$command->bindValue(":P_RECORD_SEQ",$record_seq,PDO::PARAM_STR);
+			
+			$command->bindParam(":P_ERROR_CODE",$this->error_code,PDO::PARAM_INT,10);
+			$command->bindParam(":P_ERROR_MSG",$this->error_msg,PDO::PARAM_STR,200);
+			
+			$command->execute();
+		}catch(Exception $ex){
+			if($this->error_code < 1){
+				$transaction->rollback();
+				$this->error_msg = $ex->getMessage();
+			}
+		}
+		
+		if($this->error_code < 0)
+			$this->addError('error_msg', 'Error '.$this->error_code.' '.$this->error_msg);
+		
+		
+		return $this->error_code;
+	}
+
+	public function executeSpCancelContract($exec_status,$record_seq,&$transaction)
+	{
+		$connection  = Yii::app()->db;
+		
+		try{
+			$query  = "CALL SP_CONTRACT_AVGPRICE_CANCEL(:P_SEARCH_CONTR_NUM,:P_USER_ID, 
+						:P_UPD_STATUS,:P_IP_ADDRESS,:P_CANCEL_REASON,TO_DATE(:P_UPDATE_DATE,'YYYY-MM-DD HH24:MI:SS'),
+						:P_UPDATE_SEQ,:P_RECORD_SEQ,:P_ERROR_CODE,:P_ERROR_MSG)";
+					
+			$command = $connection->createCommand($query);
+			
+			$command->bindValue(":P_SEARCH_CONTR_NUM",$this->contr_num,PDO::PARAM_STR);
+			
+			$command->bindValue(":P_USER_ID",$this->user_id,PDO::PARAM_STR);			
+			$command->bindValue(":P_UPD_STATUS",$exec_status,PDO::PARAM_STR);
+			$command->bindValue(":P_IP_ADDRESS",$this->ip_address,PDO::PARAM_STR);
+			$command->bindValue(":P_CANCEL_REASON",$this->correction_reason,PDO::PARAM_STR);
+			$command->bindValue(":P_UPDATE_DATE",$this->update_date,PDO::PARAM_STR);
+			$command->bindValue(":P_UPDATE_SEQ",$this->update_seq,PDO::PARAM_STR);
+			$command->bindValue(":P_RECORD_SEQ",$record_seq,PDO::PARAM_STR);
+			
+			$command->bindParam(":P_ERROR_CODE",$this->error_code,PDO::PARAM_INT,10);
+			$command->bindParam(":P_ERROR_MSG",$this->error_msg,PDO::PARAM_STR,200);
+			
+			$command->execute();
+		}catch(Exception $ex){
+			if($this->error_code < 1){
+				$transaction->rollback();
+				$this->error_msg = $ex->getMessage();
+			}
+		}
+		
+		if($this->error_code < 0)
+			$this->addError('error_msg', 'Error '.$this->error_code.' '.$this->error_msg);
+		
+		
+		return $this->error_code;
+	}
+
+	public function executeSpCancelAvgPrice($exec_status,$contr_num,$record_seq,&$transaction)
+	{
+		$connection  = Yii::app()->db;
+		
+		try{
+			$query  = "CALL SP_CANCEL_AVGPRICE_UPD(:P_CONTR_NUM, :P_REVERSAL_JUR, TO_DATE(:P_CONTR_DT,'YYYY-MM-DD'),:P_STK_CD,
+						:P_USER_ID,:P_UPD_STATUS,:P_IP_ADDRESS,:P_CANCEL_REASON,TO_DATE(:P_UPDATE_DATE,'YYYY-MM-DD HH24:MI:SS'),
+						:P_UPDATE_SEQ,:P_RECORD_SEQ,:P_ERROR_CODE,:P_ERROR_MSG)";
+					
+			$command = $connection->createCommand($query);
+			
+			$command->bindValue(":P_CONTR_NUM",$contr_num,PDO::PARAM_STR);
+			$command->bindValue(":P_REVERSAL_JUR",$this->reversal_jur,PDO::PARAM_STR);
+			$command->bindValue(":P_CONTR_DT",$this->contr_dt,PDO::PARAM_STR);
+			$command->bindValue(":P_STK_CD",$this->stk_cd,PDO::PARAM_STR);
+			
+			$command->bindValue(":P_USER_ID",$this->user_id,PDO::PARAM_STR);			
+			$command->bindValue(":P_UPD_STATUS",$exec_status,PDO::PARAM_STR);
+			$command->bindValue(":P_IP_ADDRESS",$this->ip_address,PDO::PARAM_STR);
+			$command->bindValue(":P_CANCEL_REASON",$this->correction_reason,PDO::PARAM_STR);
+			$command->bindValue(":P_UPDATE_DATE",$this->update_date,PDO::PARAM_STR);
+			$command->bindValue(":P_UPDATE_SEQ",$this->update_seq,PDO::PARAM_STR);
+			$command->bindValue(":P_RECORD_SEQ",$record_seq,PDO::PARAM_STR);
+			
+			$command->bindParam(":P_ERROR_CODE",$this->error_code,PDO::PARAM_INT,10);
+			$command->bindParam(":P_ERROR_MSG",$this->error_msg,PDO::PARAM_STR,200);
+			
+			$command->execute();
+		}catch(Exception $ex){
+			if($this->error_code < 1){
+				//$transaction->rollback();
+				$this->error_msg = $ex->getMessage();
+			}
+		}
+		
+		if($this->error_code < 0)
+			$this->addError('error_msg', 'Error '.$this->error_code.' '.$this->error_msg);
+		
+		
+		return $this->error_code;
+	}
+
+	public function executeSp($exec_status,$record_seq,$bj,&$transaction)
+	{
+		$connection  = Yii::app()->db;
+		
+		try{
+			$query  = "CALL SP_CONTRACT_CORRECTION_UPD(:P_SEARCH_CONTR_NUM,:P_BELIJUAL,:P_SEQNO,:P_CLIENT_CD,:P_QTY,
+						TO_DATE(:P_DUE_DT_FOR_AMT,'YYYY-MM-DD'), :P_BROKER_PERC,:P_USER_ID, 
+						:P_UPD_STATUS,:P_IP_ADDRESS,:P_CANCEL_REASON,TO_DATE(:P_UPDATE_DATE,'YYYY-MM-DD HH24:MI:SS'),
+						:P_UPDATE_SEQ,:P_RECORD_SEQ,:P_ERROR_CODE,:P_ERROR_MSG)";
+					
+			$command = $connection->createCommand($query);
+			
+			$command->bindValue(":P_SEARCH_CONTR_NUM",$this->contr_num,PDO::PARAM_STR);
+			$command->bindValue(":P_BELIJUAL",$bj,PDO::PARAM_STR);
+			$command->bindValue(":P_SEQNO",$this->seqno,PDO::PARAM_STR);
+			$command->bindValue(":P_CLIENT_CD",$this->client_cd,PDO::PARAM_STR);
+			$command->bindValue(":P_QTY",$this->qty,PDO::PARAM_STR);
+			$command->bindValue(":P_DUE_DT_FOR_AMT",$this->due_dt_for_amt,PDO::PARAM_STR);
+			$command->bindValue(":P_BROKER_PERC",$this->brok_perc*100,PDO::PARAM_STR);
+			
+			$command->bindValue(":P_USER_ID",$this->user_id,PDO::PARAM_STR);			
+			$command->bindValue(":P_UPD_STATUS",$exec_status,PDO::PARAM_STR);
+			$command->bindValue(":P_IP_ADDRESS",$this->ip_address,PDO::PARAM_STR);
+			$command->bindValue(":P_CANCEL_REASON",$this->correction_reason,PDO::PARAM_STR);
+			$command->bindValue(":P_UPDATE_DATE",$this->update_date,PDO::PARAM_STR);
+			$command->bindValue(":P_UPDATE_SEQ",$this->update_seq,PDO::PARAM_STR);
+			$command->bindValue(":P_RECORD_SEQ",$record_seq,PDO::PARAM_STR);
+			
+			$command->bindParam(":P_ERROR_CODE",$this->error_code,PDO::PARAM_INT,10);
+			$command->bindParam(":P_ERROR_MSG",$this->error_msg,PDO::PARAM_STR,200);
+			
+			$command->execute();
+		}catch(Exception $ex){
+			if($this->error_code < 1){
+				$transaction->rollback();
+				$this->error_msg = $ex->getMessage();
+			}
+		}
+		
+		if($this->error_code < 0)
+			$this->addError('error_msg', 'Error '.$this->error_code.' '.$this->error_msg);
+		
+		
+		return $this->error_code;
+	}
+}

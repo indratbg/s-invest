@@ -1,0 +1,2 @@
+Transaction Status,TC Reference ID,Data Type,TC Reference No.,Trade Date,Settlement Date,BR Code,IM Code,Counterparty Code,Fund Code,Security Code,Buy/Sell,Price,Face Value,Proceeds,Last Coupon Date,Next Coupon Date,Accrued Days,Accrued Interest Amount,Other Fee,Capital Gain Tax,Interest Income Tax,Withholding Tax,Net Proceeds,Seller's Tax ID,Purpose of Transaction
+NEWM,,1,1700234,20170725,20170727,YJ001,GMT01,BCA01,GMT01FICDANOBP00,FR0074,2,101.85,10000000000,10185000000,20170215,20170815,162,335640000,,750000,0,,10519890000,013591318054000     ,2

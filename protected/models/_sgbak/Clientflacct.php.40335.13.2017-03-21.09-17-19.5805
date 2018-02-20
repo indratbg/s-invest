@@ -1,0 +1,332 @@
+<?php
+
+/**
+ * This is the model class for table "MST_CLIENT_FLACCT".
+ *
+ * The followings are the available columns in table 'MST_CLIENT_FLACCT':
+ * @property string $client_cd
+ * @property string $bank_cd
+ * @property string $bank_acct_num
+ * @property string $acct_name
+ * @property string $acct_stat
+ * @property string $bank_short_name
+ * @property string $bank_acct_fmt
+ * @property string $cre_dt
+ * @property string $user_id
+ * @property string $upd_dt
+ * @property string $upd_user_id
+ * @property string $approved_dt
+ * @property string $approved_by
+ * @property string $approved_stat
+ * @property string $from_dt
+ * @property string $to_dt
+ */
+class Clientflacct extends AActiveRecordSP
+{
+	//AH: #BEGIN search (datetime || date) additional comparison
+	public $cre_dt_date;
+	public $cre_dt_month;
+	public $cre_dt_year;
+
+	public $upd_dt_date;
+	public $upd_dt_month;
+	public $upd_dt_year;
+
+	public $approved_dt_date;
+	public $approved_dt_month;
+	public $approved_dt_year;
+	//AH: #END search (datetime || date)  additional comparison
+	
+	public $account_format;
+	public $is_format_null;
+	public $update_date;
+	public $update_seq;
+	public $record_seq;
+	//AH : For closing Investor Account 
+	public $saldo_rdi;
+	public $shw_btn_conf;
+	//AH : End  For closing Investor Account
+	public function __construct($scenario = 'insert')
+	{
+		parent::__construct($scenario);
+		$this->logRecord=true;
+	}
+	
+	public static function model($className=__CLASS__)
+	{
+		return parent::model($className);
+	}
+    
+
+	public function tableName()
+	{
+		return 'MST_CLIENT_FLACCT';
+	}
+	
+	public function getComboCloseInvestorAcct()
+	{
+		return $this->client_cd.' - '.$this->acct_name.' - '.$this->bank_acct_num;
+	}
+	
+	public function getPrimaryKey()
+	{
+		return array('client_cd'=>$this->client_cd,'bank_acct_num'=>$this->bank_acct_num);	
+	}
+	
+	protected function afterFind()
+	{
+		$this->from_dt  = Yii::app()->format->cleanDate($this->from_dt);
+		$this->to_dt    = Yii::app()->format->cleanDate($this->to_dt);
+	}
+
+	public function rules()
+	{
+		return array(
+			//array('client_cd','required','on'=>'closeinvacct-validate'),
+			array('saldo_rdi,shw_btn_conf','safe','on'=>'closeinvacct-validate'),
+			
+			array('client_cd, acct_name, acct_stat','safe','on'=>'closeinvacct-close'),
+			
+			array('client_cd, bank_cd, bank_acct_num, acct_name, acct_stat','required','on'=>'insert,update'),
+			array('approved_dt, from_dt, to_dt', 'application.components.validator.ADatePickerSwitcherValidator'),
+			array('client_cd, bank_cd, bank_acct_num, from_dt, to_dt','required'),
+			array('bank_cd', 'length', 'max'=>5),
+			array('bank_acct_num', 'length', 'max'=>25),
+			array('acct_name', 'length', 'max'=>50),
+			array('acct_stat, approved_stat', 'length', 'max'=>1),
+			array('bank_short_name', 'length', 'max'=>15),
+			array('bank_acct_fmt', 'length', 'max'=>30),
+			array('user_id, upd_user_id, approved_by', 'length', 'max'=>10),
+			array('cre_dt, upd_dt, approved_dt', 'safe'),
+
+			// The following rule is used by search().
+			// Please remove those attributes that should not be searched.
+	
+			array('client_cd, bank_cd, bank_acct_num, acct_name, acct_stat, bank_short_name, bank_acct_fmt, cre_dt, user_id, upd_dt, upd_user_id, approved_dt, approved_by, approved_stat,cre_dt_date,cre_dt_month,cre_dt_year,upd_dt_date,upd_dt_month,upd_dt_year,approved_dt_date,approved_dt_month,approved_dt_year', 'safe', 'on'=>'search'),
+		);
+	}
+
+	public function relations()
+	{
+		return array(
+			//'usergroupdetail' => array(self::HAS_MANY, 'Usergroupdetail', 'user_id','order'=>'t.user_name ASC'),
+			'client' => array(self::BELONGS_TO, 'Client', array('client_cd'=>'client_cd')),
+			'bank' => array(self::BELONGS_TO, 'Fundbank', array('bank_cd'=>'bank_cd')),
+			'vclientsubrek14' => array(self::BELONGS_TO, 'VClientSubrek14', array('client_cd'=>'client_cd')),
+		);
+	}
+
+	public function attributeLabels()
+	{
+		return array(
+			'client_cd' => 'Client',
+			'bank_cd' => 'Bank',
+			'bank_acct_num' => 'Bank Account No.',
+			'acct_name' => 'Account Name',
+			'acct_stat' => 'Status',
+			'bank_short_name' => 'Bank Short Name',
+			'bank_acct_fmt' => 'Bank Acct Fmt',
+			'cre_dt' => 'Create Date',
+			'user_id' => 'User',
+			'upd_dt' => 'Update Date',
+			'upd_user_id' => 'Update User',
+			'approved_dt' => 'Approved Date',
+			'approved_by' => 'Approved By',
+			'approved_stat' => 'Approved Status',
+			'from_dt' => 'From Date',
+			'to_dt' => 'To Date'
+		);
+	}
+
+
+	public function search()
+	{
+		$criteria = new CDbCriteria;
+        
+		$criteria->addCondition("UPPER(client_cd) LIKE UPPER('".$this->client_cd."%')");
+		if(!empty($this->bank_cd))
+			$criteria->addCondition("UPPER(bank_cd) LIKE UPPER('".$this->bank_cd."%')");
+		$criteria->compare('bank_acct_num',$this->bank_acct_num,true);
+		if(!empty($this->acct_name))
+			$criteria->addCondition("UPPER(acct_name) LIKE UPPER('%".$this->acct_name."%')");
+		$criteria->compare('acct_stat',$this->acct_stat,true);
+		if(!empty($this->bank_short_name))
+			$criteria->addCondition("UPPER(bank_short_name) LIKE UPPER('".$this->bank_short_name."%')");
+		$criteria->compare('bank_acct_fmt',$this->bank_acct_fmt,true);
+
+		if(!empty($this->cre_dt_date))
+			$criteria->addCondition("TO_CHAR(t.cre_dt,'DD') LIKE '%".($this->cre_dt_date)."%'");
+		if(!empty($this->cre_dt_month))
+			$criteria->addCondition("TO_CHAR(t.cre_dt,'MM') LIKE '%".($this->cre_dt_month)."%'");
+		if(!empty($this->cre_dt_year))
+			$criteria->addCondition("TO_CHAR(t.cre_dt,'YYYY') LIKE '%".($this->cre_dt_year)."%'");		$criteria->compare('user_id',$this->user_id,true);
+
+		if(!empty($this->upd_dt_date))
+			$criteria->addCondition("TO_CHAR(t.upd_dt,'DD') LIKE '%".($this->upd_dt_date)."%'");
+		if(!empty($this->upd_dt_month))
+			$criteria->addCondition("TO_CHAR(t.upd_dt,'MM') LIKE '%".($this->upd_dt_month)."%'");
+		if(!empty($this->upd_dt_year))
+			$criteria->addCondition("TO_CHAR(t.upd_dt,'YYYY') LIKE '%".($this->upd_dt_year)."%'");		$criteria->compare('upd_user_id',$this->upd_user_id,true);
+
+		if(!empty($this->approved_dt_date))
+			$criteria->addCondition("TO_CHAR(t.approved_dt,'DD') LIKE '%".($this->approved_dt_date)."%'");
+		if(!empty($this->approved_dt_month))
+			$criteria->addCondition("TO_CHAR(t.approved_dt,'MM') LIKE '%".($this->approved_dt_month)."%'");
+		if(!empty($this->approved_dt_year))
+			$criteria->addCondition("TO_CHAR(t.approved_dt,'YYYY') LIKE '%".($this->approved_dt_year)."%'");		$criteria->compare('approved_by',$this->approved_by,true);
+		$criteria->compare('approved_stat','A',true);
+		$sort = new CSort();
+		$sort->defaultOrder = 'client_cd, bank_cd';
+		return new CActiveDataProvider($this, array(
+			'criteria'=>$criteria,
+			'sort'=>$sort
+		));
+	}
+	
+
+	public function executeSp($exec_status,$client_cd,$bank_acct_num)
+	{
+		$connection  = Yii::app()->db;
+		$transaction = $connection->beginTransaction();
+		
+		
+		try{
+			$query  = "CALL SP_MST_CLIENT_FLACCT_UPD(
+						:P_SEARCH_CLIENT_CD,
+						:P_SEARCH_BANK_ACCT_NUM,
+						:P_CLIENT_CD,
+						:P_BANK_CD, 
+						:P_BANK_ACCT_NUM,
+						:P_ACCT_NAME,
+						:P_ACCT_STAT,
+						:P_BANK_SHORT_NAME,
+						:P_BANK_ACCT_FMT,
+						TO_DATE(:P_FROM_DT,'YYYY-MM-DD HH24:MI:SS'),
+						TO_DATE(:P_TO_DT,'YYYY-MM-DD HH24:MI:SS'),
+						TO_DATE(:P_CRE_DT,'YYYY-MM-DD HH24:MI:SS'),
+						:P_USER_ID,
+						TO_DATE(:P_UPD_DT,'YYYY-MM-DD HH24:MI:SS'),
+						:P_UPD_USER_ID,
+						:P_UPD_STATUS,
+						:P_IP_ADDRESS,
+						:P_CANCEL_REASON,
+						:P_ERROR_CODE,
+						:P_ERROR_MSG)";
+					
+			$command = $connection->createCommand($query);
+			
+			$this->bank_acct_fmt = $this->bank_acct_num;
+			$this->bank_acct_num = str_replace('.','',$this->bank_acct_num);
+			$bank_acct_num = str_replace('.','',$bank_acct_num);
+			$command->bindValue(":P_SEARCH_CLIENT_CD",$client_cd,PDO::PARAM_STR);
+			$command->bindValue(":P_SEARCH_BANK_ACCT_NUM",$bank_acct_num,PDO::PARAM_STR);
+			$command->bindValue(":P_CLIENT_CD",$this->client_cd,PDO::PARAM_STR);
+			$command->bindValue(":P_BANK_CD",$this->bank_cd,PDO::PARAM_STR);
+			$command->bindValue(":P_BANK_ACCT_NUM",$this->bank_acct_num,PDO::PARAM_STR);
+			$command->bindValue(":P_ACCT_NAME",$this->acct_name,PDO::PARAM_STR);
+			$command->bindValue(":P_ACCT_STAT",$this->acct_stat,PDO::PARAM_STR);
+			$command->bindValue(":P_BANK_SHORT_NAME",$this->bank_short_name,PDO::PARAM_STR);
+			$command->bindValue(":P_BANK_ACCT_FMT",$this->bank_acct_fmt,PDO::PARAM_STR);
+			$command->bindValue(":P_FROM_DT",$this->from_dt,PDO::PARAM_STR);
+			$command->bindValue(":P_TO_DT",$this->to_dt,PDO::PARAM_STR);
+			$command->bindValue(":P_CRE_DT",$this->cre_dt,PDO::PARAM_STR);
+			$command->bindValue(":P_USER_ID",$this->user_id,PDO::PARAM_STR);
+			$command->bindValue(":P_UPD_DT",$this->upd_dt,PDO::PARAM_STR);
+			$command->bindValue(":P_UPD_USER_ID",$this->upd_user_id,PDO::PARAM_STR);
+			
+			$command->bindValue(":P_UPD_STATUS",$exec_status,PDO::PARAM_STR);
+			$command->bindValue(":P_IP_ADDRESS",$this->ip_address,PDO::PARAM_STR);
+			$command->bindValue(":P_CANCEL_REASON",$this->cancel_reason,PDO::PARAM_STR);
+			
+			$command->bindParam(":P_ERROR_CODE",$this->error_code,PDO::PARAM_INT,10);
+			$command->bindParam(":P_ERROR_MSG",$this->error_msg,PDO::PARAM_STR,100);
+			
+			$command->execute();
+			$transaction->commit();
+		}catch(Exception $ex){
+			$transaction->rollback();
+			if($this->error_code == -999)
+				$this->error_msg = $ex->getMessage();
+		}
+		
+		if($this->error_code < 0)
+			$this->addError('error_msg', 'Error '.$this->error_code.' '.$this->error_msg);
+		
+		
+		return $this->error_code;
+	}
+public function executeSpImport($exec_status,$old_client_cd,$old_bank_acct_num,$record_seq)
+	{
+		$connection  = Yii::app()->db;
+			$p_user_id = Yii::app()->user->id;
+		
+		try{
+			$query  = "CALL Sp_MST_client_FLACCT_IMP_Upd (
+						:P_SEARCH_CLIENT_CD,
+						:P_SEARCH_BANK_ACCT_NUM,
+						:P_CLIENT_CD,
+						:P_BANK_CD,
+						:P_BANK_ACCT_NUM,
+						:P_ACCT_NAME,
+						:P_ACCT_STAT,
+						:P_BANK_SHORT_NAME,
+						:P_BANK_ACCT_FMT,
+						TO_DATE(:P_CRE_DT,'YYYY-MM-DD HH24:MI:SS'),
+						:P_USER_ID,
+						TO_DATE(:P_UPD_DT,'YYYY-MM-DD HH24:MI:SS'),
+						:P_UPD_USER_ID,
+						:P_UPD_BY,
+						TO_DATE(:P_FROM_DT,'YYYY-MM-DD'),
+						TO_DATE(:P_TO_DT,'YYYY-MM-DD'),
+						:P_UPD_STATUS,
+						:p_ip_address,
+						:p_cancel_reason,
+						TO_DATE(:p_update_date,'YYYY-MM-DD HH24:MI:SS'),
+						:p_update_seq,
+						:p_record_seq,
+						:p_error_code,
+						:p_error_msg)";
+			
+						
+			$command = $connection->createCommand($query);
+			$command->bindValue(":P_SEARCH_CLIENT_CD",$old_client_cd,PDO::PARAM_STR);
+			$command->bindValue(":P_SEARCH_BANK_ACCT_NUM",$old_bank_acct_num,PDO::PARAM_STR);
+			$command->bindValue(":P_CLIENT_CD",$this->client_cd,PDO::PARAM_STR);
+			$command->bindValue(":P_BANK_CD",$this->bank_cd,PDO::PARAM_STR);
+			$command->bindValue(":P_BANK_ACCT_NUM",$this->bank_acct_num,PDO::PARAM_STR);
+			$command->bindValue(":P_ACCT_NAME",$this->acct_name,PDO::PARAM_STR);
+			$command->bindValue(":P_ACCT_STAT",$this->acct_stat,PDO::PARAM_STR);
+			$command->bindValue(":P_BANK_SHORT_NAME",$this->bank_short_name,PDO::PARAM_STR);
+			$command->bindValue(":P_BANK_ACCT_FMT",$this->bank_acct_fmt,PDO::PARAM_STR);
+			$command->bindValue(":P_CRE_DT",$this->cre_dt,PDO::PARAM_STR);
+			$command->bindValue(":P_USER_ID",$this->user_id,PDO::PARAM_STR);
+			$command->bindValue(":P_UPD_DT",$this->upd_dt,PDO::PARAM_STR);
+			$command->bindValue(":P_UPD_USER_ID",$this->upd_user_id,PDO::PARAM_STR);
+			$command->bindValue(":P_UPD_BY",$this->upd_by,PDO::PARAM_STR);
+			$command->bindValue(":P_FROM_DT",$this->from_dt,PDO::PARAM_STR);
+			$command->bindValue(":P_TO_DT",$this->to_dt,PDO::PARAM_STR);
+			$command->bindValue(":P_UPD_STATUS",$exec_status,PDO::PARAM_STR);
+			$command->bindValue(":P_IP_ADDRESS",$this->ip_address,PDO::PARAM_STR);
+			$command->bindValue(":P_CANCEL_REASON",$this->cancel_reason,PDO::PARAM_STR);
+			$command->bindValue(":P_UPDATE_DATE",$this->update_date,PDO::PARAM_STR);
+			$command->bindValue(":P_UPDATE_SEQ",$this->update_seq,PDO::PARAM_STR);
+			$command->bindValue(":P_RECORD_SEQ",$record_seq,PDO::PARAM_STR);	
+			$command->bindParam(":P_ERROR_CODE",$this->error_code,PDO::PARAM_INT,10);
+			$command->bindParam(":P_ERROR_MSG",$this->error_msg,PDO::PARAM_STR,1000);
+
+			$command->execute();
+			
+		}catch(Exception $ex){
+		
+			if($this->error_code = -999)
+				$this->error_msg = $ex->getMessage();
+		}
+		
+		if($this->error_code < 0)
+			$this->addError('error_msg', 'Error '.$this->error_code.' '.$this->error_msg);
+		
+		return $this->error_code;
+	}
+
+
+}

@@ -1,0 +1,261 @@
+<?php
+
+/**
+ * This is the model class for table "T_CLIENT_ACCT_STMT_FAIL".
+ *
+ * The followings are the available columns in table 'T_CLIENT_ACCT_STMT_FAIL':
+ * @property string $external_ref
+ * @property integer $seq_no
+ * @property string $acct_num
+ * @property string $curr_cd
+ * @property string $trx_date
+ * @property string $trx_type
+ * @property string $trx_cd
+ * @property string $acct_debit
+ * @property string $acct_credit
+ * @property double $trx_amt
+ * @property double $open_bal
+ * @property double $close_bal
+ * @property string $description
+ * @property string $cre_dt
+ */
+class Tclientacctstmtfail extends AActiveRecordSP
+{
+	//AH: #BEGIN search (datetime || date) additional comparison
+	public $trx_date_date;
+	public $trx_date_month;
+	public $trx_date_year;
+
+	public $cre_dt_date;
+	public $cre_dt_month;
+	public $cre_dt_year;
+	public $tanggalefektif;
+	public $tanggaltimestamp;
+	public $branch_code;
+	public $client_cd;
+	public $client_name;
+	public $remarks;
+	public $save_flg='N';
+	public $from_dt;
+	public $to_dt;
+	public $user_id;
+	public $cifs;
+	//AH: #END search (datetime || date)  additional comparison
+	
+	public function __construct($scenario = 'insert')
+	{
+		parent::__construct($scenario);
+		$this->logRecord=true;
+	}
+	
+	public static function model($className=__CLASS__)
+	{
+		return parent::model($className);
+	}
+    
+
+	public function tableName()
+	{
+		return 'T_CLIENT_ACCT_STMT_FAIL';
+	}
+
+	public function rules()
+	{
+		return array(
+		
+			array('from_dt,to_dt,tanggalefektif,trx_date', 'application.components.validator.ADatePickerSwitcherValidatorSP'),
+		
+			array('seq_no, trx_amt, open_bal, close_bal', 'application.components.validator.ANumberSwitcherValidator'),
+			
+			array('seq_no', 'numerical', 'integerOnly'=>true),
+			array('trx_amt, open_bal, close_bal', 'numerical'),
+			array('external_ref', 'length', 'max'=>32),
+			array('acct_num', 'length', 'max'=>10),
+			array('curr_cd', 'length', 'max'=>3),
+			array('trx_type', 'length', 'max'=>4),
+			//array('trx_cd, journal_flg', 'length', 'max'=>1),
+			array('acct_debit, acct_credit', 'length', 'max'=>23),
+			array('description', 'length', 'max'=>100),
+			array('client_cd','cekClient','on'=>'journal'),
+			array('cifs,tanggaltimestamp,save_flg,remarks,client_name,client_cd,branch_code,tanggaltimestamp,trx_date, cre_dt', 'safe'),
+
+			// The following rule is used by search().
+			// Please remove those attributes that should not be searched.
+	
+			array('external_ref, seq_no, acct_num, curr_cd, trx_date, trx_type, trx_cd, acct_debit, acct_credit, trx_amt, open_bal, close_bal, description, cre_dt, journal_flg,trx_date_date,trx_date_month,trx_date_year,cre_dt_date,cre_dt_month,cre_dt_year', 'safe', 'on'=>'search'),
+		);
+	}
+
+	public function relations()
+	{
+		return array(
+		);
+	}
+	public function cekClient()
+	{	//var_dump($this->cifs);die();
+		$sql = "SELECT B.BANK_ACCT_NUM,B.CLIENT_CD, COUNT(B.BANK_ACCT_NUM) CNT FROM MST_CLIENT A, MST_CLIENT_FLACCT B
+			    WHERE  A.CLIENT_CD=  B.CLIENT_CD  AND B.ACCT_STAT='A'  AND A.CIFS = '$this->cifs' AND A.CLIENT_CD='$this->client_cd'
+			    GROUP BY B.BANK_ACCT_NUM, b.client_cd";
+		$check = DAO::queryAllSql($sql);
+		if(!$check)
+			$this->addError('client_cd', 'Invalid client code');
+	}
+	public static function getData($from_dt, $to_dt, $branch_cd)
+	{
+		$sql=" SELECT 
+		      M.CLIENT_CD,
+		      TRIM(M.BRANCH_CODE) BRANCH_CODE,
+		      T.ACCT_NUM ,
+		      M.CLIENT_NAME,
+		      TRUNC(TRX_DATE) AS TANGGALEFEKTIF,
+		      TRX_DATE        AS TANGGALTIMESTAMP,
+		      T.TRX_CD ,
+		      T.TRX_TYPE ,
+		      T.TRX_AMT ,
+		      DECODE( T.TRX_TYPE ,'NINT','Bunga ',R.DESCRIP)
+		      ||' '
+		      ||M.CLIENT_CD AS REMARKS,
+		      R.FUND_BANK_CD ,
+		      t.ACCT_DEBIT,
+		      T.ACCT_CREDIT,
+		      T.EXTERNAL_REF,
+		      F_CHECK_CIFS_RDI(M.CIFS) CNT,
+		      M.CIFS
+		    FROM
+		      (SELECT A.*
+		      FROM t_client_acct_stmt_fail A,
+		        (SELECT REPLACE(REPLACE(bank_acct_cd,'-',''),'.','') pe_bank_acct
+		        FROM MST_BANK_ACCT
+		        WHERE bank_acct_cd <> 'X'
+		        )P
+		    WHERE A.ACCT_NUM    =P.PE_BANK_ACCT(+)
+		    AND P.PE_BANK_ACCT IS NULL
+		    AND A.trx_date  BETWEEN GET_DOC_DATE(1,TO_DATE('$from_dt','dd/mm/yyyy')) AND GET_DUE_DATE(1,TO_DATE('$to_dt','dd/mm/yyyy'))
+		      )T ,
+		      mst_client M,
+		     (SELECT  MAX(CLIENT_CD)CLIENT_CD,BANK_ACCT_NUM
+     			FROM MST_CLIENT_FLACCT WHERE ACCT_STAT='A'  AND BANK_CD='BCA02'
+     			GROUP BY BANK_ACCT_NUM ) C,
+		      MST_RDI_TRX_TYPE R,
+		      (SELECT NVL(bank_ref_num,'X') bank_ref_num,
+		        fund_bank_acct AS BANK_ACCT_NUM,
+		        doc_Date,
+		        sl_acct_cd,
+		        BANK_MVMT_DATE
+		      FROM T_FUND_MOVEMENT
+		      WHERE doc_date   between GET_DOC_DATE(1,to_date('$from_dt','dd/mm/yyyy')) and GET_DUE_DATE(1,to_date('$to_dt','dd/mm/yyyy'))
+		      AND source        = 'MUTASI'
+		      AND approved_sts <> 'C'
+		      ) F
+		    WHERE M.CLIENT_CD    =C.CLIENT_CD
+		    AND M.SUSP_STAT      ='N'
+			AND M.BRANCH_CODE LIKE '$branch_cd%'
+		    AND t.acct_num       = C.bank_acct_num
+		    AND T.TRX_TYPE       = R.RDI_TRX_TYPE
+		    AND T.ACCT_NUM       = F.BANK_ACCT_NUM(+)
+		    AND T.EXTERNAL_REF = F.BANK_REF_NUM(+)  
+		    AND T.TRX_DATE = F.BANK_MVMT_DATE(+)
+		    AND T.TRX_TYPE = F.SL_ACCT_CD(+)
+		    AND F.bank_ref_num  IS NULL
+		    AND F.BANK_ACCT_NUM IS NULL
+		    AND F.BANK_MVMT_DATE IS NULL
+		    AND F.SL_ACCT_CD IS NULL ";
+		    
+     return $sql;
+		
+	}
+	public function attributeLabels()
+	{
+		return array(
+			'external_ref' => 'External Ref',
+			'seq_no' => 'Seq No',
+			'acct_num' => 'Acct Num',
+			'curr_cd' => 'Curr Code',
+			'trx_date' => 'Date',
+			'trx_type' => 'Trx Type',
+			'trx_cd' => 'Trx Code',
+			'acct_debit' => 'Acct Debit',
+			'acct_credit' => 'Acct Credit',
+			'trx_amt' => 'Trx Amt',
+			'open_bal' => 'Open Bal',
+			'close_bal' => 'Close Bal',
+			'description' => 'Description',
+			'cre_dt' => 'Cre Date',
+			
+		);
+	}
+
+public function executeSp()
+	{
+		$connection  = Yii::app()->db;
+	
+		
+		try{
+			$query  = "CALL SP_FUND_AUTO_BCA_FAIL(	TO_DATE(:P_TANGGALEFEKTIF,'YYYY-MM-DD'),
+													TO_DATE(:P_FROM_DATE,'YYYY-MM-DD'),
+													TO_DATE(:P_TO_DATE,'YYYY-MM-DD'),
+													:P_RDN,
+													:P_CLIENT_CD,
+													:P_EXTERNAL_REF,
+													:p_user_id,
+													:p_ip_address,
+													:P_ERROR_CODE,
+													:P_ERROR_MSG)";
+			
+			$command = $connection->createCommand($query);
+			$command->bindValue(":P_TANGGALEFEKTIF",$this->tanggalefektif,PDO::PARAM_STR);
+			$command->bindValue(":P_FROM_DATE",$this->from_dt,PDO::PARAM_STR);
+			$command->bindValue(":P_TO_DATE",$this->to_dt,PDO::PARAM_STR);
+			$command->bindValue(":P_RDN",$this->acct_num,PDO::PARAM_STR);
+			$command->bindValue(":P_CLIENT_CD",$this->client_cd,PDO::PARAM_STR);
+			$command->bindValue(":P_EXTERNAL_REF",$this->external_ref,PDO::PARAM_STR);
+			$command->bindValue(":p_user_id",$this->user_id,PDO::PARAM_STR);
+			$command->bindValue(":p_ip_address",$this->ip_address,PDO::PARAM_STR);
+			$command->bindParam(":P_ERROR_CODE",$this->error_code,PDO::PARAM_INT,10);
+			$command->bindParam(":P_ERROR_MSG",$this->error_msg,PDO::PARAM_STR,1000);
+			$command->execute();
+			
+		}catch(Exception $ex){
+			if($this->error_code = -999)
+				$this->error_msg = $ex->getMessage();
+		}
+		
+		if($this->error_code < 0)
+			$this->addError('error_msg', 'Error '.$this->error_code.' '.$this->error_msg);
+		
+		return $this->error_code;
+	}
+	public function search()
+	{
+		$criteria = new CDbCriteria;
+		$criteria->compare('external_ref',$this->external_ref,true);
+		$criteria->compare('seq_no',$this->seq_no);
+		$criteria->compare('acct_num',$this->acct_num,true);
+		$criteria->compare('curr_cd',$this->curr_cd,true);
+
+		if(!empty($this->trx_date_date))
+			$criteria->addCondition("TO_CHAR(t.trx_date,'DD') LIKE '%".$this->trx_date_date."%'");
+		if(!empty($this->trx_date_month))
+			$criteria->addCondition("TO_CHAR(t.trx_date,'MM') LIKE '%".$this->trx_date_month."%'");
+		if(!empty($this->trx_date_year))
+			$criteria->addCondition("TO_CHAR(t.trx_date,'YYYY') LIKE '%".$this->trx_date_year."%'");		$criteria->compare('trx_type',$this->trx_type,true);
+		$criteria->compare('trx_cd',$this->trx_cd,true);
+		$criteria->compare('acct_debit',$this->acct_debit,true);
+		$criteria->compare('acct_credit',$this->acct_credit,true);
+		$criteria->compare('trx_amt',$this->trx_amt);
+		$criteria->compare('open_bal',$this->open_bal);
+		$criteria->compare('close_bal',$this->close_bal);
+		$criteria->compare('description',$this->description,true);
+
+		if(!empty($this->cre_dt_date))
+			$criteria->addCondition("TO_CHAR(t.cre_dt,'DD') LIKE '%".$this->cre_dt_date."%'");
+		if(!empty($this->cre_dt_month))
+			$criteria->addCondition("TO_CHAR(t.cre_dt,'MM') LIKE '%".$this->cre_dt_month."%'");
+		if(!empty($this->cre_dt_year))
+			$criteria->addCondition("TO_CHAR(t.cre_dt,'YYYY') LIKE '%".$this->cre_dt_year."%'");		$criteria->compare('journal_flg',$this->journal_flg,true);
+
+		return new CActiveDataProvider($this, array(
+			'criteria'=>$criteria,
+		));
+	}
+}

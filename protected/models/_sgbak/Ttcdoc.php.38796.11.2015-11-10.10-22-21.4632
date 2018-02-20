@@ -1,0 +1,414 @@
+<?php
+
+/**
+ * This is the model class for table "T_TC_DOC".
+ *
+ * The followings are the available columns in table 'T_TC_DOC':
+ * @property string $tc_id
+ * @property string $tc_date
+ * @property integer $tc_status
+ * @property integer $tc_rev
+ * @property string $client_cd
+ * @property string $client_name
+ * @property string $brch_cd
+ * @property string $rem_cd
+ * @property string $cre_dt
+ * @property string $cre_by
+ * @property string $tc_clob_ind
+ * @property string $tc_clob_eng
+ * @property string $tc_matrix_ind
+ * @property string $tc_matrix_eng
+ */
+class Ttcdoc extends AActiveRecordSP
+{
+	//AH: #BEGIN search (datetime || date) additional comparison
+	public $tc_date_date;
+	public $tc_date_month;
+	public $tc_date_year;
+
+	public $cre_dt_date;
+	public $cre_dt_month;
+	public $cre_dt_year;
+	//AH: #END search (datetime || date)  additional comparison
+	
+	public $upload_file;
+	public $client_type;
+	public $market_type;
+	public $brch_type;
+	public $rem_type;
+	
+	public $beg_rem;
+	public $end_rem;
+	public $beg_branch;
+	public $end_branch;
+	public $bgn_date;
+	public $end_date;
+	public $beg_client;
+	public $end_client;
+	public $generate_date;
+	public $random_value;
+	
+	public $trx_cnt;
+	public $cl_type;
+	public $update_date; //update date for t_many_header
+	public $update_seq; // update seq for t_many_header
+	
+	public function __construct($scenario = 'insert')
+	{
+		parent::__construct($scenario);
+		$this->logRecord=true;
+	}
+	
+	public static function model($className=__CLASS__)
+	{
+		return parent::model($className);
+	}
+    
+	public function tableName()
+	{
+		return 'T_TC_DOC';
+	}
+	
+	public function executeSp($mode,$type,&$transaction)
+	{
+		$connection  = Yii::app()->db;
+		
+		try{
+			$query  = "CALL SP_GEN_TRADING_REF_UPD(
+						TO_DATE(:P_TRX_DATE,'YYYY-MM-DD'),
+						:P_CLIENT_CD,
+						:P_MODE,
+						:P_TC_ID,
+						:P_USER_ID,
+						
+						:P_UPD_STATUS,
+						:p_ip_address,
+						:p_cancel_reason,
+						:p_update_date,
+						:p_update_seq,
+						
+						:P_ERROR_CODE,
+						:P_ERROR_MSG)";
+						
+			$command = $connection->createCommand($query);
+			$command->bindValue(":P_TRX_DATE",$this->tc_date,PDO::PARAM_STR);
+			$command->bindValue(":P_CLIENT_CD",$this->client_cd,PDO::PARAM_STR);
+			$command->bindValue(":P_MODE",$mode,PDO::PARAM_STR);
+			$command->bindValue(":P_TC_ID",$type,PDO::PARAM_STR);
+			$command->bindValue(":P_USER_ID",$this->cre_by,PDO::PARAM_STR);
+			
+			$command->bindValue(":P_UPD_STATUS",'X',PDO::PARAM_STR);
+			$command->bindValue(":P_IP_ADDRESS",$this->ip_address,PDO::PARAM_STR);
+			$command->bindValue(":P_CANCEL_REASON",$this->cancel_reason,PDO::PARAM_STR);
+			$command->bindValue(":P_UPDATE_DATE",$this->update_date,PDO::PARAM_STR);
+			$command->bindValue(":P_UPDATE_SEQ",$this->update_seq,PDO::PARAM_STR);
+
+			$command->bindParam(":P_ERROR_CODE",$this->error_code,PDO::PARAM_INT,10);
+			$command->bindParam(":P_ERROR_MSG",$this->error_msg,PDO::PARAM_STR,1000);
+
+			$command->execute();
+		}catch(Exception $ex){
+			if($this->error_code = -999)
+				$this->error_msg = $ex->getMessage();
+		}
+		
+		if($this->error_code < 0)
+			$this->addError('error_msg', 'Error '.$this->error_code.' '.$this->error_msg);
+		
+		return $this->error_code;
+	}
+
+	public function executeSprGenTc()
+	{
+		$connection  = Yii::app()->db;
+		$transaction = $connection->beginTransaction();	
+		
+		try{
+			$query  = "CALL SPR_GEN_TRADE_CONF(
+					  :vp_beg_rem,
+					  :vp_end_rem,
+					  :vp_beg_branch,
+					  :vp_end_branch,
+					  TO_DATE(:vp_bgn_date,'YYYY-MM-DD'),
+					  TO_DATE(:vp_end_date,'YYYY-MM-DD'),
+					  :vp_beg_client,
+					  :vp_end_client,
+					  :vp_userid,
+					  TO_DATE(:vp_generate_date,'YYYY-MM-DD HH24:MI:SS'),
+					  :vo_errcd,
+					  :vo_errmsg)";
+						
+			$command = $connection->createCommand($query);
+			$command->bindValue(":vp_beg_rem",$this->beg_rem,PDO::PARAM_STR);
+			$command->bindValue(":vp_end_rem",$this->end_rem,PDO::PARAM_STR);
+			$command->bindValue(":vp_beg_branch",$this->beg_branch,PDO::PARAM_STR);
+			$command->bindValue(":vp_end_branch",$this->end_branch,PDO::PARAM_STR);
+			$command->bindValue(":vp_bgn_date",$this->tc_date,PDO::PARAM_STR);
+			$command->bindValue(":vp_end_date",$this->tc_date,PDO::PARAM_STR);
+			$command->bindValue(":vp_beg_client",$this->beg_client,PDO::PARAM_STR);
+			$command->bindValue(":vp_end_client",$this->end_client,PDO::PARAM_STR);
+			$command->bindValue(":vp_userid",$this->cre_by,PDO::PARAM_STR);
+			$command->bindValue(":vp_generate_date",$this->generate_date,PDO::PARAM_STR);
+			
+			//$command->bindParam(":vo_random_value",$this->random_value,PDO::PARAM_INT,100);
+			$command->bindParam(":vo_errcd",$this->error_code,PDO::PARAM_INT,10);
+			$command->bindParam(":vo_errmsg",$this->error_msg,PDO::PARAM_STR,1000);
+
+			$command->execute();
+			$transaction->commit();
+		}catch(Exception $ex){
+			if($this->error_code = -999)
+				$this->error_msg = $ex->getMessage();
+			$transaction->rollback();
+		}
+		
+		if($this->error_code < 0)
+			$this->addError('error_msg', 'Error '.$this->error_code.' '.$this->error_msg);
+		
+		return $this->error_code;
+	}
+	
+	public function executeSpManyHeader($exec_status,$menuName,&$transaction)
+	{
+		$connection  = Yii::app()->db;
+		$transaction = $connection->beginTransaction();	
+		try{
+			$query  = "CALL SP_T_MANY_HEADER_INSERT(
+						:P_MENU_NAME,
+						:P_STATUS,
+						:P_USER_ID,
+						:P_IP_ADDRESS,
+						:P_CANCEL_REASON,
+						:P_UPDATE_DATE,
+						:P_UPDATE_SEQ,
+						:P_ERROR_CODE,
+						:P_ERROR_MSG)";
+			
+						
+			$command = $connection->createCommand($query);
+			$command->bindValue(":P_MENU_NAME",$menuName,PDO::PARAM_STR);
+			$command->bindValue(":P_STATUS",$exec_status,PDO::PARAM_STR);
+			$command->bindValue(":P_USER_ID",$this->cre_by,PDO::PARAM_STR);			
+			$command->bindValue(":P_IP_ADDRESS",$this->ip_address,PDO::PARAM_STR);
+			$command->bindValue(":P_CANCEL_REASON",$this->cancel_reason,PDO::PARAM_STR);
+			
+			$command->bindParam(":P_UPDATE_DATE",$this->update_date,PDO::PARAM_STR,30);
+			$command->bindParam(":P_UPDATE_SEQ",$this->update_seq,PDO::PARAM_STR,10);
+			$command->bindParam(":P_ERROR_CODE",$this->error_code,PDO::PARAM_INT,10);
+			$command->bindParam(":P_ERROR_MSG",$this->error_msg,PDO::PARAM_STR,1000);
+
+			$command->execute();
+			
+			//Commit baru akan dijalankan saat semua transaksi INSERT sukses
+			
+		}catch(Exception $ex){
+			//$transaction->rollback();
+			if($this->error_code = -999)
+				$this->error_msg = $ex->getMessage();
+		}
+		
+		if($this->error_code < 0)
+			$this->addError('error_msg', 'Error '.$this->error_code.' '.$this->error_msg);
+		
+		return $this->error_code;
+	}
+	
+	public function executeSpGenTcClob($tc_id,$tc_rev,$tc_clob_eng,$tc_clob_ind,$tc_matrix_eng,$tc_matrix_ind,$updstat)
+	{
+		$connection  = Yii::app()->db;
+		$transaction = $connection->beginTransaction();	
+		try{
+			$query  = " BEGIN 
+						SP_GEN_TC_CLOB(
+						TO_DATE('".$this->tc_date."','YYYY-MM-DD'),
+						'".$tc_id."',
+						'".$tc_rev."',
+						'".str_replace("'","''",$tc_clob_eng)."',
+						'".str_replace("'","''",$tc_clob_ind)."',
+						'".str_replace("'","''",$tc_matrix_eng)."',
+						'".str_replace("'","''",$tc_matrix_ind)."',
+						:P_UPD_STAT,
+						:P_ERROR_CODE,
+						:P_ERROR_MSG);
+						END;
+						";
+						
+			$command = $connection->createCommand($query);
+			//$command->bindValue(":P_TC_DATE",$this->tc_date,PDO::PARAM_STR);
+			//$command->bindValue(":P_TC_ID",$tc_id,PDO::PARAM_STR);
+			//$command->bindValue(":P_TC_REV",$tc_rev,PDO::PARAM_STR);
+			//$command->bindValue(":P_TC_CLOB_ENG",$tc_clob_eng,PDO::PARAM_LOB);
+			//$command->bindValue(":P_TC_CLOB_IND",$tc_clob_ind,PDO::PARAM_LOB);
+			$command->bindValue(":P_UPD_STAT",$updstat,PDO::PARAM_STR);
+			$command->bindParam(":P_ERROR_CODE",$this->error_code,PDO::PARAM_INT,10);
+			$command->bindParam(":P_ERROR_MSG",$this->error_msg,PDO::PARAM_STR,500);
+
+			$command->execute();
+			$transaction->commit();
+		}catch(Exception $ex){
+			
+			if($this->error_code = -999)
+				$this->error_msg = $ex->getMessage();
+			$transaction->rollback();
+		}
+		
+		if($this->error_code < 0)
+			$this->addError('error_msg', 'Error '.$this->error_code.' '.$this->error_msg);
+		
+		return $this->error_code;
+	}
+
+	public function executeRejectGentradingref($menu_name,$reject_reason)
+	{
+		$connection  = Yii::app()->db;
+		$transaction = $connection->beginTransaction();
+		
+		try{
+			$query   = "CALL SP_GEN_TRADING_REF_REJECT(
+						:P_MENU_NAME,
+						TO_DATE(:P_UPDATE_DATE,'YYYY-MM-DD HH24:MI:SS'),
+						:P_UPDDATE_SEQ,
+						:P_REJECT_USER_ID,
+						:P_IP_ADDRESS,
+						:P_REJECT_REASON,
+						:P_ERROR_CODE,
+						:P_ERROR_MSG)";
+			
+			$command = $connection->createCommand($query);
+			$command->bindValue(":P_MENU_NAME",$menu_name,PDO::PARAM_STR);
+			$command->bindValue(":P_UPDATE_DATE",$this->update_date,PDO::PARAM_STR);
+			$command->bindValue(":P_UPDDATE_SEQ",$this->update_seq,PDO::PARAM_STR);
+			$command->bindValue(":P_REJECT_USER_ID",$this->cre_by,PDO::PARAM_STR);
+			$command->bindValue(":P_REJECT_REASON",$reject_reason,PDO::PARAM_STR);
+			$command->bindValue(":P_IP_ADDRESS",$this->ip_address,PDO::PARAM_STR);
+			
+			$command->bindParam(":P_ERROR_CODE",$this->error_code,PDO::PARAM_STR,10);
+			$command->bindParam(":P_ERROR_MSG",$this->error_msg,PDO::PARAM_STR,200);
+			$command->execute();
+			$transaction->commit();
+		}catch(Exception $ex){
+			if($this->error_code = -999)
+				$this->error_msg = $ex->getMessage();
+			$transaction->rollback();
+		}
+		
+		return $this->error_code;
+	}
+	
+	public function executeSpConGen()
+	{
+		$connection  = Yii::app()->db;
+		$transaction = $connection->beginTransaction();	
+		try{
+			$query  = " BEGIN 
+						SP_CONTRACT_GENERATION(
+						TO_DATE(:P_EXCHANGE_DATE,'YYYY-MM-DD'),
+						:P_USER_ID,
+						:P_TRX_CNT,
+						:P_ERROR_CODE,
+						:P_ERROR_MSG);
+						END;
+						";
+						
+			$command = $connection->createCommand($query);
+			$command->bindValue(":P_EXCHANGE_DATE",$this->tc_date,PDO::PARAM_STR);
+			$command->bindValue(":P_USER_ID",$this->cre_by,PDO::PARAM_STR);
+			$command->bindParam(":P_TRX_CNT",$this->trx_cnt,PDO::PARAM_INT,10);
+			$command->bindParam(":P_ERROR_CODE",$this->error_code,PDO::PARAM_INT,10);
+			$command->bindParam(":P_ERROR_MSG",$this->error_msg,PDO::PARAM_STR,500);
+
+			$command->execute();
+			$transaction->commit();
+		}catch(Exception $ex){
+			
+			if($this->error_code = -999)
+				$this->error_msg = $ex->getMessage();
+			$transaction->rollback();
+		}
+		
+		if($this->error_code < 0)
+			$this->addError('error_msg', 'Error '.$this->error_code.' '.$this->error_msg);
+		
+		return $this->error_code;
+	}
+
+	public function rules()
+	{
+		return array(
+		
+			array('tc_date, bgn_date, end_date, generate_date', 'application.components.validator.ADatePickerSwitcherValidatorSP'),
+		
+			array('tc_rev', 'application.components.validator.ANumberSwitcherValidator'),
+			
+			array('tc_date', 'required'),
+			array('tc_status, tc_rev', 'numerical', 'integerOnly'=>true),
+			array('client_cd, beg_client, end_client', 'length', 'max'=>12),
+			array('client_name', 'length', 'max'=>50),
+			array('brch_cd', 'length', 'max'=>2),
+			array('rem_cd', 'length', 'max'=>3),
+			array('cre_by', 'length', 'max'=>10),
+			array('cl_type,cre_dt,client_type,tc_clob_eng,tc_clob_ind,tc_matrix_eng,tc_matrix_ind,brch_type,rem_type', 'safe'),
+
+			// The following rule is used by search().
+			// Please remove those attributes that should not be searched.
+	
+			array('tc_id, tc_date, tc_status, tc_rev, client_cd, client_name, brch_cd, rem_cd, cre_dt, cre_by,tc_date_date,tc_date_month,tc_date_year,cre_dt_date,cre_dt_month,cre_dt_year,tc_clob_eng,tc_clob_ind,tc_matrix_eng,tc_matrix_ind', 'safe', 'on'=>'search'),
+		);
+	}
+
+	public function relations()
+	{
+		return array(
+		);
+	}
+
+	public function attributeLabels()
+	{
+		return array(
+			'tc_id' => 'Tc',
+			'tc_date' => 'Trade Confirmation Date',
+			'tc_status' => 'Tc Status',
+			'tc_rev' => 'Tc Rev',
+			'client_cd' => 'Client Code',
+			'client_name' => 'Client Name',
+			'brch_cd' => 'Brch Code',
+			'rem_cd' => 'Rem Code',
+			'cre_dt' => 'Cre Date',
+			'cre_by' => 'Cre By',
+			'tc_clob_eng'=> 'Trade Confirmation',
+			'tc_clob_ind'=> 'Konfirmasi Transaksi',
+			'tc_matrix_eng'=> 'Trade Confirmation',
+			'tc_matrix_ind'=> 'Konfirmasi Transaksi'
+		);
+	}
+
+
+	public function search()
+	{
+		$criteria = new CDbCriteria;
+		$criteria->compare('tc_id',$this->tc_id,true);
+
+		if(!empty($this->tc_date_date))
+			$criteria->addCondition("TO_CHAR(t.tc_date,'DD') LIKE '%".$this->tc_date_date."%'");
+		if(!empty($this->tc_date_month))
+			$criteria->addCondition("TO_CHAR(t.tc_date,'MM') LIKE '%".$this->tc_date_month."%'");
+		if(!empty($this->tc_date_year))
+			$criteria->addCondition("TO_CHAR(t.tc_date,'YYYY') LIKE '%".$this->tc_date_year."%'");		$criteria->compare('tc_status',$this->tc_status);
+		$criteria->compare('tc_rev',$this->tc_rev);
+		$criteria->compare('client_cd',$this->client_cd,true);
+		$criteria->compare('client_name',$this->client_name,true);
+		$criteria->compare('brch_cd',$this->brch_cd,true);
+		$criteria->compare('rem_cd',$this->rem_cd,true);
+
+		if(!empty($this->cre_dt_date))
+			$criteria->addCondition("TO_CHAR(t.cre_dt,'DD') LIKE '%".$this->cre_dt_date."%'");
+		if(!empty($this->cre_dt_month))
+			$criteria->addCondition("TO_CHAR(t.cre_dt,'MM') LIKE '%".$this->cre_dt_month."%'");
+		if(!empty($this->cre_dt_year))
+			$criteria->addCondition("TO_CHAR(t.cre_dt,'YYYY') LIKE '%".$this->cre_dt_year."%'");		$criteria->compare('cre_by',$this->cre_by,true);
+
+		return new CActiveDataProvider($this, array(
+			'criteria'=>$criteria,
+		));
+	}
+}

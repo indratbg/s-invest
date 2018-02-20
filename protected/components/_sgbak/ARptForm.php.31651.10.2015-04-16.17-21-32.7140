@@ -1,0 +1,169 @@
+<?php
+/* 
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+class ARptForm extends CFormModel
+{
+    // AH  
+	public $vp_userid;
+	public $vp_generate_date;
+	
+	public $vo_random_value;
+	public $vo_errcd;
+	public $vo_errmsg;
+	public $trx_date;
+	public $approved_stat;
+	public $tablename; 
+	public $module;
+	public $rptname;
+	
+    public function __construct($module,$tablename,$rptname,$scenario = 'insert')
+	{
+        parent::__construct($scenario);
+        $this->attachEventHandler('onAfterValidate', '');
+		
+		// [AH] Setting variable
+		$this->tablename = $tablename;
+		$this->module    = $module;	
+		$this->rptname   = $rptname;
+    }
+
+    public function onAfterValidate($event)
+	{
+        $this->vo_errcd  = -999;
+		$this->vo_errmsg = 'Initial Value';
+		
+        $this->vp_userid = Yii::app()->user->id;
+		$this->vp_generate_date = Yii::app()->datetime->getDateTimeNow();         
+    }
+	
+	public function showReport()
+	{
+		$url = "";
+		
+		$connection  = Yii::app()->dbrpt;
+		$transaction = $connection->beginTransaction();
+		
+		
+		try{				
+			//insert token here
+			if(!is_array($this->tablename)) 
+			{
+				$modelToken   = new Token;
+				$modelToken->user_id 	= $this->vp_userid;
+				$modelToken->module 	= $this->module;
+				$modelToken->tablename	= $this->tablename;
+				$modelToken->token_cd 	= $this->vp_userid.$this->module.date("YmdHis");
+				$modelToken->token_date = date("Y-m-d H:i:s");
+				$modelToken->random_value = $this->vo_random_value;
+				
+				
+				$modelDeleteToken = Token::model()->find("user_id =:user_id AND module =:module", array(':user_id'=>$modelToken->user_id,':module'=>$modelToken->module));
+				
+				if($modelDeleteToken != null && $modelToken->module != 'Generate_MKBD_Report' )
+				{
+					
+					if($modelToken->module != 'LIST_OF_CASH_DIVIDEN' && $modelToken->module != 'Generate_MKBD_Report'){
+						
+					// [AR] delete old report data 1 user = 1 trash
+					$query  = "CALL SP_RPT_REMOVE_RAND(:VP_TABLE_NAME,:VP_RAND_VALUE,:VO_ERRCD,:VO_ERRMSG)";	
+					$command = $connection->createCommand($query);
+					
+					$command->bindValue(":VP_TABLE_NAME",$modelDeleteToken->tablename,PDO::PARAM_STR);
+					$command->bindValue(":VP_RAND_VALUE",$modelDeleteToken->random_value,PDO::PARAM_STR);
+					//$command->bindValue(":VP_USERID",$modelDeleteToken->user_id,PDO::PARAM_STR);
+					
+					$command->bindParam(":VO_ERRCD",$this->vo_errcd,PDO::PARAM_INT,10);
+					$command->bindParam(":VO_ERRMSG",$this->vo_errmsg,PDO::PARAM_STR,100);
+		
+					$command->execute();
+					
+					$modelDeleteToken->delete();
+					}
+				}
+				if ($modelToken->module !='LAPORAN_TRX_HARIAN' && $modelToken->module != 'Generate_MKBD_Report' ){
+					
+				$modelToken->save();
+				}
+				
+			}
+			else 
+			{	//LO : For report that uses multiple tables
+				$x = 1;			
+				$tokenCdDate = date("YmdHis");
+			
+				foreach($this->tablename as $val)
+				{
+					$modelToken   = new Token;
+					$modelToken->user_id 	= $this->vp_userid;
+					$modelToken->module 	= $this->module;
+					$modelToken->token_date = date("Y-m-d H:i:s");
+					$modelToken->random_value = $this->vo_random_value;
+					if($x == 1)$modelToken->token_cd 	= $this->vp_userid.$this->module.$tokenCdDate;
+					else {
+						$modelToken->token_cd 	= $this->vp_userid.$this->module.$tokenCdDate.'_'.$x;
+					}
+					$modelToken->tablename	= $val;
+					
+					$modelDeleteToken = Token::model()->find("user_id =:user_id AND module =:module AND tablename =:tablename", array(':user_id'=>$modelToken->user_id,':module'=>$modelToken->module,':tablename'=>$modelToken->tablename));
+				
+					if($modelDeleteToken != null )
+					{
+						
+						if($modelToken->module != 'LIST_OF_CASH_DIVIDEN'){
+						// [AR] delete old report data 1 user = 1 trash
+						$query  = "CALL SP_RPT_REMOVE_RAND(:VP_TABLE_NAME,:VP_RAND_VALUE,:VO_ERRCD,:VO_ERRMSG)";	
+						$command = $connection->createCommand($query);
+						
+						$command->bindValue(":VP_TABLE_NAME",$modelDeleteToken->tablename,PDO::PARAM_STR);
+						$command->bindValue(":VP_RAND_VALUE",$modelDeleteToken->random_value,PDO::PARAM_STR);
+						//$command->bindValue(":VP_USERID",$modelDeleteToken->user_id,PDO::PARAM_STR);
+						
+						$command->bindParam(":VO_ERRCD",$this->vo_errcd,PDO::PARAM_INT,10);
+						$command->bindParam(":VO_ERRMSG",$this->vo_errmsg,PDO::PARAM_STR,100);
+			
+						$command->execute();
+						
+						$modelDeleteToken->delete();
+						}
+					}
+					
+					$modelToken->save();
+					$x++;
+				}				
+			}
+			
+			$transaction->commit();
+			
+			if ($modelToken->module =='LAPORAN_TRX_HARIAN' || $modelToken->module == 'Generate_MKBD_Report' ){
+			$param 		  = '&ACC_TOKEN='.$modelToken->token_cd.'&ACC_USER_ID='.$this->vp_userid.'&TRX_DATE='.$this->trx_date;
+			}
+			else{
+			$param 		  = '&ACC_TOKEN='.$modelToken->token_cd.'&ACC_USER_ID='.$this->vp_userid.'&RP_RANDOM_VALUE='.$this->vo_random_value;	
+			}
+			$url 		  = Constanta::URL.$this->rptname.$param;
+			
+		}catch(Exception $ex){
+			$transaction->rollback();
+			$this->vo_errcd = -888;
+			$this->vo_errmsg = $ex->getMessage();
+		}
+		
+		if($this->vo_errcd < 0)
+			$this->addError('vo_errmsg', 'Error '.$this->vo_errcd.' '.$this->vo_errmsg);
+		
+		return $url;
+	}
+
+	public function showReport2()
+	{
+		$param 		  = '&ACC_USER_ID='.$this->vp_userid.'&TRX_DATE='.$this->trx_date.'&APPROVED_STAT='.$this->approved_stat;
+		$url 		  = Constanta::URL.$this->rptname.$param;	
+		return $url;
+	}
+	
+	
+}
+?>

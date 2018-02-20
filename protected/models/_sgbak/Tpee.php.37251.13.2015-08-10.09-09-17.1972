@@ -1,0 +1,353 @@
+<?php
+
+/**
+ * This is the model class for table "T_PEE".
+ *
+ * The followings are the available columns in table 'T_PEE':
+ * @property string $stk_cd
+ * @property string $eff_dt_fr
+ * @property string $eff_dt_to
+ * @property string $offer_dt_fr
+ * @property string $offer_dt_to
+ * @property string $distrib_dt_fr
+ * @property string $distrib_dt_to
+ * @property integer $qty
+ * @property integer $price
+ * @property integer $unsubscribe_qty
+ * @property string $cre_dt
+ * @property string $upd_dt
+ * @property string $user_id
+ * @property string $stk_name
+ * @property string $paym_dt
+ * @property string $tgl_kontrak
+ * @property string $jenis_penjaminan
+ * @property double $nilai_komitment
+ * @property string $allocate_dt
+ * @property integer $order_price
+ * @property double $bank_garansi
+ * @property string $approved_by
+ * @property string $approved_dt
+ * @property string $approved_stat
+ */
+class Tpee extends AActiveRecordSP
+{
+	//AH: #BEGIN search (datetime || date) additional comparison
+	public $eff_dt_fr_date;
+	public $eff_dt_fr_month;
+	public $eff_dt_fr_year;
+
+	public $eff_dt_to_date;
+	public $eff_dt_to_month;
+	public $eff_dt_to_year;
+
+	public $offer_dt_fr_date;
+	public $offer_dt_fr_month;
+	public $offer_dt_fr_year;
+
+	public $offer_dt_to_date;
+	public $offer_dt_to_month;
+	public $offer_dt_to_year;
+
+	public $distrib_dt_fr_date;
+	public $distrib_dt_fr_month;
+	public $distrib_dt_fr_year;
+
+	public $distrib_dt_to_date;
+	public $distrib_dt_to_month;
+	public $distrib_dt_to_year;
+
+	public $cre_dt_date;
+	public $cre_dt_month;
+	public $cre_dt_year;
+
+	public $upd_dt_date;
+	public $upd_dt_month;
+	public $upd_dt_year;
+
+	public $paym_dt_date;
+	public $paym_dt_month;
+	public $paym_dt_year;
+
+	public $tgl_kontrak_date;
+	public $tgl_kontrak_month;
+	public $tgl_kontrak_year;
+
+	public $allocate_dt_date;
+	public $allocate_dt_month;
+	public $allocate_dt_year;
+	public $jurnal_distribdt;
+	public $stk_cd_temp;
+	public $stk_cd_ksei;
+	public $tahap;
+	public $option;
+	//public $menu;
+	public $gl_acct_bank;
+	public $sl_acct_bank;
+	public $gl_acct_utang;
+	public $sl_acct_utang;
+	public $voucher_ref;
+	public $total;
+	public $remarks;
+	public $client_cd;
+	public $branch_cd;
+	public $check_gl;
+	//public $penjatahan;
+	
+	//AH: #END search (datetime || date)  additional comparison
+	
+	public function __construct($scenario = 'insert')
+	{
+		parent::__construct($scenario);
+		$this->logRecord=true;
+	}
+	
+	public static function model($className=__CLASS__)
+	{
+		return parent::model($className);
+	}
+    
+
+	public function tableName()
+	{
+		return 'T_PEE';
+	}
+	public function getDropDownList(){
+		
+		
+		return $this->stk_cd." - ".$this->stk_name;
+	}
+	public function executeSp($exec_status,$old_id)
+	{
+		$connection  = Yii::app()->db;
+		$transaction = $connection->beginTransaction();	
+		
+		try{
+			$query  = "CALL SP_T_PEE_UPD(
+						:P_SEARCH_STK_CD,
+						:P_STK_CD,
+						TO_DATE(:P_EFF_DT_FR,'DD/MM/YY'),
+						TO_DATE(:P_EFF_DT_TO,'DD/MM/YY'),
+						TO_DATE(:P_OFFER_DT_FR,'DD/MM/YY'),
+						TO_DATE(:P_OFFER_DT_TO,'DD/MM/YY'),
+						TO_DATE(:P_DISTRIB_DT_FR,'DD/MM/YY'),
+						TO_DATE(:P_DISTRIB_DT_TO,'DD/MM/YY'),
+						:P_QTY,
+						:P_PRICE,
+						:P_UNSUBSCRIBE_QTY,
+						TO_DATE(:P_CRE_DT,'YYYY-MM-DD HH24:MI:SS'),
+						TO_DATE(:P_UPD_DT,'YYYY-MM-DD HH24:MI:SS'),
+						:P_USER_ID,
+						:P_STK_NAME,
+						TO_DATE(:P_PAYM_DT,'DD/MM/YY'),
+						TO_DATE(:P_TGL_KONTRAK,'DD/MM/YY'),
+						:P_JENIS_PENJAMINAN,
+						:P_NILAI_KOMITMENT,
+						TO_DATE(:P_ALLOCATE_DT,'DD/MM/YY'),
+						:P_ORDER_PRICE,
+						:P_BANK_GARANSI,
+						:P_UPD_BY,
+						:P_UPD_STATUS,
+						:P_IP_ADDRESS,
+						:P_CANCEL_REASON,
+						:P_ERROR_CODE,
+						:P_ERROR_MSG)";
+			
+						
+			$command = $connection->createCommand($query);
+			$command->bindValue(":P_SEARCH_STK_CD",$old_id,PDO::PARAM_STR);
+			$command->bindValue(":P_STK_CD",$this->stk_cd,PDO::PARAM_STR);
+			$command->bindValue(":P_EFF_DT_FR",$this->eff_dt_fr,PDO::PARAM_STR);
+			$command->bindValue(":P_EFF_DT_TO",$this->eff_dt_to,PDO::PARAM_STR);
+			$command->bindValue(":P_OFFER_DT_FR",$this->offer_dt_fr,PDO::PARAM_STR);
+			$command->bindValue(":P_OFFER_DT_TO",$this->offer_dt_to,PDO::PARAM_STR);
+			$command->bindValue(":P_DISTRIB_DT_FR",$this->distrib_dt_fr,PDO::PARAM_STR);
+			$command->bindValue(":P_DISTRIB_DT_TO",$this->distrib_dt_fr,PDO::PARAM_STR);
+			$command->bindValue(":P_QTY",$this->qty,PDO::PARAM_STR);
+			$command->bindValue(":P_PRICE",$this->price,PDO::PARAM_STR);
+			$command->bindValue(":P_UNSUBSCRIBE_QTY",$this->unsubscribe_qty,PDO::PARAM_STR);
+			$command->bindValue(":P_CRE_DT",$this->cre_dt,PDO::PARAM_STR);
+			$command->bindValue(":P_UPD_DT",$this->upd_dt,PDO::PARAM_STR);
+			$command->bindValue(":P_USER_ID",$this->user_id,PDO::PARAM_STR);
+			$command->bindValue(":P_STK_NAME",$this->stk_name,PDO::PARAM_STR);
+			$command->bindValue(":P_PAYM_DT",$this->paym_dt,PDO::PARAM_STR);
+			$command->bindValue(":P_TGL_KONTRAK",$this->tgl_kontrak,PDO::PARAM_STR);
+			$command->bindValue(":P_JENIS_PENJAMINAN",$this->jenis_penjaminan,PDO::PARAM_STR);
+			$command->bindValue(":P_NILAI_KOMITMENT",$this->nilai_komitment,PDO::PARAM_STR);
+			$command->bindValue(":P_ALLOCATE_DT",$this->allocate_dt,PDO::PARAM_STR);
+			$command->bindValue(":P_ORDER_PRICE",$this->order_price,PDO::PARAM_STR);
+			$command->bindValue(":P_BANK_GARANSI",$this->bank_garansi,PDO::PARAM_STR);
+			$command->bindValue(":P_UPD_BY",$this->upd_by,PDO::PARAM_STR);
+			$command->bindValue(":P_UPD_STATUS",$exec_status,PDO::PARAM_STR);
+			$command->bindValue(":P_IP_ADDRESS",$this->ip_address,PDO::PARAM_STR);
+			$command->bindValue(":P_CANCEL_REASON",$this->cancel_reason,PDO::PARAM_STR);
+
+			$command->bindParam(":P_ERROR_CODE",$this->error_code,PDO::PARAM_INT,10);
+			$command->bindParam(":P_ERROR_MSG",$this->error_msg,PDO::PARAM_STR,1000);
+
+			$command->execute();
+			$transaction->commit();
+		}catch(Exception $ex){
+			$transaction->rollback();
+			if($this->error_code = -999)
+				$this->error_msg = $ex->getMessage();
+		}
+		
+		if($this->error_code < 0)
+			$this->addError('error_msg', 'Error '.$this->error_code.' '.$this->error_msg);
+		
+		return $this->error_code;
+	}
+
+	public function rules()
+	{
+		return array(
+		
+			array('qty, price, unsubscribe_qty, nilai_komitment, order_price, bank_garansi', 'application.components.validator.ANumberSwitcherValidator'),
+			//array('eff_dt_fr, eff_dt_to, offer_dt_fr, offer_dt_to, distrib_dt_fr', 'application.components.validator.ADatePickerSwitcherValidatorSP'),
+			
+			array('stk_cd,jenis_penjaminan,stk_name,eff_dt_fr,eff_dt_to,offer_dt_fr,offer_dt_to,distrib_dt_fr','required','except'=>'ipoentry,penjatahan'),
+			array('qty, price, unsubscribe_qty, order_price', 'numerical', 'integerOnly'=>true),
+			array('nilai_komitment, bank_garansi', 'numerical'),
+			array('user_id', 'length', 'max'=>10),
+			array('stk_name', 'length', 'max'=>80),
+			array('jenis_penjaminan', 'length', 'max'=>30),
+			//array('gl_acct_bank,gl_acct_utang,sl_acct_bank,sl_acct_utang','required','on'=>'penjatahan'),
+			array('check_gl,client_cd,branch_cd,remarks,gl_acct_bank,gl_acct_utang,sl_acct_bank,sl_acct_utang,voucher_ref,total,gl_acct_bank,sl_acct_bank, gl_acct_utang, sl_acct_utang,tahap,option,tahap,stk_cd_temp,stk_cd_ksei,jurnal_distribdt,distrib_dt_to, cre_dt, upd_dt, paym_dt, tgl_kontrak, allocate_dt, upd_by', 'safe'),
+			//array('eff_dt_fr, eff_dt_to, offer_dt_fr, offer_dt_to, distrib_dt_fr, distrib_dt_to, cre_dt, upd_dt, paym_dt, tgl_kontrak, allocate_dt', 'safe'),
+
+			// The following rule is used by search().
+			// Please remove those attributes that should not be searched.
+	
+			array('stk_cd, eff_dt_fr, eff_dt_to, offer_dt_fr, offer_dt_to, distrib_dt_fr, distrib_dt_to, qty, price, unsubscribe_qty, cre_dt, upd_dt, user_id, stk_name, paym_dt, tgl_kontrak, jenis_penjaminan, nilai_komitment, allocate_dt, order_price, bank_garansi,eff_dt_fr_date,eff_dt_fr_month,eff_dt_fr_year,eff_dt_to_date,eff_dt_to_month,eff_dt_to_year,offer_dt_fr_date,offer_dt_fr_month,offer_dt_fr_year,offer_dt_to_date,offer_dt_to_month,offer_dt_to_year,distrib_dt_fr_date,distrib_dt_fr_month,distrib_dt_fr_year,distrib_dt_to_date,distrib_dt_to_month,distrib_dt_to_year,cre_dt_date,cre_dt_month,cre_dt_year,upd_dt_date,upd_dt_month,upd_dt_year,paym_dt_date,paym_dt_month,paym_dt_year,tgl_kontrak_date,tgl_kontrak_month,tgl_kontrak_year,allocate_dt_date,allocate_dt_month,allocate_dt_year', 'safe', 'on'=>'search'),
+		);
+	}
+
+	public function relations()
+	{
+		return array(
+		);
+	}
+
+	public function attributeLabels()
+	{
+		return array(
+			'stk_cd' => 'Stock Code Sementara',
+			'eff_dt_fr' => 'Efektif dari',
+			'eff_dt_to' => 'Efektif sampai',
+			'offer_dt_fr' => 'Penawaran dari',
+			'offer_dt_to' => 'Penawaran sampai',
+			'distrib_dt_fr' => 'Distribution Date',
+			'distrib_dt_to' => 'Distribution Date',
+			'qty' => 'Qty',
+			'price' => 'Harga',
+			'unsubscribe_qty' => 'Unsubscribed',
+			'cre_dt' => 'Cre Date',
+			'upd_dt' => 'Upd Date',
+			'user_id' => 'User',
+			'stk_name' => 'Nama',
+			'paym_dt' => 'Pembayaran',
+			'tgl_kontrak' => 'Tgl Kontrak',
+			'jenis_penjaminan' => 'Jenis Penjaminan',
+			'nilai_komitment' => 'Nilai Komitment',
+			'allocate_dt' => 'Penjatahan',
+			'order_price' => 'Order Price',
+			'bank_garansi' => 'Bank Garansi',
+		);
+	}
+
+
+	public function search()
+	{
+		$criteria = new CDbCriteria;
+		$criteria->compare('lower(stk_cd)',strtolower($this->stk_cd),true);
+
+		if(!empty($this->eff_dt_fr_date))
+			$criteria->addCondition("TO_CHAR(t.eff_dt_fr,'DD') LIKE '%".($this->eff_dt_fr_date)."%'");
+		if(!empty($this->eff_dt_fr_month))
+			$criteria->addCondition("TO_CHAR(t.eff_dt_fr,'MM') LIKE '%".($this->eff_dt_fr_month)."%'");
+		if(!empty($this->eff_dt_fr_year))
+			$criteria->addCondition("TO_CHAR(t.eff_dt_fr,'YYYY') LIKE '%".($this->eff_dt_fr_year)."%'");
+		if(!empty($this->eff_dt_to_date))
+			$criteria->addCondition("TO_CHAR(t.eff_dt_to,'DD') LIKE '%".($this->eff_dt_to_date)."%'");
+		if(!empty($this->eff_dt_to_month))
+			$criteria->addCondition("TO_CHAR(t.eff_dt_to,'MM') LIKE '%".($this->eff_dt_to_month)."%'");
+		if(!empty($this->eff_dt_to_year))
+			$criteria->addCondition("TO_CHAR(t.eff_dt_to,'YYYY') LIKE '%".($this->eff_dt_to_year)."%'");
+		if(!empty($this->offer_dt_fr_date))
+			$criteria->addCondition("TO_CHAR(t.offer_dt_fr,'DD') LIKE '%".($this->offer_dt_fr_date)."%'");
+		if(!empty($this->offer_dt_fr_month))
+			$criteria->addCondition("TO_CHAR(t.offer_dt_fr,'MM') LIKE '%".($this->offer_dt_fr_month)."%'");
+		if(!empty($this->offer_dt_fr_year))
+			$criteria->addCondition("TO_CHAR(t.offer_dt_fr,'YYYY') LIKE '%".($this->offer_dt_fr_year)."%'");
+		if(!empty($this->offer_dt_to_date))
+			$criteria->addCondition("TO_CHAR(t.offer_dt_to,'DD') LIKE '%".($this->offer_dt_to_date)."%'");
+		if(!empty($this->offer_dt_to_month))
+			$criteria->addCondition("TO_CHAR(t.offer_dt_to,'MM') LIKE '%".($this->offer_dt_to_month)."%'");
+		if(!empty($this->offer_dt_to_year))
+			$criteria->addCondition("TO_CHAR(t.offer_dt_to,'YYYY') LIKE '%".($this->offer_dt_to_year)."%'");
+		if(!empty($this->distrib_dt_fr_date))
+			$criteria->addCondition("TO_CHAR(t.distrib_dt_fr,'DD') LIKE '%".($this->distrib_dt_fr_date)."%'");
+		if(!empty($this->distrib_dt_fr_month))
+			$criteria->addCondition("TO_CHAR(t.distrib_dt_fr,'MM') LIKE '%".($this->distrib_dt_fr_month)."%'");
+		if(!empty($this->distrib_dt_fr_year))
+			$criteria->addCondition("TO_CHAR(t.distrib_dt_fr,'YYYY') LIKE '%".($this->distrib_dt_fr_year)."%'");
+		if(!empty($this->distrib_dt_to_date))
+			$criteria->addCondition("TO_CHAR(t.distrib_dt_to,'DD') LIKE '%".($this->distrib_dt_to_date)."%'");
+		if(!empty($this->distrib_dt_to_month))
+			$criteria->addCondition("TO_CHAR(t.distrib_dt_to,'MM') LIKE '%".($this->distrib_dt_to_month)."%'");
+		if(!empty($this->distrib_dt_to_year))
+			$criteria->addCondition("TO_CHAR(t.distrib_dt_to,'YYYY') LIKE '%".($this->distrib_dt_to_year)."%'");		$criteria->compare('qty',$this->qty);
+		$criteria->compare('price',$this->price);
+		$criteria->compare('unsubscribe_qty',$this->unsubscribe_qty);
+
+		if(!empty($this->cre_dt_date))
+			$criteria->addCondition("TO_CHAR(t.cre_dt,'DD') LIKE '%".($this->cre_dt_date)."%'");
+		if(!empty($this->cre_dt_month))
+			$criteria->addCondition("TO_CHAR(t.cre_dt,'MM') LIKE '%".($this->cre_dt_month)."%'");
+		if(!empty($this->cre_dt_year))
+			$criteria->addCondition("TO_CHAR(t.cre_dt,'YYYY') LIKE '%".($this->cre_dt_year)."%'");
+		if(!empty($this->upd_dt_date))
+			$criteria->addCondition("TO_CHAR(t.upd_dt,'DD') LIKE '%".($this->upd_dt_date)."%'");
+		if(!empty($this->upd_dt_month))
+			$criteria->addCondition("TO_CHAR(t.upd_dt,'MM') LIKE '%".($this->upd_dt_month)."%'");
+		if(!empty($this->upd_dt_year))
+			$criteria->addCondition("TO_CHAR(t.upd_dt,'YYYY') LIKE '%".($this->upd_dt_year)."%'");		$criteria->compare('user_id',$this->user_id,true);
+		$criteria->compare('lower(stk_name)',strtolower($this->stk_name),true);
+
+		if(!empty($this->paym_dt_date))
+			$criteria->addCondition("TO_CHAR(t.paym_dt,'DD') LIKE '%".($this->paym_dt_date)."%'");
+		if(!empty($this->paym_dt_month))
+			$criteria->addCondition("TO_CHAR(t.paym_dt,'MM') LIKE '%".($this->paym_dt_month)."%'");
+		if(!empty($this->paym_dt_year))
+			$criteria->addCondition("TO_CHAR(t.paym_dt,'YYYY') LIKE '%".($this->paym_dt_year)."%'");
+		if(!empty($this->tgl_kontrak_date))
+			$criteria->addCondition("TO_CHAR(t.tgl_kontrak,'DD') LIKE '%".($this->tgl_kontrak_date)."%'");
+		if(!empty($this->tgl_kontrak_month))
+			$criteria->addCondition("TO_CHAR(t.tgl_kontrak,'MM') LIKE '%".($this->tgl_kontrak_month)."%'");
+		if(!empty($this->tgl_kontrak_year))
+			$criteria->addCondition("TO_CHAR(t.tgl_kontrak,'YYYY') LIKE '%".($this->tgl_kontrak_year)."%'");		$criteria->compare('jenis_penjaminan',$this->jenis_penjaminan,true);
+		$criteria->compare('nilai_komitment',$this->nilai_komitment);
+
+		if(!empty($this->allocate_dt_date))
+			$criteria->addCondition("TO_CHAR(t.allocate_dt,'DD') LIKE '%".($this->allocate_dt_date)."%'");
+		if(!empty($this->allocate_dt_month))
+			$criteria->addCondition("TO_CHAR(t.allocate_dt,'MM') LIKE '%".($this->allocate_dt_month)."%'");
+		if(!empty($this->allocate_dt_year))
+			$criteria->addCondition("TO_CHAR(t.allocate_dt,'YYYY') LIKE '%".($this->allocate_dt_year)."%'");		$criteria->compare('order_price',$this->order_price);
+		$criteria->compare('bank_garansi',$this->bank_garansi);
+		$criteria->compare('approved_stat',$this->approved_stat,true);
+		$sort = new CSort;
+		$sort->defaultOrder = 'distrib_dt_to DESC, stk_cd';
+		//$sort->attributes = array('distrib_dt_to DESC','stk_cd');
+		$sort->attributes = array(
+			'stk_cd',
+			'stk_name',
+			'distrib_dt_to',
+		);
+
+		return new CActiveDataProvider($this, array(
+			'criteria'=>$criteria,
+			'sort' => $sort,
+		));
+	}
+}

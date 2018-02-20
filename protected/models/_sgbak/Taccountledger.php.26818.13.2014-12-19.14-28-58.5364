@@ -1,0 +1,410 @@
+<?php
+
+/**
+ * This is the model class for table "T_ACCOUNT_LEDGER".
+ *
+ * The followings are the available columns in table 'T_ACCOUNT_LEDGER':
+ * @property string $xn_doc_num
+ * @property integer $tal_id
+ * @property string $doc_ref_num
+ * @property string $acct_type
+ * @property string $sl_acct_cd
+ * @property string $gl_acct_cd
+ * @property string $chrg_cd
+ * @property integer $chq_sno
+ * @property string $curr_cd
+ * @property string $brch_cd
+ * @property double $curr_val
+ * @property double $xn_val
+ * @property string $budget_cd
+ * @property string $db_cr_flg
+ * @property string $ledger_nar
+ * @property string $cashier_id
+ * @property string $user_id
+ * @property string $cre_dt
+ * @property string $upd_dt
+ * @property string $doc_date
+ * @property string $due_date
+ * @property string $netting_date
+ * @property string $netting_flg
+ * @property string $record_source
+ * @property double $sett_for_curr
+ * @property string $sett_status
+ * @property string $rvpv_number
+ * @property string $approved_sts
+ * @property string $approved_by
+ * @property string $approved_dt
+ * @property string $folder_cd
+ * @property double $sett_val
+ * @property string $arap_due_date
+ * @property string $rvpv_gssl
+ */
+class Taccountledger extends AActiveRecordSP
+{
+	//AH: #BEGIN search (datetime || date) additional comparison
+	public $cre_dt_date;
+	public $cre_dt_month;
+	public $cre_dt_year;
+
+	public $upd_dt_date;
+	public $upd_dt_month;
+	public $upd_dt_year;
+
+	public $doc_date_date;
+	public $doc_date_month;
+	public $doc_date_year;
+
+	public $due_date_date;
+	public $due_date_month;
+	public $due_date_year;
+
+	public $netting_date_date;
+	public $netting_date_month;
+	public $netting_date_year;
+
+	public $approved_dt_date;
+	public $approved_dt_month;
+	public $approved_dt_year;
+
+	public $arap_due_date_date;
+	public $arap_due_date_month;
+	public $arap_due_date_year;
+	public $cancel_flg = 'N';
+	public $save_flg = 'N';
+	public $old_xn_doc_num;
+	public $old_tal_id;
+	public $update_date;
+	public $update_seq;
+	//AH: #END search (datetime || date)  additional comparison
+	
+	public $system_generated;
+	public $bank_flg;
+	
+	public function __construct($scenario = 'insert')
+	{
+		parent::__construct($scenario);
+		$this->logRecord=true;
+	}
+	
+	public static function model($className=__CLASS__)
+	{
+		return parent::model($className);
+	}
+    
+
+	public function tableName()
+	{
+		return 'T_ACCOUNT_LEDGER';
+	}
+
+	public function rules()
+	{
+		return array(
+		
+			array('doc_date, due_date, netting_date, approved_dt, arap_due_date', 'application.components.validator.ADatePickerSwitcherValidatorSP'),
+		
+			array('tal_id, chq_sno, curr_val, xn_val, sett_for_curr, sett_val', 'application.components.validator.ANumberSwitcherValidator'),
+			
+			array('gl_acct_cd, sl_acct_cd, curr_val','required'),
+			
+			array('tal_id, chq_sno', 'numerical', 'integerOnly'=>true),
+			array('curr_val, xn_val, sett_for_curr, sett_val', 'numerical'),
+			array('xn_doc_num, doc_ref_num, rvpv_number, rvpv_gssl', 'length', 'max'=>17),
+			array('acct_type', 'length', 'max'=>4),
+			array('sl_acct_cd, gl_acct_cd', 'length', 'max'=>12),
+			array('chrg_cd', 'length', 'max'=>5),
+			array('sl_acct_cd','ceksl_a'),
+			array('gl_acct_cd','cekgl_a'),
+			array('curr_cd, brch_cd', 'length', 'max'=>3),
+			array('budget_cd', 'length', 'max'=>9),
+			array('db_cr_flg, netting_flg, sett_status, approved_sts', 'length', 'max'=>1),
+			array('ledger_nar', 'length', 'max'=>50),
+			array('cashier_id', 'length', 'max'=>6),
+			array('user_id', 'length', 'max'=>10),
+			array('record_source', 'length', 'max'=>30),
+			array('approved_by', 'length', 'max'=>20),
+			array('folder_cd', 'length', 'max'=>8),
+			array('curr_val,bank_flg,system_generated,old_tal_id,old_xn_doc_num,cancel_flg,save_flg,cre_dt, upd_dt, doc_date, due_date, netting_date, approved_dt, arap_due_date', 'safe'),
+
+			// The following rule is used by search().
+			// Please remove those attributes that should not be searched.
+	
+			array('xn_doc_num, tal_id, doc_ref_num, acct_type, sl_acct_cd, gl_acct_cd, chrg_cd, chq_sno, curr_cd, brch_cd, curr_val, xn_val, budget_cd, db_cr_flg, ledger_nar, cashier_id, user_id, cre_dt, upd_dt, doc_date, due_date, netting_date, netting_flg, record_source, sett_for_curr, sett_status, rvpv_number, approved_sts, approved_by, approved_dt, folder_cd, sett_val, arap_due_date, rvpv_gssl,cre_dt_date,cre_dt_month,cre_dt_year,upd_dt_date,upd_dt_month,upd_dt_year,doc_date_date,doc_date_month,doc_date_year,due_date_date,due_date_month,due_date_year,netting_date_date,netting_date_month,netting_date_year,approved_dt_date,approved_dt_month,approved_dt_year,arap_due_date_date,arap_due_date_month,arap_due_date_year', 'safe', 'on'=>'search'),
+		);
+	}
+
+	public function relations()
+	{
+		return array(
+		);
+	}
+	public function ceksl_a(){
+		$sql="select trim(gl_a),trim(sl_a) from mst_gl_account where sl_a=trim('$this->sl_acct_cd')";
+		$cek=DAO::queryRowSql($sql);
+		
+		if(!$cek){
+			$this->addError('sl_acct_cd', 'Not found in chart of Account');
+		}
+	}
+	public function cekgl_a(){
+		$sql="select gl_a from mst_gl_account where gl_a='$this->gl_acct_cd'";
+		$cek=DAO::queryRowSql($sql);
+		
+		if(!$cek){
+			$this->addError('gl_acct_cd', 'Not found in chart of Account');
+		}
+	}
+/*
+	public function cek_branch(){
+		$sql="select dflg1 from mst_sys_param where param_id='SYSTEM' and param_cd1='CHECK' AND PARAM_CD2='ACCTBRCH'";
+		$dflg=DAO::queryRowSql($sql);
+		$branch_cd = $dflg['dflg1'];
+		if($branch_cd =='Y'){
+		$query="SELECT brch_cd from mst_gl_account where trim(gl_a)=trim('$this->gl_acct_cd') rownum=1";
+		$getquery=DAO::queryRowSql($query);
+		$branch=$getquery['brch_cd'];
+		if($branch){
+			
+			$sql="SELECT * from mst_gl_account where brch_cd ='$branch' and trim(gl_a) = trim('$this->gl_acct_cd') and trim(sl_a) = trim('$this->sl_acct_cd')";
+			$cek=DAO::queryAllSql($sql);
+			if(!$cek){
+				$this->addError('sl_acct_cd', 'GL Account dan SL Account harus dari Branch yang sama');
+			}
+			
+		}
+		
+		
+			
+		}
+	}
+*/
+	public function attributeLabels()
+	{
+		return array(
+			'xn_doc_num' => 'Xn Doc Num',
+			'tal_id' => 'Tal',
+			'doc_ref_num' => 'Doc Ref Num',
+			'acct_type' => 'Acct Type',
+			'sl_acct_cd' => 'Sl Acct Code',
+			'gl_acct_cd' => 'Gl Acct Code',
+			'chrg_cd' => 'Chrg Code',
+			'chq_sno' => 'Chq Sno',
+			'curr_cd' => 'Curr Code',
+			'brch_cd' => 'Brch Code',
+			'curr_val' => 'Curr Val',
+			'xn_val' => 'Xn Val',
+			'budget_cd' => 'Budget Code',
+			'db_cr_flg' => 'Db Cr Flg',
+			'ledger_nar' => 'Ledger Nar',
+			'cashier_id' => 'Cashier',
+			'user_id' => 'User',
+			'cre_dt' => 'Cre Date',
+			'upd_dt' => 'Upd Date',
+			'doc_date' => 'Doc Date',
+			'due_date' => 'Due Date',
+			'netting_date' => 'Netting Date',
+			'netting_flg' => 'Netting Flg',
+			'record_source' => 'Record Source',
+			'sett_for_curr' => 'Sett For Curr',
+			'sett_status' => 'Sett Status',
+			'rvpv_number' => 'Rvpv Number',
+			'approved_sts' => 'Approved Sts',
+			'approved_by' => 'Approved By',
+			'approved_dt' => 'Approved Date',
+			'folder_cd' => 'Folder Code',
+			'sett_val' => 'Sett Val',
+			'arap_due_date' => 'Arap Due Date',
+			'rvpv_gssl' => 'Rvpv Gssl',
+		);
+	}
+
+	public function executeSp($exec_status,$old_xn_doc_num,$old_tal_id,$update_date,$update_seq,$record_seq)
+	{
+		$connection  = Yii::app()->db;
+				
+		try{
+			$query  = "CALL Sp_T_ACCOUNT_LEDGER_Upd(
+						:P_SEARCH_XN_DOC_NUM,
+						:P_SEARCH_TAL_ID,
+						:P_XN_DOC_NUM,
+						:P_TAL_ID,
+						:P_DOC_REF_NUM,
+						:P_ACCT_TYPE,
+						:P_SL_ACCT_CD,
+						:P_GL_ACCT_CD,
+						:P_CHRG_CD,
+						:P_CHQ_SNO,
+						:P_CURR_CD,
+						:P_BRCH_CD,
+						:P_CURR_VAL,
+						:P_XN_VAL,
+						:P_BUDGET_CD,
+						:P_DB_CR_FLG,
+						:P_LEDGER_NAR,
+						:P_CASHIER_ID,
+						TO_DATE(:P_DOC_DATE,'YYYY-MM-DD'),
+						TO_DATE(:P_DUE_DATE,'YYYY-MM-DD'),
+						TO_DATE(:P_NETTING_DATE,'YYYY-MM-DD'),
+						:P_NETTING_FLG,
+						:P_RECORD_SOURCE,
+						:P_SETT_FOR_CURR,
+						:P_SETT_STATUS,
+						:P_RVPV_NUMBER,
+						:P_FOLDER_CD,
+						:P_SETT_VAL,
+						TO_DATE(:P_ARAP_DUE_DATE,'YYYY-MM-DD'),
+						:P_RVPV_GSSL,
+						:P_USER_ID,
+						TO_DATE(:P_CRE_DT,'YYYY-MM-DD HH24:MI:SS'),
+						:P_UPD_BY,
+						TO_DATE(:P_UPD_DT,'YYYY-MM-DD HH24:MI:SS'),		
+						:P_REVERSAL_JUR,
+						:P_MANUAL,				
+						:P_UPD_STATUS,
+						:p_ip_address,
+						:p_cancel_reason,
+						TO_DATE(:p_update_date,'YYYY-MM-DD HH24:MI:SS'),
+						:p_update_seq,
+						:p_record_seq,
+						:p_error_code,
+						:p_error_msg	)";
+			
+			$command = $connection->createCommand($query);
+			$command->bindValue(":P_SEARCH_XN_DOC_NUM",$old_xn_doc_num,PDO::PARAM_STR);
+			$command->bindValue(":P_SEARCH_TAL_ID",$old_tal_id,PDO::PARAM_STR);
+			$command->bindValue(":P_XN_DOC_NUM",$this->xn_doc_num,PDO::PARAM_STR);
+			$command->bindValue(":P_TAL_ID",$this->tal_id,PDO::PARAM_STR);
+			$command->bindValue(":P_DOC_REF_NUM",$this->doc_ref_num,PDO::PARAM_STR);
+			$command->bindValue(":P_ACCT_TYPE",$this->acct_type,PDO::PARAM_STR);
+			$command->bindValue(":P_SL_ACCT_CD",$this->sl_acct_cd,PDO::PARAM_STR);
+			$command->bindValue(":P_GL_ACCT_CD",$this->gl_acct_cd,PDO::PARAM_STR);
+			$command->bindValue(":P_CHRG_CD",$this->chq_sno,PDO::PARAM_STR);
+			$command->bindValue(":P_CHQ_SNO",$this->chq_sno,PDO::PARAM_STR);
+			$command->bindValue(":P_CURR_CD",$this->curr_cd,PDO::PARAM_STR);
+			$command->bindValue(":P_BRCH_CD",$this->brch_cd,PDO::PARAM_STR);
+			$command->bindValue(":P_CURR_VAL",$this->curr_val,PDO::PARAM_STR);
+			$command->bindValue(":P_XN_VAL",$this->xn_val,PDO::PARAM_STR);
+			$command->bindValue(":P_BUDGET_CD",$this->budget_cd,PDO::PARAM_STR);
+			$command->bindValue(":P_DB_CR_FLG",$this->db_cr_flg,PDO::PARAM_STR);
+			$command->bindValue(":P_LEDGER_NAR",$this->ledger_nar,PDO::PARAM_STR);
+			$command->bindValue(":P_CASHIER_ID",$this->cashier_id,PDO::PARAM_STR);
+			$command->bindValue(":P_DOC_DATE",$this->doc_date,PDO::PARAM_STR);
+			$command->bindValue(":P_DUE_DATE",$this->due_date,PDO::PARAM_STR);
+			$command->bindValue(":P_NETTING_DATE",$this->netting_date,PDO::PARAM_STR);
+			$command->bindValue(":P_NETTING_FLG",$this->netting_flg,PDO::PARAM_STR);
+			$command->bindValue(":P_RECORD_SOURCE",$this->record_source,PDO::PARAM_STR);
+			$command->bindValue(":P_SETT_FOR_CURR",$this->sett_for_curr,PDO::PARAM_STR);
+			$command->bindValue(":P_SETT_STATUS",$this->sett_status,PDO::PARAM_STR);
+			$command->bindValue(":P_RVPV_NUMBER",$this->rvpv_number,PDO::PARAM_STR);
+			$command->bindValue(":P_FOLDER_CD",$this->folder_cd,PDO::PARAM_STR);
+			$command->bindValue(":P_SETT_VAL",$this->sett_val,PDO::PARAM_STR);
+			$command->bindValue(":P_ARAP_DUE_DATE",$this->arap_due_date,PDO::PARAM_STR);
+			$command->bindValue(":P_RVPV_GSSL",$this->rvpv_gssl,PDO::PARAM_STR);
+			$command->bindValue(":P_USER_ID",$this->user_id,PDO::PARAM_STR);
+			$command->bindValue(":P_CRE_DT",$this->cre_dt,PDO::PARAM_STR);
+			$command->bindValue(":P_UPD_BY",$this->upd_by,PDO::PARAM_STR);
+			$command->bindValue(":P_UPD_DT",$this->upd_dt,PDO::PARAM_STR);
+			$command->bindValue(":P_REVERSAL_JUR",$this->reversal_jur,PDO::PARAM_STR);
+			$command->bindValue(":P_MANUAL",$this->manual,PDO::PARAM_STR);
+			$command->bindValue(":P_UPD_STATUS",$exec_status,PDO::PARAM_STR);								
+			$command->bindValue(":P_IP_ADDRESS",$this->ip_address,PDO::PARAM_STR);
+			$command->bindValue(":P_CANCEL_REASON",$this->cancel_reason,PDO::PARAM_STR);
+			$command->bindValue(":P_UPDATE_DATE",$update_date,PDO::PARAM_STR);
+			$command->bindValue(":P_UPDATE_SEQ",$update_seq,PDO::PARAM_STR);
+			$command->bindValue(":P_RECORD_SEQ",$record_seq,PDO::PARAM_STR);	
+			$command->bindParam(":P_ERROR_CODE",$this->error_code,PDO::PARAM_INT,10);
+			$command->bindParam(":P_ERROR_MSG",$this->error_msg,PDO::PARAM_STR,1000);
+
+			$command->execute();
+			
+			//Commit baru akan dijalankan saat semua transaksi INSERT sukses
+			
+		}catch(Exception $ex){
+			if($this->error_code = -999)
+				$this->error_msg = $ex->getMessage();
+		}
+		
+		if($this->error_code < 0)
+			$this->addError('error_msg', 'Error '.$this->error_code.' '.$this->error_msg);
+		
+		return $this->error_code;
+	}
+
+	public function search()
+	{
+		$criteria = new CDbCriteria;
+		$criteria->compare('xn_doc_num',$this->xn_doc_num,true);
+		$criteria->compare('tal_id',$this->tal_id);
+		$criteria->compare('doc_ref_num',$this->doc_ref_num,true);
+		$criteria->compare('acct_type',$this->acct_type,true);
+		$criteria->compare('sl_acct_cd',$this->sl_acct_cd,true);
+		$criteria->compare('gl_acct_cd',$this->gl_acct_cd,true);
+		$criteria->compare('chrg_cd',$this->chrg_cd,true);
+		$criteria->compare('chq_sno',$this->chq_sno);
+		$criteria->compare('curr_cd',$this->curr_cd,true);
+		$criteria->compare('brch_cd',$this->brch_cd,true);
+		$criteria->compare('curr_val',$this->curr_val);
+		$criteria->compare('xn_val',$this->xn_val);
+		$criteria->compare('budget_cd',$this->budget_cd,true);
+		$criteria->compare('db_cr_flg',$this->db_cr_flg,true);
+		$criteria->compare('ledger_nar',$this->ledger_nar,true);
+		$criteria->compare('cashier_id',$this->cashier_id,true);
+		$criteria->compare('user_id',$this->user_id,true);
+
+		if(!empty($this->cre_dt_date))
+			$criteria->addCondition("TO_CHAR(t.cre_dt,'DD') LIKE '%".$this->cre_dt_date."%'");
+		if(!empty($this->cre_dt_month))
+			$criteria->addCondition("TO_CHAR(t.cre_dt,'MM') LIKE '%".$this->cre_dt_month."%'");
+		if(!empty($this->cre_dt_year))
+			$criteria->addCondition("TO_CHAR(t.cre_dt,'YYYY') LIKE '%".$this->cre_dt_year."%'");
+		if(!empty($this->upd_dt_date))
+			$criteria->addCondition("TO_CHAR(t.upd_dt,'DD') LIKE '%".$this->upd_dt_date."%'");
+		if(!empty($this->upd_dt_month))
+			$criteria->addCondition("TO_CHAR(t.upd_dt,'MM') LIKE '%".$this->upd_dt_month."%'");
+		if(!empty($this->upd_dt_year))
+			$criteria->addCondition("TO_CHAR(t.upd_dt,'YYYY') LIKE '%".$this->upd_dt_year."%'");
+		if(!empty($this->doc_date_date))
+			$criteria->addCondition("TO_CHAR(t.doc_date,'DD') LIKE '%".$this->doc_date_date."%'");
+		if(!empty($this->doc_date_month))
+			$criteria->addCondition("TO_CHAR(t.doc_date,'MM') LIKE '%".$this->doc_date_month."%'");
+		if(!empty($this->doc_date_year))
+			$criteria->addCondition("TO_CHAR(t.doc_date,'YYYY') LIKE '%".$this->doc_date_year."%'");
+		if(!empty($this->due_date_date))
+			$criteria->addCondition("TO_CHAR(t.due_date,'DD') LIKE '%".$this->due_date_date."%'");
+		if(!empty($this->due_date_month))
+			$criteria->addCondition("TO_CHAR(t.due_date,'MM') LIKE '%".$this->due_date_month."%'");
+		if(!empty($this->due_date_year))
+			$criteria->addCondition("TO_CHAR(t.due_date,'YYYY') LIKE '%".$this->due_date_year."%'");
+		if(!empty($this->netting_date_date))
+			$criteria->addCondition("TO_CHAR(t.netting_date,'DD') LIKE '%".$this->netting_date_date."%'");
+		if(!empty($this->netting_date_month))
+			$criteria->addCondition("TO_CHAR(t.netting_date,'MM') LIKE '%".$this->netting_date_month."%'");
+		if(!empty($this->netting_date_year))
+			$criteria->addCondition("TO_CHAR(t.netting_date,'YYYY') LIKE '%".$this->netting_date_year."%'");		$criteria->compare('netting_flg',$this->netting_flg,true);
+		$criteria->compare('record_source',$this->record_source,true);
+		$criteria->compare('sett_for_curr',$this->sett_for_curr);
+		$criteria->compare('sett_status',$this->sett_status,true);
+		$criteria->compare('rvpv_number',$this->rvpv_number,true);
+		$criteria->compare('approved_sts',$this->approved_sts,true);
+		$criteria->compare('approved_by',$this->approved_by,true);
+
+		if(!empty($this->approved_dt_date))
+			$criteria->addCondition("TO_CHAR(t.approved_dt,'DD') LIKE '%".$this->approved_dt_date."%'");
+		if(!empty($this->approved_dt_month))
+			$criteria->addCondition("TO_CHAR(t.approved_dt,'MM') LIKE '%".$this->approved_dt_month."%'");
+		if(!empty($this->approved_dt_year))
+			$criteria->addCondition("TO_CHAR(t.approved_dt,'YYYY') LIKE '%".$this->approved_dt_year."%'");		$criteria->compare('folder_cd',$this->folder_cd,true);
+		$criteria->compare('sett_val',$this->sett_val);
+
+		if(!empty($this->arap_due_date_date))
+			$criteria->addCondition("TO_CHAR(t.arap_due_date,'DD') LIKE '%".$this->arap_due_date_date."%'");
+		if(!empty($this->arap_due_date_month))
+			$criteria->addCondition("TO_CHAR(t.arap_due_date,'MM') LIKE '%".$this->arap_due_date_month."%'");
+		if(!empty($this->arap_due_date_year))
+			$criteria->addCondition("TO_CHAR(t.arap_due_date,'YYYY') LIKE '%".$this->arap_due_date_year."%'");		$criteria->compare('rvpv_gssl',$this->rvpv_gssl,true);
+
+		return new CActiveDataProvider($this, array(
+			'criteria'=>$criteria,
+		));
+	}
+}

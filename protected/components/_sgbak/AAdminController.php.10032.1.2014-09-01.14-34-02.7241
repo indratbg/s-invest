@@ -1,0 +1,213 @@
+<?php
+/**
+ * Controller is the customized base controller class.
+ * All controller classes for this application should extend from this base class.
+ */
+class AAdminController extends CController
+{
+	/**
+	 * @var string the default layout for the controller view. Defaults to '//layouts/column1',
+	 * meaning using a single column layout. See 'protected/views/layouts/column2.php'.
+	 */
+	public $layout = '//layouts/admin_column2';
+    
+	/**
+	 * @var array context menu items. This property will be assigned to {@link CMenu::items}.
+	 */
+	public $menu=array();
+    
+	/**
+	 * @var array the breadcrumbs of the current page. The value of this property will
+	 * be assigned to {@link CBreadcrumbs::links}. Please refer to {@link CBreadcrumbs::links}
+	 * for more details on how to specify this property.
+	 */
+	public $breadcrumbs = array();
+	
+	public $gridTemplate;
+	
+	public $isPopupWindow = false;
+	
+	/**
+	 * @return array action filters
+	 */
+	public function filters()
+	{
+		return array(
+			'accessControl', // perform access control for CRUD operations
+		);
+	}
+	
+	//WT: 20140807
+	public function accessRules()
+	{
+		// AH: Uncomment this code below to gave full access to anyone login
+		// BEGIN FULL ACCESS
+		/*
+				$rules = array(
+					array('allow', 'users' => array('@')),
+				);
+				return $rules;
+	}*/
+	
+		// END FULL ACCESS
+		
+		$rules = array(
+			//array('deny', 'users' => array('*')),
+		);
+		
+		if(!Yii::app()->user->isGuest) {
+			
+			$arrUsergroupId  = Yii::app()->user->usergroup_id;
+			$sUserGroupId 	 = implode(',', $arrUsergroupId);
+	
+			$sModule 		 = '';
+			if(isset($this->module))
+				$sModule	 = $this->module->getName();
+	
+			$sReqAction 	 = $sModule.'/'.Yii::app()->controller->id.'/'.$this->action->id;
+			$sQuery			 = "SELECT menu_id, is_popup_window
+								FROM mst_usergroupakses a ,mst_menuaction b
+								WHERE a.menuaction_id = b.menuaction_id
+								AND lower(action_url)  = lower('$sReqAction')
+								AND usergroup_id IN ( $sUserGroupId )";
+			
+			$sQueryMenu = "SELECT is_popup_window
+							FROM mst_menuaction 
+							WHERE lower(action_url)  = lower('$sReqAction')";
+	
+	
+			$result = DAO::queryRowSql($sQuery);
+			$result2 = DAO::queryRowSql($sQueryMenu);
+			if($result2['is_popup_window'] == '1'){
+				$this->isPopupWindow = true;
+				Yii::app()->errorHandler->errorAction='site/errorpopup';
+			}
+			//Yii::app()->end();
+			
+			if(!empty($result)){
+				// AH : this code is to removing button from grid view and left navbar
+				$query 			= "SELECT MAX(group_id) AS mx_group_id FROM mst_menuaction
+							  		WHERE menu_id = ".$result['menu_id']." AND menuaction_id IN
+					  				( SELECT menuaction_id FROM mst_usergroupakses
+					  				WHERE usergroup_id IN ($sUserGroupId))";
+  				$mx_group_id	= DAO::queryRowSql($query);
+	
+				// reduce from array to integer
+				$mx_group_id 	= $mx_group_id['mx_group_id'];
+				switch($mx_group_id)
+				{
+					case AConstant::MENUACTIONGROUP_READONLY :
+						$this->gridTemplate = '{view}';
+						break;
+					case AConstant::MENUACTIONGROUP_CREATE :
+						$this->gridTemplate = '{view}';
+						break;
+					case AConstant::MENUACTIONGROUP_MODIFY :
+						$this->gridTemplate = '{view}{update}';
+						//$this->leftMenuAcc  =  array( array('label'=>'Create','url'=>array('create'),'icon'=>'plus') );
+						break;
+					case AConstant::MENUACTIONGROUP_REMOVE :
+						$this->gridTemplate = '{view}{update}{delete}';
+						break;
+				}
+	
+				$rules = array(
+							array('allow', 'users' => array('@')),
+							array('deny', 'users' => array('*')),
+						);
+			}
+		}
+	
+		return $rules;
+	}
+	
+	
+	/*
+	// AH: will return array needed for acces control
+	protected function getArrayAccessRules()
+	{
+		// AH: Uncomment this code below to gave full access to anyone login
+		// BEGIN FULL ACCESS
+// 		$rules = array(
+// 				array('allow', 'users' => array('@')),
+// 		);
+// 		return $rules;
+	
+		// END FULL ACCESS
+		
+		if($this->action->id == 'login'){
+			$rules = array(
+					array('allow', 'users' => array('*'))
+			);
+		}else if($this->action->id == 'logout'){
+			$rules = array(
+					array('allow','users' => array('@'))
+			);
+		}else if(!Yii::app()->user->isGuest){
+			$arrUsergroupId  = Yii::app()->user->usergroup_id;
+			$sUserGroupId 	 = implode(',', $arrUsergroupId);
+				
+			$sModule 		 = '';
+			if(isset($this->module))
+				$sModule	 = $this->module->getName();
+				
+			$sReqAction 	 = $sModule.'/'.Yii::app()->controller->id.'/'.$this->action->id;
+			$sQuery			 = "SELECT menu_id 
+								FROM mst_usergroupakses a JOIN mst_menuaction b
+								ON a.menuaction_id = b.menuaction_id
+								AND action_url  = '$sReqAction'
+								AND usergroup_id IN ( $sUserGroupId )";
+	
+				
+			$result = DAO::queryRowSql($sQuery);
+			if(!empty($result)){
+				
+				
+				// AH : this code is to removing button from grid view and left navbar	
+				$query 			= "SELECT MAX(group_id) AS mx_group_id FROM mst_menuaction 
+							  		WHERE menu_id = ".$result['menu_id']." AND menuaction_id IN  
+							  		( SELECT menuaction_id FROM mst_usergroupakses
+							  		 	WHERE usergroup_id IN ($sUserGroupId))";
+				$mx_group_id	= DAO::queryRowSql($query);
+		
+				// reduce from array to integer
+				$mx_group_id 	= $mx_group_id['mx_group_id'];
+				switch($mx_group_id)
+				{
+					case AConstant::MENUACTIONGROUP_READONLY :
+						$this->gridTemplate = '{view}';
+						break;  
+						
+					case AConstant::MENUACTIONGROUP_CREATE :
+						$this->gridTemplate = '{view}';
+						break;  
+					case AConstant::MENUACTIONGROUP_MODIFY :
+						$this->gridTemplate = '{view}{update}';
+						
+						$this->leftMenuAcc  =  array( array('label'=>'Create','url'=>array('create'),'icon'=>'plus') );
+						break;
+					case AConstant::MENUACTIONGROUP_REMOVE :
+						$this->gridTemplate = '{view}{update}{delete}';
+						break;
+				}
+				
+				$rules = array(
+					array('allow', 'users' => array('@')),
+					array('deny', 'users' => array('*')),
+				);
+			}else{
+				$rules = array(
+					array('deny', 'users' => array('@')),
+					array('deny', 'users' => array('*')),
+				);
+			}
+		}else{
+			$rules = array(
+				array('deny', 'users' => array('@')),
+				array('deny', 'users' => array('*')),
+			);
+		}
+		return $rules;
+	}
+	*/
+}

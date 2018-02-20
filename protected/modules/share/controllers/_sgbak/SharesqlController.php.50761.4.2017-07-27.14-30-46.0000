@@ -1,0 +1,113 @@
+<?php
+
+class SharesqlController extends ShareController
+{
+	public function actionIndex()
+	{
+		$this->render('index');
+	}
+	
+	public function actionGetClientNotCustodian()
+	{
+		 $i=0;
+	      $src=array();
+	      $term = strtoupper($_REQUEST['term']);
+	      $qSearch = DAO::queryAllSql("
+					Select client_cd, client_name FROM MST_CLIENT 
+					Where (client_cd like '".$term."%')
+	      			AND susp_stat = 'N' AND client_type_1 <> 'B' AND custodian_cd IS NULL
+	      			AND rownum <= 11
+	      			ORDER BY client_cd
+	      			");
+	      
+	      foreach($qSearch as $search)
+	      {
+	      	$src[$i++] = array('label'=>$search['client_cd'].' - '.$search['client_name']
+	      			, 'labelhtml'=>$search['client_cd'].' - '.$search['client_name'] //WT: Display di auto completenya
+	      			, 'value'=>$search['client_cd']);
+	      }
+	      
+	      echo CJSON::encode($src);
+	      Yii::app()->end();
+	}
+	
+	public function actionGetSlAcct()
+	{
+		$i=0;
+      	$src=array();
+      	$term = strtoupper($_REQUEST['term']);
+      	$glAcctCd = $_REQUEST['gl_acct_cd'];
+      	
+      	$qSearch = DAO::queryAllSql("
+					SELECT sl_a, acct_name FROM MST_GL_ACCOUNT 
+					WHERE TRIM(gl_a) = '$glAcctCd' 
+					AND sl_a LIKE '".$term."%'
+					AND prt_type <> 'S'
+					AND acct_stat = 'A'
+					AND approved_stat = 'A'
+	      			AND rownum <= 200
+	      			ORDER BY sl_a
+      			");
+      
+	    foreach($qSearch as $search)
+	    {
+	      	$src[$i++] = array('label'=>$search['sl_a'].' - '.$search['acct_name']
+	      			, 'labelhtml'=>$search['sl_a'].' - '.$search['acct_name'] //WT: Display di auto completenya
+	      			, 'value'=>$search['sl_a']);
+	    }
+      
+      	echo CJSON::encode($src);
+      	Yii::app()->end();
+	}
+
+    public function actionGetStock()
+    {
+      $i=0;
+      $src=array();
+      $term = isset($_POST['term'])?strtoupper($_POST['term']):'';
+      $qSearch = DAO::queryAllSql("
+                select  stk_cd, stk_desc from mst_counter 
+                where approved_stat='A' 
+               and (stk_cd like '" . $term . "%')
+                and rownum<31 
+                order by stk_cd
+                ");
+      foreach($qSearch as $search)
+      {
+        $src[$i++] = array('label'=>$search['stk_cd'].' - '.$search['stk_desc']
+                , 'labelhtml'=>$search['stk_cd'] 
+                , 'value'=>$search['stk_cd']);
+      }
+      
+      echo CJSON::encode($src);
+      Yii::app()->end();
+    }
+    
+    public function actionGetclient()
+    {
+        $i = 0;
+        $src = array();
+        $term = strtoupper($_REQUEST['term']);
+        $custody_flg = isset($_POST['custody_flg'])?$_POST['custody_flg']:'N';
+        $qSearch = DAO::queryAllSql("
+                Select client_cd, client_name FROM MST_CLIENT 
+                Where (client_cd like '" . $term . "%')
+                and ((custodian_cd is not null and '$custody_flg'='Y') or '$custody_flg'='N')
+                AND rownum <= 30
+                ORDER BY client_cd
+                ");
+
+        foreach ($qSearch as $search)
+        {
+            $src[$i++] = array(
+                'label' => $search['client_cd'] . ' - ' . $search['client_name'],
+                'labelhtml' => $search['client_cd'],
+                'value' => $search['client_cd']
+            );
+        }
+
+        echo CJSON::encode($src);
+        Yii::app()->end();
+    }
+	
+}

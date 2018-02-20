@@ -1,0 +1,91 @@
+body, div, span, object, iframe, p, blockquote, pre, a, abbr, acronym, address, code, del, dfn, em, img, q, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, 
+th, td, article, aside, dialog, figure, footer, header, hgroup, nav, section{ font-size: 9pt;}
+label, input, button, select, textarea {font-size: 9pt;}
+form{margin: 0;}
+
+.form-horizontal .form-actions { padding-left: 140px;}
+.form-actions { padding: 5px 0px 5px;margin-top: 10px;margin-bottom: 10px;background-color: transparent;border-top: 1px solid #e5e5e5;}
+.form-horizontal .controls { margin-left: 30px; }
+.form-horizontal .control-label { padding-top: 5px; text-align: left;font-size: 9pt !important;width: 140px;}
+.form-horizontal .control-group{ margin-bottom: 1px; }
+.radio, .checkbox {min-height: 20px;padding-left: 140px;}
+.radio.inline{padding: 0px;}
+.radio.inline input[type="radio"]{margin-left: 0px; margin-right: 2px;}
+
+.search-form span.required{display:none}
+
+h3.title{border-bottom: 1px solid #e5e5e5;}
+#content{margin-top: 30px; padding:5px;}
+#footer{
+	padding: 20px 0;
+font-size: 0.8em;
+text-align: center;
+border-top: 1px solid #C9E0ED;
+bottom: 0;
+width: 100%;
+height: 20px;
+border-top: 1px solid #e5e5e5;
+background-color: #f5f5f5;
+margin: 0px;
+}
+
+.bs-docs-sidenav {
+    margin: 0px;
+    padding: 3px 15px;
+    background-color: rgb(255, 255, 255);
+    border-radius: 6px 6px 6px 6px;
+    box-shadow: 0px 1px 4px rgba(0, 0, 0, 0.067);
+}
+
+.nav-header {
+    display: block;
+    padding: 3px 15px;
+    height: 18px;
+    font-size: 2px;
+    font-weight: bold;
+    line-height: 20px;
+    /*color: rgb(153, 153, 153);*/
+    color: #FFFFFF;
+    text-shadow: 0px 1px 0px rgba(255, 255, 255, 0.5);
+    text-transform: uppercase;
+    background-color: rgb(229, 229, 229);
+    /*background-color: #FFFFFF;*/
+    /*box-shadow: 0px 1px 4px rgba(0, 0, 0, 0.067);*/
+}
+
+.form-horizontal .control-group {
+    min-height: 28px;
+}
+
+
+.row-fluid [class*="span"]{
+	min-height: 22px;
+}
+
+input[type="text"], input[type="password"], input[type="datetime"], input[type="datetime-local"], input[type="date"], input[type="month"], input[type="time"], input[type="week"], input[type="number"], input[type="email"], input[type="url"], input[type="search"], input[type="tel"], input[type="color"], .uneditable-input {
+    padding: 2px 6px;
+    font-size: 9pt;
+    height: 24px;
+}
+
+textarea{
+	padding: 2px 6px;
+	font-size: 9pt;
+	margin-bottom: 1px; 
+}
+
+select, input[type="file"] {
+	padding: 2px 2px 2px 6px;
+	height: 24px;
+}
+
+.input-prepend .add-on, .input-prepend .btn{
+	padding-top: 1px;
+	padding-bottom: 1px;
+}
+
+#wrap-detail{
+	background-color: #f5f5f5;
+	padding-left: 10px;
+	padding-right: 10px;
+}

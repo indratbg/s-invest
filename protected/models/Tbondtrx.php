@@ -1,0 +1,1076 @@
+<?php
+
+/**
+ * This is the model class for table "T_BOND_TRX".
+ *
+ * The followings are the available columns in table 'T_BOND_TRX':
+ * @property string $trx_date
+ * @property integer $trx_seq_no
+ * @property string $trx_type
+ * @property string $trx_ref
+ * @property string $ctp_num
+ * @property string $trx_id
+ * @property string $lawan
+ * @property string $lawan_type
+ * @property string $bond_cd
+ * @property string $buy_dt
+ * @property integer $buy_trx_seq
+ * @property string $seller_buy_dt
+ * @property double $buy_price
+ * @property string $buy_value_dt
+ * @property string $custodian_cd
+ * @property string $value_dt
+ * @property string $last_coupon
+ * @property string $next_coupon
+ * @property double $nominal
+ * @property double $price
+ * @property double $cost
+ * @property double $int_rate
+ * @property integer $accrued_days
+ * @property double $accrued_int
+ * @property double $accrued_int_round
+ * @property double $accrued_tax_pcn
+ * @property double $accrued_tax_round
+ * @property integer $accrued_tax_days
+ * @property double $accrued_int_tax
+ * @property double $capital_gain
+ * @property double $capital_tax_pcn
+ * @property double $capital_tax
+ * @property double $net_capital_gain
+ * @property double $net_amount
+ * @property string $settlement_instr
+ * @property string $journal_status
+ * @property string $doc_num
+ * @property double $sisa_nominal
+ * @property string $rvpv_number
+ * @property double $sett_for_curr
+ * @property double $sett_val
+ * @property string $cre_dt
+ * @property string $user_id
+ * @property string $upd_dt
+ * @property string $upd_by
+ * @property string $approved_dt
+ * @property string $approved_by
+ * @property string $approved_sts
+ * @property string $secu_jur_trx
+ * @property string $secu_jur_lawan
+ * @property string $settle_secu_flg
+ * @property string $sign_by
+ * @property string $bukti_pajak
+ * @property string $report_type
+ * @property string $ctp_trx_type
+ * @property string $trx_id_yymm
+ * @property string $sisa_temp
+ * @property string $multi_buy_price
+ */
+class Tbondtrx extends AActiveRecordSP
+{
+	//AH: #BEGIN search (datetime || date) additional comparison
+	public $trx_date_date;
+	public $trx_date_month;
+	public $trx_date_year;
+
+	public $buy_dt_date;
+	public $buy_dt_month;
+	public $buy_dt_year;
+
+	public $seller_buy_dt_date;
+	public $seller_buy_dt_month;
+	public $seller_buy_dt_year;
+
+	public $buy_value_dt_date;
+	public $buy_value_dt_month;
+	public $buy_value_dt_year;
+
+	public $value_dt_date;
+	public $value_dt_month;
+	public $value_dt_year;
+
+	public $last_coupon_date;
+	public $last_coupon_month;
+	public $last_coupon_year;
+
+	public $next_coupon_date;
+	public $next_coupon_month;
+	public $next_coupon_year;
+
+	public $cre_dt_date;
+	public $cre_dt_month;
+	public $cre_dt_year;
+
+	public $upd_dt_date;
+	public $upd_dt_month;
+	public $upd_dt_year;
+
+	public $approved_dt_date;
+	public $approved_dt_month;
+	public $approved_dt_year;
+	
+	public $maturity_date;
+	public $maturity_date_date;
+	public $maturity_date_month;
+	public $maturity_date_year;
+	
+	public $calc_accrued_int;
+	public $calc_interest;
+	public $purchased_bond;
+	
+	public $pocost;
+	public $poaccrued_days;
+	public $pocalc_interest;
+	public $poaccrued_int;
+	public $poaccrued_tax_days;
+	public $pocalc_accrued_int;
+	public $poaccrued_int_tax;
+	public $pocapital_gain;
+	public $pocapital_tax;
+	public $ponet_capital_gain;
+	public $ponet_amount;
+	
+	public $gen_last_coupon;
+	public $gen_next_coupon;
+	public $gen_interest_rate;
+	
+	public $old_ctp_num;
+	
+	public $seqno;
+	
+	public $isksei;
+	//AH: #END search (datetime || date)  additional comparison
+	
+	public $save_flg = 'N';
+	
+	public $update_date; //update date for t_many_header
+	public $update_seq; // update seq for t_many_header
+	
+	public $allid = 'N';
+	
+	//REPORT
+	public $seller;
+	public $buyer;
+	public $nomor_surat;
+	public $lawan_name;
+	
+	public function __construct($scenario = 'insert')
+	{
+		parent::__construct($scenario);
+		$this->logRecord=true;
+	}
+	
+	public static function model($className=__CLASS__)
+	{
+		return parent::model($className);
+	}
+    
+	public function getPrimaryKey(){
+		return array('trx_date'=>$this->trx_date, 'trx_seq_no'=>$this->trx_seq_no);
+	}
+	
+	protected function afterFind()
+	{
+		$this->trx_date = Yii::app()->format->cleanDate($this->trx_date);
+		$this->value_dt = Yii::app()->format->cleanDate($this->value_dt);
+		$this->buy_dt = Yii::app()->format->cleanDate($this->buy_dt);
+		$this->seller_buy_dt = Yii::app()->format->cleanDate($this->seller_buy_dt);
+		$this->buy_value_dt = Yii::app()->format->cleanDate($this->buy_value_dt);
+		$this->last_coupon = Yii::app()->format->cleanDate($this->last_coupon);
+		$this->next_coupon = Yii::app()->format->cleanDate($this->next_coupon);
+	}
+	
+	public function tableName()
+	{
+		return 'IPNEXTG.T_BOND_TRX';
+	}
+
+	public function rules()
+	{
+		return array(
+		
+			array('trx_date, buy_dt, seller_buy_dt, buy_value_dt, value_dt, last_coupon, next_coupon, approved_dt', 'application.components.validator.ADatePickerSwitcherValidatorSP'),
+		
+			array('calc_accrued_int,calc_interest,trx_seq_no, buy_trx_seq, buy_price, nominal, price, cost, int_rate, accrued_days, accrued_int, accrued_int_round, accrued_tax_pcn, accrued_tax_round, accrued_tax_days, accrued_int_tax, capital_gain, capital_tax_pcn, capital_tax, net_capital_gain, net_amount, sisa_nominal, sisa_temp, sett_for_curr, sett_val', 'application.components.validator.ANumberSwitcherValidator'),
+			
+			array('trx_type, trx_id, trx_date, settlement_instr, lawan, nominal, price, bond_cd, buy_dt, buy_value_dt, custodian_cd, value_dt, accrued_days, calc_accrued_int, accrued_int', 'required','except'=>'retrieve'),
+			array('buy_trx_seq, accrued_days, accrued_tax_days', 'numerical', 'integerOnly'=>true),
+			array('calc_accrued_int,calc_interest,buy_price, nominal, price, cost, int_rate, accrued_int, accrued_int_round, accrued_tax_pcn, accrued_tax_round, accrued_int_tax, capital_gain, capital_tax_pcn, capital_tax, net_capital_gain, net_amount, sisa_nominal, sett_for_curr, sett_val', 'numerical'),
+			array('multi_buy_price, trx_type, lawan_type, journal_status, approved_sts, settle_secu_flg', 'length', 'max'=>1),
+			array('trx_ref', 'length', 'max'=>50),
+			array('ctp_num, lawan, user_id, upd_by, approved_by', 'length', 'max'=>10),
+			array('trx_id, custodian_cd, settlement_instr', 'length', 'max'=>5),
+			array('bond_cd', 'length', 'max'=>20),
+			array('doc_num, rvpv_number, secu_jur_trx, secu_jur_lawan', 'length', 'max'=>17),
+			array('sign_by', 'length', 'max'=>3),
+			array('bukti_pajak', 'length', 'max'=>30),
+			array('lawan_name,nomor_surat,seller,buyer,old_ctp_num, seqno, save_flg, report_type, ctp_trx_type, trx_id_yymm, sisa_temp, seller_buy_dt, last_coupon, next_coupon, cre_dt, upd_dt, approved_dt, maturity_date, purchased_bond, calc_accrued_int, calc_interest,isksei', 'safe'),
+
+			// The following rule is used by search().
+			// Please remove those attributes that should not be searched.
+	
+			array('multi_buy_price,old_ctp_num, seqno, save_flg,calc_accrued_int, calc_interest, trx_date, trx_seq_no, trx_type, trx_ref, ctp_num, trx_id, lawan, lawan_type, bond_cd, buy_dt, 
+			buy_trx_seq, seller_buy_dt, buy_price, buy_value_dt, custodian_cd, value_dt, last_coupon, next_coupon, nominal, price, cost, int_rate, 
+			accrued_days, accrued_int, accrued_int_round, accrued_tax_pcn, accrued_tax_round, accrued_tax_days, accrued_int_tax, capital_gain, 
+			capital_tax_pcn, capital_tax, net_capital_gain, net_amount, settlement_instr, journal_status, doc_num, sisa_nominal, rvpv_number, 
+			sett_for_curr, sett_val, cre_dt, user_id, upd_dt, upd_by, approved_dt, approved_by, approved_sts, secu_jur_trx, secu_jur_lawan, 
+			settle_secu_flg, sign_by, bukti_pajak,trx_date_date,trx_date_month,trx_date_year,buy_dt_date,buy_dt_month,buy_dt_year,seller_buy_dt_date,
+			seller_buy_dt_month,seller_buy_dt_year,buy_value_dt_date,buy_value_dt_month,buy_value_dt_year,value_dt_date,value_dt_month,value_dt_year,
+			last_coupon_date,last_coupon_month,last_coupon_year,next_coupon_date,next_coupon_month,next_coupon_year,cre_dt_date,cre_dt_month,cre_dt_year,
+			upd_dt_date,upd_dt_month,upd_dt_year,approved_dt_date,approved_dt_month,approved_dt_year,report_type,ctp_trx_type,trx_id_yymm,sisa_temp,isksei', 'safe', 'on'=>'search'),
+		);
+	}
+
+	public function relations()
+	{
+		return array(
+			'lawanbondtrx' => array(self::BELONGS_TO, 'LawanBondTrx', array('lawan'=>'lawan')),
+			'bond' => array(self::BELONGS_TO, 'Bond', array('bond_cd'=>'bond_cd'))
+		);
+	}
+
+	public function attributeLabels()
+	{
+		return array(
+			'trx_date' => 'Transaction Date',
+			'trx_seq_no' => 'Trx Seq No',
+			'trx_type' => 'Buy / Sell',
+			'trx_ref' => 'Reference',
+			'ctp_num' => 'CTP',
+			'trx_id' => 'Internal ID',
+			'lawan' => 'Counterpart',
+			'lawan_type' => 'Counterpart Type',
+			'bond_cd' => 'Bond',
+			'buy_dt' => 'Date',
+			'buy_trx_seq' => 'Buy Trx Seq',
+			'seller_buy_dt' => 'Seller Buy Date',
+			'buy_price' => 'Purchase Price (%)',
+			'buy_value_dt' => 'Buy Value Date',
+			'custodian_cd' => 'Custodian',
+			'value_dt' => 'Value Date',
+			'last_coupon' => 'Coupon Period',
+			'next_coupon' => 'To',
+			'nominal' => 'Nominal',
+			'price' => 'Price (%)',
+			'cost' => 'Proceed',
+			'int_rate' => 'Coupon Rate (%)',
+			'accrued_days' => 'Days',
+			'accrued_int' => 'Accrued Interest',
+			'accrued_int_round' => 'Rounding',
+			'accrued_tax_pcn' => 'Tax',
+			'accrued_tax_round' => 'Rounding',
+			'accrued_tax_days' => 'Days',
+			'accrued_int_tax' => '',
+			'capital_gain' => 'Capital Gain',
+			'capital_tax_pcn' => 'Gain Tax',
+			'capital_tax' => '',
+			'net_capital_gain' => 'Net Capital Gain',
+			'net_amount' => 'Net Amount',
+			'settlement_instr' => 'Settlement Instruction',
+			'journal_status' => 'Journal Status',
+			'doc_num' => 'Doc Num',
+			'sisa_nominal' => 'Sisa Nominal',
+			'rvpv_number' => 'Rvpv Number',
+			'sett_for_curr' => 'Sett For Curr',
+			'sett_val' => 'Sett Val',
+			'cre_dt' => 'Cre Date',
+			'user_id' => 'User',
+			'upd_dt' => 'Upd Date',
+			'upd_by' => 'Upd By',
+			'approved_dt' => 'Approved Date',
+			'approved_by' => 'Approved By',
+			'approved_sts' => 'Approved Sts',
+			'secu_jur_trx' => 'Secu Jur Trx',
+			'secu_jur_lawan' => 'Secu Jur Lawan',
+			'settle_secu_flg' => 'Settle Secu Flg',
+			'sign_by' => 'Signed By',
+			'bukti_pajak' => 'Bukti Pajak',
+			'maturity_date' => 'Maturity Date',
+			'calc_accrued_int' => 'Calc Accrued Int',
+			'calc_interest' => 'Calc Interest',
+			'purchased_bond' => 'Purchased Bond',
+			'report_type' => 'Report Type',
+			'ctp_trx_type' => 'CTP Trx Type',
+			'trx_id_yymm' => 'Trx Id Yymm',
+			'sisa_temp' => 'Sisa Temp',
+			'allid' => 'All',
+			'multi_buy_price' => 'Multiple Purchase Price'
+		);
+	}
+	
+	public function executeSpGetCouponDate()
+	{
+		$connection  = Yii::app()->db;
+		$transaction = $connection->beginTransaction();
+		
+		try{
+			$query  = "CALL SP_GET_COUPON_DATE(
+						TO_DATE(:P_VALUE_DATE,'YYYY-MM-DD'),
+						:P_BOND_CD,
+						:P_USER_ID,
+						:P_LAST_COUPON,
+						:P_NEXT_COUPON,
+						:P_INTEREST_RATE,
+						:P_ERROR_CODE,
+						:P_ERROR_MSG)";
+					
+			$command = $connection->createCommand($query);
+			
+			$command->bindValue(":P_VALUE_DATE",$this->value_dt,PDO::PARAM_STR);
+			$command->bindValue(":P_BOND_CD",$this->bond_cd,PDO::PARAM_STR);
+			$command->bindValue(":P_USER_ID",$this->user_id,PDO::PARAM_STR);
+			
+			
+			$command->bindParam(":P_LAST_COUPON",$this->gen_last_coupon,PDO::PARAM_STR,100);
+			$command->bindParam(":P_NEXT_COUPON",$this->gen_next_coupon,PDO::PARAM_STR,100);
+			$command->bindParam(":P_INTEREST_RATE",$this->gen_interest_rate,PDO::PARAM_INT,50);
+			
+			$command->bindParam(":P_ERROR_CODE",$this->error_code,PDO::PARAM_INT,10);
+			$command->bindParam(":P_ERROR_MSG",$this->error_msg,PDO::PARAM_STR,100);
+			
+			$command->execute();
+			$transaction->commit();
+		}catch(Exception $ex){
+			$transaction->rollback();
+			if($this->error_code < 0)
+				$this->error_msg = $ex->getMessage();
+		}
+		
+		if($this->error_code < 0)
+			$this->addError('error_msg', 'Error '.$this->error_code.' '.$this->error_msg);
+		
+		
+		return $this->error_code;
+	}
+	
+	public function executeSpCalcBond()
+	{
+		$connection  = Yii::app()->db;
+		$transaction = $connection->beginTransaction();
+		
+		try{
+			$query  = "CALL SP_CALC_BOND_INTEREST(
+						TO_DATE(:P_TRX_DATE,'YYYY-MM-DD'),
+						TO_DATE(:P_VALUE_DT,'YYYY-MM-DD'),
+						:P_TRX_TYPE,
+						:P_BOND_CD,
+						:P_LAWAN_TYPE,
+						:P_NOMINAL,
+						:P_PRICE,
+						TO_DATE(:P_LAST_COUPON,'YYYY-MM-DD'),
+						:P_ACCRUED_INT_ROUND,
+						:P_ACCRUED_TAX_PCN,
+						:P_ACCRUED_TAX_ROUND,
+						:P_CAPITAL_TAX_PCN,
+						TO_DATE(:P_BUY_DT,'YYYY-MM-DD'),
+						:P_BUY_SEQ_NO,
+						TO_DATE(:P_SELLER_BUY_DT,'YYYY-MM-DD'),
+						TO_DATE(:P_BUY_VALUE_DT,'YYYY-MM-DD'),
+						:P_BUY_PRICE,
+						:P_COST,
+						:P_ACCRUED_DAYS,
+						:P_CALC_INT,
+						:P_ACCRUED_INT,
+						:P_ACCRUED_TAX_DAYS,
+						:P_CALC_INT_TAX,
+						:P_ACCRUED_INT_TAX,
+						:P_CAPITAL_GAIN,
+						:P_CAPITAL_TAX,
+						:P_NET_CAPITAL_GAIN,
+						:P_NET_AMOUNT,
+						:P_ERROR_CODE,
+						:P_ERROR_MSG)";
+					
+			$command = $connection->createCommand($query);
+			
+			$command->bindValue(":P_TRX_DATE",$this->trx_date,PDO::PARAM_STR);
+			$command->bindValue(":P_VALUE_DT",$this->value_dt,PDO::PARAM_STR);
+			$command->bindValue(":P_TRX_TYPE",$this->trx_type,PDO::PARAM_STR);
+			$command->bindValue(":P_BOND_CD",$this->bond_cd,PDO::PARAM_STR);
+			$command->bindValue(":P_LAWAN_TYPE",$this->lawan_type,PDO::PARAM_STR);
+			$command->bindValue(":P_NOMINAL",$this->nominal,PDO::PARAM_STR);
+			$command->bindValue(":P_PRICE",$this->price,PDO::PARAM_STR);
+			$command->bindValue(":P_LAST_COUPON",$this->last_coupon,PDO::PARAM_STR);
+			$command->bindValue(":P_ACCRUED_INT_ROUND",$this->accrued_int_round,PDO::PARAM_STR);
+			$command->bindValue(":P_ACCRUED_TAX_PCN",$this->accrued_tax_pcn/100,PDO::PARAM_STR);
+			$command->bindValue(":P_ACCRUED_TAX_ROUND",$this->accrued_tax_round,PDO::PARAM_STR);
+			$command->bindValue(":P_CAPITAL_TAX_PCN",$this->capital_tax_pcn/100,PDO::PARAM_STR);
+			$command->bindValue(":P_BUY_DT",$this->buy_dt,PDO::PARAM_STR);
+			$command->bindValue(":P_BUY_SEQ_NO",$this->buy_trx_seq,PDO::PARAM_STR);
+			$command->bindValue(":P_SELLER_BUY_DT",$this->seller_buy_dt,PDO::PARAM_STR);
+			$command->bindValue(":P_BUY_VALUE_DT",$this->buy_value_dt,PDO::PARAM_STR);
+			$command->bindValue(":P_BUY_PRICE",$this->buy_price,PDO::PARAM_STR);
+			
+			$command->bindParam(":P_COST",$this->pocost,PDO::PARAM_STR,100);
+			$command->bindParam(":P_ACCRUED_DAYS",$this->poaccrued_days,PDO::PARAM_STR,100);
+			$command->bindParam(":P_CALC_INT",$this->pocalc_accrued_int,PDO::PARAM_STR,100);
+			$command->bindParam(":P_ACCRUED_INT",$this->poaccrued_int,PDO::PARAM_STR,100);
+			$command->bindParam(":P_ACCRUED_TAX_DAYS",$this->poaccrued_tax_days,PDO::PARAM_STR,100);
+			$command->bindParam(":P_CALC_INT_TAX",$this->pocalc_interest,PDO::PARAM_STR,100);
+			$command->bindParam(":P_ACCRUED_INT_TAX",$this->poaccrued_int_tax,PDO::PARAM_STR,100);
+			$command->bindParam(":P_CAPITAL_GAIN",$this->pocapital_gain,PDO::PARAM_STR,100);
+			$command->bindParam(":P_CAPITAL_TAX",$this->pocapital_tax,PDO::PARAM_STR,100);
+			$command->bindParam(":P_NET_CAPITAL_GAIN",$this->ponet_capital_gain,PDO::PARAM_STR,100);
+			$command->bindParam(":P_NET_AMOUNT",$this->ponet_amount,PDO::PARAM_STR,100);
+			
+			$command->bindParam(":P_ERROR_CODE",$this->error_code,PDO::PARAM_INT,10);
+			$command->bindParam(":P_ERROR_MSG",$this->error_msg,PDO::PARAM_STR,500);
+			
+			$command->execute();
+			$transaction->commit();
+		}catch(Exception $ex){
+			$transaction->rollback();
+			if($this->error_code == -999)
+				$this->error_msg = $ex->getMessage();
+		}
+		
+		if($this->error_code < 0)
+			$this->addError('error_msg', 'Error '.$this->error_code.' '.$this->error_msg);
+		
+		
+		return $this->error_code;
+	}
+
+	public function executeSpManyHeader($exec_status,$menuName,&$transaction)
+	{
+		$connection  = Yii::app()->db;
+		$transaction = $connection->beginTransaction();	
+		
+		try{
+			$query  = "CALL SP_T_MANY_HEADER_INSERT(
+						:P_MENU_NAME,
+						:P_STATUS,
+						:P_USER_ID,
+						:P_IP_ADDRESS,
+						:P_CANCEL_REASON,
+						:P_UPDATE_DATE,
+						:P_UPDATE_SEQ,
+						:P_ERROR_CODE,
+						:P_ERROR_MSG)";
+			
+						
+			$command = $connection->createCommand($query);
+			$command->bindValue(":P_MENU_NAME",$menuName,PDO::PARAM_STR);
+			$command->bindValue(":P_STATUS",$exec_status,PDO::PARAM_STR);
+			$command->bindValue(":P_USER_ID",$this->user_id,PDO::PARAM_STR);			
+			$command->bindValue(":P_IP_ADDRESS",$this->ip_address,PDO::PARAM_STR);
+			$command->bindValue(":P_CANCEL_REASON",$this->cancel_reason,PDO::PARAM_STR);
+			
+			$command->bindParam(":P_UPDATE_DATE",$this->update_date,PDO::PARAM_STR,50);
+			$command->bindParam(":P_UPDATE_SEQ",$this->update_seq,PDO::PARAM_STR,10);
+			$command->bindParam(":P_ERROR_CODE",$this->error_code,PDO::PARAM_INT,10);
+			$command->bindParam(":P_ERROR_MSG",$this->error_msg,PDO::PARAM_STR,1000);
+
+			$command->execute();
+			
+			//Commit baru akan dijalankan saat semua transaksi INSERT sukses
+			
+		}catch(Exception $ex){
+			//$transaction->rollback();
+			if($this->error_code = -999)
+				$this->error_msg = $ex->getMessage();
+		}
+		
+		if($this->error_code < 0)
+			$this->addError('error_msg', 'Error '.$this->error_code.' '.$this->error_msg);
+		
+		return $this->error_code;
+	}
+
+	public function executeSpBondTrxUpd($exec_status,$trx_date,$trx_seq_no,$record_seq,&$transaction)
+	{
+		$connection  = Yii::app()->db;
+		
+		try{
+			$query  = "CALL SP_T_BOND_TRX_UPD(
+						TO_DATE(:P_SEARCH_TRX_DATE,'YYYY-MM-DD'),
+						:P_SEARCH_TRX_SEQ_NO,
+						TO_DATE(:P_TRX_DATE,'YYYY-MM-DD'),
+						:P_TRX_SEQ_NO,
+						:P_TRX_TYPE,
+						:P_TRX_REF,
+						:P_CTP_NUM,
+						:P_TRX_ID,
+						:P_LAWAN,
+						:P_LAWAN_TYPE,
+						:P_BOND_CD,
+						:P_CUSTODIAN_CD,
+						TO_DATE(:P_VALUE_DT,'YYYY-MM-DD'),
+						TO_DATE(:P_BUY_DT,'YYYY-MM-DD'),
+						:P_BUY_TRX_SEQ,
+						TO_DATE(:P_SELLER_BUY_DT,'YYYY-MM-DD'),
+						:P_BUY_PRICE,
+						TO_DATE(:P_BUY_VALUE_DT,'YYYY-MM-DD'),
+						TO_DATE(:P_LAST_COUPON,'YYYY-MM-DD'),
+						TO_DATE(:P_NEXT_COUPON,'YYYY-MM-DD'),
+						:P_NOMINAL,
+						:P_PRICE,
+						:P_COST,
+						:P_INT_RATE,
+						:P_ACCRUED_DAYS,
+						:P_ACCRUED_INT,
+						:P_ACCRUED_INT_ROUND,
+						:P_ACCRUED_TAX_PCN,
+						:P_ACCRUED_TAX_ROUND,
+						:P_ACCRUED_TAX_DAYS,
+						:P_ACCRUED_INT_TAX,
+						:P_CAPITAL_GAIN,
+						:P_CAPITAL_TAX_PCN,
+						:P_CAPITAL_TAX,
+						:P_NET_CAPITAL_GAIN,
+						:P_NET_AMOUNT,
+						:P_SISA_NOMINAL,
+						:P_SETTLEMENT_INSTR,
+						:P_SIGN_BY,
+						:P_REPORT_TYPE,
+						:P_CTP_TRX_TYPE,
+						:P_TRX_ID_YYMM,
+						:P_SISA_TEMP,
+						:P_MULTI_BUY_PRICE,
+						:P_SEQNO,
+						:P_USER_ID,
+						:P_UPD_STATUS,
+						:p_ip_address,
+						:p_cancel_reason,
+						:p_update_date,
+						:p_update_seq,
+						:p_record_seq,
+						:P_ERROR_CODE,
+						:P_ERROR_MSG)";
+					
+			$command = $connection->createCommand($query);
+			
+			$command->bindValue(":P_SEARCH_TRX_DATE",$trx_date,PDO::PARAM_STR);
+			$command->bindValue(":P_SEARCH_TRX_SEQ_NO",$trx_seq_no,PDO::PARAM_STR);
+			$command->bindValue(":P_TRX_DATE",$this->trx_date,PDO::PARAM_STR);
+			$command->bindValue(":P_TRX_SEQ_NO",$this->trx_seq_no,PDO::PARAM_STR);
+			$command->bindValue(":P_TRX_TYPE",$this->trx_type,PDO::PARAM_STR);
+			$command->bindValue(":P_TRX_REF",$this->trx_ref,PDO::PARAM_STR);
+			$command->bindValue(":P_CTP_NUM",$this->ctp_num,PDO::PARAM_STR);
+			$command->bindValue(":P_TRX_ID",$this->trx_id,PDO::PARAM_STR);
+			$command->bindValue(":P_LAWAN",$this->lawan,PDO::PARAM_STR);
+			$command->bindValue(":P_LAWAN_TYPE",$this->lawan_type,PDO::PARAM_STR);
+			$command->bindValue(":P_BOND_CD",$this->bond_cd,PDO::PARAM_STR);
+			$command->bindValue(":P_CUSTODIAN_CD",$this->custodian_cd,PDO::PARAM_STR);
+			$command->bindValue(":P_VALUE_DT",$this->value_dt,PDO::PARAM_STR);
+			$command->bindValue(":P_BUY_DT",$this->buy_dt,PDO::PARAM_STR);
+			$command->bindValue(":P_BUY_TRX_SEQ",$this->buy_trx_seq,PDO::PARAM_STR);
+			$command->bindValue(":P_SELLER_BUY_DT",$this->seller_buy_dt,PDO::PARAM_STR);
+			$command->bindValue(":P_BUY_PRICE",$this->buy_price,PDO::PARAM_STR);
+			$command->bindValue(":P_BUY_VALUE_DT",$this->buy_value_dt,PDO::PARAM_STR);
+			$command->bindValue(":P_LAST_COUPON",$this->last_coupon,PDO::PARAM_STR);
+			$command->bindValue(":P_NEXT_COUPON",$this->next_coupon,PDO::PARAM_STR);
+			$command->bindValue(":P_NOMINAL",$this->nominal,PDO::PARAM_STR);
+			$command->bindValue(":P_PRICE",$this->price,PDO::PARAM_STR);
+			$command->bindValue(":P_COST",$this->cost,PDO::PARAM_STR);
+			$command->bindValue(":P_INT_RATE",$this->int_rate,PDO::PARAM_STR);
+			$command->bindValue(":P_ACCRUED_DAYS",$this->accrued_days,PDO::PARAM_STR);
+			$command->bindValue(":P_ACCRUED_INT",$this->accrued_int,PDO::PARAM_STR);
+			$command->bindValue(":P_ACCRUED_INT_ROUND",$this->accrued_int_round,PDO::PARAM_STR);
+			$command->bindValue(":P_ACCRUED_TAX_PCN",$this->accrued_tax_pcn,PDO::PARAM_STR);
+			$command->bindValue(":P_ACCRUED_TAX_ROUND",$this->accrued_tax_round,PDO::PARAM_STR);
+			$command->bindValue(":P_ACCRUED_TAX_DAYS",$this->accrued_tax_days,PDO::PARAM_STR);
+			$command->bindValue(":P_ACCRUED_INT_TAX",$this->accrued_int_tax,PDO::PARAM_STR);
+			$command->bindValue(":P_CAPITAL_GAIN",$this->capital_gain,PDO::PARAM_STR);
+			$command->bindValue(":P_CAPITAL_TAX_PCN",$this->capital_tax_pcn,PDO::PARAM_STR);
+			$command->bindValue(":P_CAPITAL_TAX",$this->capital_tax,PDO::PARAM_STR);
+			$command->bindValue(":P_NET_CAPITAL_GAIN",$this->net_capital_gain,PDO::PARAM_STR);
+			$command->bindValue(":P_NET_AMOUNT",$this->net_amount,PDO::PARAM_STR);
+			$command->bindValue(":P_SISA_NOMINAL",$this->sisa_nominal,PDO::PARAM_STR);
+			$command->bindValue(":P_SETTLEMENT_INSTR",$this->settlement_instr,PDO::PARAM_STR);
+			$command->bindValue(":P_SIGN_BY",$this->sign_by,PDO::PARAM_STR);
+			$command->bindValue(":P_REPORT_TYPE",$this->report_type,PDO::PARAM_STR);
+			$command->bindValue(":P_CTP_TRX_TYPE",$this->ctp_trx_type,PDO::PARAM_STR);
+			$command->bindValue(":P_TRX_ID_YYMM",$this->trx_id_yymm,PDO::PARAM_STR);
+			$command->bindValue(":P_SISA_TEMP",$this->sisa_temp,PDO::PARAM_STR);
+			$command->bindValue(":P_MULTI_BUY_PRICE",$this->multi_buy_price,PDO::PARAM_STR);
+			$command->bindValue(":P_SEQNO",$this->seqno,PDO::PARAM_STR);
+			$command->bindValue(":P_USER_ID",$this->user_id,PDO::PARAM_STR);			
+			$command->bindValue(":P_UPD_STATUS",$exec_status,PDO::PARAM_STR);
+			$command->bindValue(":P_IP_ADDRESS",$this->ip_address,PDO::PARAM_STR);
+			$command->bindValue(":P_CANCEL_REASON",$this->cancel_reason,PDO::PARAM_STR);
+			$command->bindValue(":P_UPDATE_DATE",$this->update_date,PDO::PARAM_STR);
+			$command->bindValue(":P_UPDATE_SEQ",$this->update_seq,PDO::PARAM_STR);
+			$command->bindValue(":P_RECORD_SEQ",$record_seq,PDO::PARAM_STR);
+			$command->bindParam(":P_ERROR_CODE",$this->error_code,PDO::PARAM_INT,10);
+			$command->bindParam(":P_ERROR_MSG",$this->error_msg,PDO::PARAM_STR,500);
+			
+			$command->execute();
+		}catch(Exception $ex){
+			//$transaction->rollback();
+			if($this->error_code == -999)
+				$this->error_msg = $ex->getMessage();
+		}
+		
+		if($this->error_code < 0)
+			$this->addError('error_msg', 'Error '.$this->error_code.' '.$this->error_msg);
+		
+		
+		return $this->error_code;
+	}
+
+	public function executeSpBondTrxMultiprice($exec_status,$record_seq,&$transaction)
+	{
+		$connection  = Yii::app()->db;
+		
+		try{
+			$query  = "CALL SP_BOND_TRX_MULTIPRICE(
+						TO_DATE(:P_TRX_DATE,'YYYY-MM-DD'),
+						:P_TRX_SEQ_NO,
+						:P_SEQNO,
+						:P_TRX_ID,
+						TO_DATE(:P_BUY_DT,'YYYY-MM-DD'),
+						:P_BUY_PRICE,
+						:P_NOMINAL,
+						:P_USER_ID,
+						:P_UPD_STATUS,
+						:p_ip_address,
+						:p_update_date,
+						:p_update_seq,
+						:p_record_seq,
+						:P_ERROR_CODE,
+						:P_ERROR_MSG)";
+					
+			$command = $connection->createCommand($query);
+			
+			$command->bindValue(":P_TRX_DATE",$this->trx_date,PDO::PARAM_STR);
+			$command->bindValue(":P_TRX_SEQ_NO",$this->trx_seq_no,PDO::PARAM_STR);
+			$command->bindValue(":P_SEQNO",$this->seqno,PDO::PARAM_STR);
+			$command->bindValue(":P_TRX_ID",$this->trx_id,PDO::PARAM_STR);
+			$command->bindValue(":P_BUY_DT",$this->seller_buy_dt,PDO::PARAM_STR);
+			$command->bindValue(":P_BUY_PRICE",$this->buy_price,PDO::PARAM_STR);
+			$command->bindValue(":P_NOMINAL",$this->nominal,PDO::PARAM_STR);
+			
+			$command->bindValue(":P_USER_ID",$this->user_id,PDO::PARAM_STR);			
+			$command->bindValue(":P_UPD_STATUS",$exec_status,PDO::PARAM_STR);
+			$command->bindValue(":P_IP_ADDRESS",$this->ip_address,PDO::PARAM_STR);
+			$command->bindValue(":P_CANCEL_REASON",$this->cancel_reason,PDO::PARAM_STR);
+			$command->bindValue(":P_UPDATE_DATE",$this->update_date,PDO::PARAM_STR);
+			$command->bindValue(":P_UPDATE_SEQ",$this->update_seq,PDO::PARAM_STR);
+			$command->bindValue(":P_RECORD_SEQ",$record_seq,PDO::PARAM_STR);
+			$command->bindParam(":P_ERROR_CODE",$this->error_code,PDO::PARAM_INT,10);
+			$command->bindParam(":P_ERROR_MSG",$this->error_msg,PDO::PARAM_STR,500);
+			
+			$command->execute();
+		}catch(Exception $ex){
+			//$transaction->rollback();
+			if($this->error_code == -999)
+				$this->error_msg = $ex->getMessage();
+		}
+		
+		if($this->error_code < 0)
+			$this->addError('error_msg', 'Error '.$this->error_code.' '.$this->error_msg);
+		
+		
+		return $this->error_code;
+	}
+
+	public function executeSpUpdCtpNum($exec_status,&$transaction)
+	{
+		$connection  = Yii::app()->db;			
+		try{
+			$query  = "CALL SP_CTP_NUM_UPD(
+						TO_DATE(:P_TRX_DATE,'YYYY-MM-DD'),
+						:P_TRX_SEQ_NO,
+						:P_CTP_NUM,
+						:P_USER_ID,
+						:P_UPD_STATUS,
+						:P_IP_ADDRESS,
+						:P_CANCEL_REASON,
+						:P_ERROR_CODE,
+						:P_ERROR_MSG)";
+					
+			$command = $connection->createCommand($query);
+			
+			$command->bindValue(":P_TRX_DATE",$this->trx_date,PDO::PARAM_STR);
+			$command->bindValue(":P_TRX_SEQ_NO",$this->trx_seq_no,PDO::PARAM_STR);
+			$command->bindValue(":P_CTP_NUM",$this->ctp_num,PDO::PARAM_STR);
+			$command->bindValue(":P_USER_ID",$this->user_id,PDO::PARAM_STR);
+			$command->bindValue(":P_UPD_STATUS",$exec_status,PDO::PARAM_STR);
+			$command->bindValue(":P_IP_ADDRESS",$this->ip_address,PDO::PARAM_STR);
+			$command->bindValue(":P_CANCEL_REASON",$this->cancel_reason,PDO::PARAM_STR);
+
+			$command->bindParam(":P_ERROR_CODE",$this->error_code,PDO::PARAM_INT,10);
+			$command->bindParam(":P_ERROR_MSG",$this->error_msg,PDO::PARAM_STR,1000);
+			
+			$command->execute();
+			//$transaction->commit();
+		}catch(Exception $ex){
+			//$transaction->rollback();
+			if($this->error_code == -999)
+				$this->error_msg = $ex->getMessage();
+		}
+		
+		if($this->error_code < 0)
+			$this->addError('error_msg', 'Error '.$this->error_code.' '.$this->error_msg);
+		
+		
+		return $this->error_code;
+	}
+
+	public function executeSpBondTrxJur($record_seq, &$transaction)
+	{
+		$connection  = Yii::app()->db;			
+		try{
+			$query  = "CALL Sp_Bond_Trx_Jur_Nextg(
+						TO_DATE(:P_TRX_DATE,'YYYY-MM-DD'),
+						:P_TRX_SEQ_NO,
+						TO_DATE(:P_JUR_DATE,'YYYY-MM-DD'),
+						:P_FOLDER_CD,
+						:P_USER_ID,
+						:P_UPD_STATUS,
+						:p_ip_address,
+						:p_cancel_reason,
+						:p_update_date,
+						:p_update_seq,
+						:p_record_seq,
+						:P_ERROR_CODE,
+						:P_ERROR_MSG)";
+					
+			$command = $connection->createCommand($query);
+			
+			$command->bindValue(":P_TRX_DATE",$this->trx_date,PDO::PARAM_STR);
+			$command->bindValue(":P_TRX_SEQ_NO",$this->trx_seq_no,PDO::PARAM_STR);
+			$command->bindValue(":P_JUR_DATE",$this->trx_date,PDO::PARAM_STR);
+			$command->bindValue(":P_FOLDER_CD",null,PDO::PARAM_STR);
+			$command->bindValue(":P_USER_ID",$this->user_id,PDO::PARAM_STR);
+			
+			$command->bindValue(":P_UPD_STATUS",'X',PDO::PARAM_STR);
+			$command->bindValue(":P_IP_ADDRESS",$this->ip_address,PDO::PARAM_STR);
+			$command->bindValue(":P_CANCEL_REASON",$this->cancel_reason,PDO::PARAM_STR);
+			$command->bindValue(":P_UPDATE_DATE",$this->update_date,PDO::PARAM_STR);
+			$command->bindValue(":P_UPDATE_SEQ",$this->update_seq,PDO::PARAM_STR);
+			$command->bindValue(":P_RECORD_SEQ",$record_seq,PDO::PARAM_STR);
+
+			$command->bindParam(":P_ERROR_CODE",$this->error_code,PDO::PARAM_INT,10);
+			$command->bindParam(":P_ERROR_MSG",$this->error_msg,PDO::PARAM_STR,1000);
+			
+			$command->execute();
+			//$transaction->commit();
+		}catch(Exception $ex){
+			//$transaction->rollback();
+			if($this->error_code == -999)
+				$this->error_msg = $ex->getMessage();
+		}
+		
+		if($this->error_code < 0)
+			$this->addError('error_msg', 'Error '.$this->error_code.' '.$this->error_msg);
+		
+		
+		return $this->error_code;
+	}
+	
+	public function executeSpBondTrxSecu($record_seq, &$transaction, $menuName = '')
+	{
+		$connection  = Yii::app()->db;			
+		try{
+			$query  = "CALL Sp_Bond_Trx_Secu_Nextg(
+						TO_DATE(:P_TRX_DATE,'YYYY-MM-DD'),
+						:P_TRX_SEQ_NO,
+						TO_DATE(:P_JUR_DATE,'YYYY-MM-DD'),
+						:P_KSEI,
+						:P_USER_ID,
+						:P_UPD_STATUS,
+						:P_MENU_NAME,
+						:p_ip_address,
+						:p_cancel_reason,
+						:p_update_date,
+						:p_update_seq,
+						:p_record_seq,
+						:P_ERROR_CODE,
+						:P_ERROR_MSG)";
+					
+			$command = $connection->createCommand($query);
+			
+			$command->bindValue(":P_TRX_DATE",$this->trx_date,PDO::PARAM_STR);
+			$command->bindValue(":P_TRX_SEQ_NO",$this->trx_seq_no,PDO::PARAM_STR);
+			$command->bindValue(":P_JUR_DATE",$this->trx_date,PDO::PARAM_STR);
+			$command->bindValue(":P_KSEI",'N',PDO::PARAM_STR);
+			$command->bindValue(":P_USER_ID",$this->user_id,PDO::PARAM_STR);
+			
+			$command->bindValue(":P_MENU_NAME",$menuName,PDO::PARAM_STR);
+			$command->bindValue(":P_UPD_STATUS",'X',PDO::PARAM_STR);
+			$command->bindValue(":P_IP_ADDRESS",$this->ip_address,PDO::PARAM_STR);
+			$command->bindValue(":P_CANCEL_REASON",$this->cancel_reason,PDO::PARAM_STR);
+			$command->bindValue(":P_UPDATE_DATE",$this->update_date,PDO::PARAM_STR);
+			$command->bindValue(":P_UPDATE_SEQ",$this->update_seq,PDO::PARAM_STR);
+			$command->bindValue(":P_RECORD_SEQ",$record_seq,PDO::PARAM_STR);
+
+			$command->bindParam(":P_ERROR_CODE",$this->error_code,PDO::PARAM_INT,10);
+			$command->bindParam(":P_ERROR_MSG",$this->error_msg,PDO::PARAM_STR,1000);
+			
+			$command->execute();
+			//$transaction->commit();
+		}catch(Exception $ex){
+			//$transaction->rollback();
+			if($this->error_code == -999)
+				$this->error_msg = $ex->getMessage();
+		}
+		
+		if($this->error_code < 0)
+			$this->addError('error_msg', 'Error '.$this->error_code.' '.$this->error_msg);
+		
+		
+		return $this->error_code;
+	}
+
+	public function executeSpBondTrxSecuValuedt($record_seq, &$transaction, $menuName = '')
+	{
+		$connection  = Yii::app()->db;			
+		try{
+			$query  = "CALL Sp_Bond_Trx_Secu_Nextg(
+						TO_DATE(:P_TRX_DATE,'YYYY-MM-DD'),
+						:P_TRX_SEQ_NO,
+						TO_DATE(:P_JUR_DATE,'YYYY-MM-DD'),
+						:P_KSEI,
+						:P_USER_ID,
+						:P_UPD_STATUS,
+						:P_MENU_NAME,
+						:p_ip_address,
+						:p_cancel_reason,
+						:p_update_date,
+						:p_update_seq,
+						:p_record_seq,
+						:P_ERROR_CODE,
+						:P_ERROR_MSG)";
+					
+			$command = $connection->createCommand($query);
+			
+			$command->bindValue(":P_TRX_DATE",$this->trx_date,PDO::PARAM_STR);
+			$command->bindValue(":P_TRX_SEQ_NO",$this->trx_seq_no,PDO::PARAM_STR);
+			$command->bindValue(":P_JUR_DATE",$this->value_dt,PDO::PARAM_STR);
+			$command->bindValue(":P_KSEI",$this->isksei,PDO::PARAM_STR);
+			$command->bindValue(":P_USER_ID",$this->user_id,PDO::PARAM_STR);
+			
+			$command->bindValue(":P_MENU_NAME",$menuName,PDO::PARAM_STR);
+			$command->bindValue(":P_UPD_STATUS",'X',PDO::PARAM_STR);
+			$command->bindValue(":P_IP_ADDRESS",$this->ip_address,PDO::PARAM_STR);
+			$command->bindValue(":P_CANCEL_REASON",$this->cancel_reason,PDO::PARAM_STR);
+			$command->bindValue(":P_UPDATE_DATE",$this->update_date,PDO::PARAM_STR);
+			$command->bindValue(":P_UPDATE_SEQ",$this->update_seq,PDO::PARAM_STR);
+			$command->bindValue(":P_RECORD_SEQ",$record_seq,PDO::PARAM_STR);
+
+			$command->bindParam(":P_ERROR_CODE",$this->error_code,PDO::PARAM_INT,10);
+			$command->bindParam(":P_ERROR_MSG",$this->error_msg,PDO::PARAM_STR,1000);
+			
+			$command->execute();
+			//$transaction->commit();
+		}catch(Exception $ex){
+			//$transaction->rollback();
+			if($this->error_code == -999)
+				$this->error_msg = $ex->getMessage();
+		}
+		
+		if($this->error_code < 0)
+			$this->addError('error_msg', 'Error '.$this->error_code.' '.$this->error_msg);
+		
+		
+		return $this->error_code;
+	}
+	
+	public function executeSpBondTrxJurCancel($record_seq,&$transaction)
+	{
+		$connection  = Yii::app()->db;			
+		try{
+			$query  = "CALL Sp_Bond_Trx_Jur_Cancel(
+						TO_DATE(:P_TRX_DATE,'YYYY-MM-DD'),
+						:P_TRX_SEQ_NO,
+						:P_USER_ID,
+						:P_UPD_STATUS,
+						:p_ip_address,
+						:p_cancel_reason,
+						:p_update_date,
+						:p_update_seq,
+						:p_record_seq,
+						:P_ERROR_CODE,
+						:P_ERROR_MSG)";
+					
+			$command = $connection->createCommand($query);
+			
+			$command->bindValue(":P_TRX_DATE",$this->trx_date,PDO::PARAM_STR);
+			$command->bindValue(":P_TRX_SEQ_NO",$this->trx_seq_no,PDO::PARAM_STR);
+			$command->bindValue(":P_USER_ID",$this->user_id,PDO::PARAM_STR);
+			
+			$command->bindValue(":P_UPD_STATUS",'X',PDO::PARAM_STR);
+			$command->bindValue(":P_IP_ADDRESS",$this->ip_address,PDO::PARAM_STR);
+			$command->bindValue(":P_CANCEL_REASON",$this->cancel_reason,PDO::PARAM_STR);
+			$command->bindValue(":P_UPDATE_DATE",$this->update_date,PDO::PARAM_STR);
+			$command->bindValue(":P_UPDATE_SEQ",$this->update_seq,PDO::PARAM_STR);
+			$command->bindValue(":P_RECORD_SEQ",$record_seq,PDO::PARAM_STR);
+
+			$command->bindParam(":P_ERROR_CODE",$this->error_code,PDO::PARAM_INT,10);
+			$command->bindParam(":P_ERROR_MSG",$this->error_msg,PDO::PARAM_STR,1000);
+			
+			$command->execute();
+			//$transaction->commit();
+		}catch(Exception $ex){
+			//$transaction->rollback();
+			if($this->error_code == -999)
+				$this->error_msg = $ex->getMessage();
+		}
+		
+		if($this->error_code < 0)
+			$this->addError('error_msg', 'Error '.$this->error_code.' '.$this->error_msg);
+		
+		
+		return $this->error_code;
+	}
+	
+	public function executeApproveGenBondJurnal($menu_name)
+	{
+		$connection  = Yii::app()->db;
+		$transaction = $connection->beginTransaction();
+		
+		try{
+			//$this->logRecord();
+			$query   = "CALL SP_T_MANY_APPROVE(
+						:P_MENU_NAME,
+						TO_DATE(:P_UPDATE_DATE,'YYYY-MM-DD HH24:MI:SS'),
+						:P_UPDATE_SEQ,
+						:P_APPROVED_USER_ID,
+					    :P_APPROVED_IP_ADDRESS,
+					    :P_ERROR_CODE,
+					    :P_ERROR_MSG)";
+					
+			$command = $connection->createCommand($query);
+			$command->bindValue(":P_MENU_NAME",$menu_name,PDO::PARAM_STR);
+			$command->bindValue(":P_UPDATE_DATE",$this->update_date,PDO::PARAM_STR);
+			$command->bindValue(":P_UPDATE_SEQ",$this->update_seq,PDO::PARAM_STR);
+			$command->bindValue(":P_APPROVED_USER_ID",$this->user_id,PDO::PARAM_STR);
+			$command->bindValue(":P_APPROVED_IP_ADDRESS",$this->ip_address,PDO::PARAM_STR);
+			
+			$command->bindParam(":P_ERROR_CODE",$this->error_code,PDO::PARAM_STR,10);
+			$command->bindParam(":P_ERROR_MSG",$this->error_msg,PDO::PARAM_STR,200);
+			
+			$command->execute();
+			$transaction->commit();
+			
+		}catch(Exception $ex){
+			$transaction->rollback();
+			if($this->error_code == -999)
+				$this->error_msg = $ex->getMessage();
+		}
+		
+		return $this->error_code;
+	}
+
+	public function search()
+	{
+		$criteria = new CDbCriteria;
+
+		if(!empty($this->trx_date_date))
+			$criteria->addCondition("TO_CHAR(t.trx_date,'DD') LIKE '%".$this->trx_date_date."%'");
+		if(!empty($this->trx_date_month))
+			$criteria->addCondition("TO_CHAR(t.trx_date,'MM') LIKE '%".$this->trx_date_month."%'");
+		if(!empty($this->trx_date_year))
+			$criteria->addCondition("TO_CHAR(t.trx_date,'YYYY') LIKE '%".$this->trx_date_year."%'");		$criteria->compare('trx_seq_no',$this->trx_seq_no);
+		$criteria->compare('trx_type',$this->trx_type,true);
+		$criteria->compare('trx_ref',$this->trx_ref,true);
+		$criteria->compare('ctp_num',$this->ctp_num,true);
+		$criteria->compare('trx_id',$this->trx_id,true);
+		$criteria->compare('lawan',$this->lawan,true);
+		$criteria->compare('lawan_type',$this->lawan_type,true);
+		$criteria->compare('bond_cd',$this->bond_cd,true);
+
+		if(!empty($this->buy_dt_date))
+			$criteria->addCondition("TO_CHAR(t.buy_dt,'DD') LIKE '%".$this->buy_dt_date."%'");
+		if(!empty($this->buy_dt_month))
+			$criteria->addCondition("TO_CHAR(t.buy_dt,'MM') LIKE '%".$this->buy_dt_month."%'");
+		if(!empty($this->buy_dt_year))
+			$criteria->addCondition("TO_CHAR(t.buy_dt,'YYYY') LIKE '%".$this->buy_dt_year."%'");		$criteria->compare('buy_trx_seq',$this->buy_trx_seq);
+
+		if(!empty($this->seller_buy_dt_date))
+			$criteria->addCondition("TO_CHAR(t.seller_buy_dt,'DD') LIKE '%".$this->seller_buy_dt_date."%'");
+		if(!empty($this->seller_buy_dt_month))
+			$criteria->addCondition("TO_CHAR(t.seller_buy_dt,'MM') LIKE '%".$this->seller_buy_dt_month."%'");
+		if(!empty($this->seller_buy_dt_year))
+			$criteria->addCondition("TO_CHAR(t.seller_buy_dt,'YYYY') LIKE '%".$this->seller_buy_dt_year."%'");		$criteria->compare('buy_price',$this->buy_price);
+
+		if(!empty($this->buy_value_dt_date))
+			$criteria->addCondition("TO_CHAR(t.buy_value_dt,'DD') LIKE '%".$this->buy_value_dt_date."%'");
+		if(!empty($this->buy_value_dt_month))
+			$criteria->addCondition("TO_CHAR(t.buy_value_dt,'MM') LIKE '%".$this->buy_value_dt_month."%'");
+		if(!empty($this->buy_value_dt_year))
+			$criteria->addCondition("TO_CHAR(t.buy_value_dt,'YYYY') LIKE '%".$this->buy_value_dt_year."%'");		$criteria->compare('custodian_cd',$this->custodian_cd,true);
+
+		if(!empty($this->value_dt_date))
+			$criteria->addCondition("TO_CHAR(t.value_dt,'DD') LIKE '%".$this->value_dt_date."%'");
+		if(!empty($this->value_dt_month))
+			$criteria->addCondition("TO_CHAR(t.value_dt,'MM') LIKE '%".$this->value_dt_month."%'");
+		if(!empty($this->value_dt_year))
+			$criteria->addCondition("TO_CHAR(t.value_dt,'YYYY') LIKE '%".$this->value_dt_year."%'");
+		if(!empty($this->last_coupon_date))
+			$criteria->addCondition("TO_CHAR(t.last_coupon,'DD') LIKE '%".$this->last_coupon_date."%'");
+		if(!empty($this->last_coupon_month))
+			$criteria->addCondition("TO_CHAR(t.last_coupon,'MM') LIKE '%".$this->last_coupon_month."%'");
+		if(!empty($this->last_coupon_year))
+			$criteria->addCondition("TO_CHAR(t.last_coupon,'YYYY') LIKE '%".$this->last_coupon_year."%'");
+		if(!empty($this->next_coupon_date))
+			$criteria->addCondition("TO_CHAR(t.next_coupon,'DD') LIKE '%".$this->next_coupon_date."%'");
+		if(!empty($this->next_coupon_month))
+			$criteria->addCondition("TO_CHAR(t.next_coupon,'MM') LIKE '%".$this->next_coupon_month."%'");
+		if(!empty($this->next_coupon_year))
+			$criteria->addCondition("TO_CHAR(t.next_coupon,'YYYY') LIKE '%".$this->next_coupon_year."%'");		$criteria->compare('nominal',$this->nominal);
+		$criteria->compare('price',$this->price);
+		$criteria->compare('cost',$this->cost);
+		$criteria->compare('int_rate',$this->int_rate);
+		$criteria->compare('accrued_days',$this->accrued_days);
+		$criteria->compare('accrued_int',$this->accrued_int);
+		$criteria->compare('accrued_int_round',$this->accrued_int_round);
+		$criteria->compare('accrued_tax_pcn',$this->accrued_tax_pcn);
+		$criteria->compare('accrued_tax_round',$this->accrued_tax_round);
+		$criteria->compare('accrued_tax_days',$this->accrued_tax_days);
+		$criteria->compare('accrued_int_tax',$this->accrued_int_tax);
+		$criteria->compare('capital_gain',$this->capital_gain);
+		$criteria->compare('capital_tax_pcn',$this->capital_tax_pcn);
+		$criteria->compare('capital_tax',$this->capital_tax);
+		$criteria->compare('net_capital_gain',$this->net_capital_gain);
+		$criteria->compare('net_amount',$this->net_amount);
+		$criteria->compare('settlement_instr',$this->settlement_instr,true);
+		$criteria->compare('journal_status',$this->journal_status,true);
+		$criteria->compare('doc_num',$this->doc_num,true);
+		$criteria->compare('sisa_nominal',$this->sisa_nominal);
+		$criteria->compare('rvpv_number',$this->rvpv_number,true);
+		$criteria->compare('sett_for_curr',$this->sett_for_curr);
+		$criteria->compare('sett_val',$this->sett_val);
+
+		if(!empty($this->cre_dt_date))
+			$criteria->addCondition("TO_CHAR(t.cre_dt,'DD') LIKE '%".$this->cre_dt_date."%'");
+		if(!empty($this->cre_dt_month))
+			$criteria->addCondition("TO_CHAR(t.cre_dt,'MM') LIKE '%".$this->cre_dt_month."%'");
+		if(!empty($this->cre_dt_year))
+			$criteria->addCondition("TO_CHAR(t.cre_dt,'YYYY') LIKE '%".$this->cre_dt_year."%'");		$criteria->compare('user_id',$this->user_id,true);
+
+		if(!empty($this->upd_dt_date))
+			$criteria->addCondition("TO_CHAR(t.upd_dt,'DD') LIKE '%".$this->upd_dt_date."%'");
+		if(!empty($this->upd_dt_month))
+			$criteria->addCondition("TO_CHAR(t.upd_dt,'MM') LIKE '%".$this->upd_dt_month."%'");
+		if(!empty($this->upd_dt_year))
+			$criteria->addCondition("TO_CHAR(t.upd_dt,'YYYY') LIKE '%".$this->upd_dt_year."%'");		$criteria->compare('upd_by',$this->upd_by,true);
+
+		if(!empty($this->approved_dt_date))
+			$criteria->addCondition("TO_CHAR(t.approved_dt,'DD') LIKE '%".$this->approved_dt_date."%'");
+		if(!empty($this->approved_dt_month))
+			$criteria->addCondition("TO_CHAR(t.approved_dt,'MM') LIKE '%".$this->approved_dt_month."%'");
+		if(!empty($this->approved_dt_year))
+			$criteria->addCondition("TO_CHAR(t.approved_dt,'YYYY') LIKE '%".$this->approved_dt_year."%'");		$criteria->compare('approved_by',$this->approved_by,true);
+		if(!empty($this->approved_sts))
+			$criteria->compare('approved_sts',$this->approved_sts,true);
+		else {
+			$criteria->addCondition("approved_sts IN ('E','A')");
+		}
+		$criteria->compare('secu_jur_trx',$this->secu_jur_trx,true);
+		$criteria->compare('secu_jur_lawan',$this->secu_jur_lawan,true);
+		$criteria->compare('settle_secu_flg',$this->settle_secu_flg,true);
+		$criteria->compare('sign_by',$this->sign_by,true);
+		$criteria->compare('bukti_pajak',$this->bukti_pajak,true);
+		$criteria->compare('report_type',$this->report_type,true);
+		$criteria->compare('ctp_trx_type',$this->ctp_trx_type,true);
+		$criteria->compare('trx_id_yymm',$this->trx_id_yymm,true);
+		$criteria->compare('sisa_temp',$this->sisa_temp,true);
+
+		$sort = new CSort();
+		$sort->defaultOrder = 'trx_date desc, to_number(trx_id) desc, price, trx_seq_no';
+		return new CActiveDataProvider($this, array(
+			'criteria'=>$criteria,
+			'sort'=>$sort
+		));
+	}
+}

@@ -1,0 +1,152 @@
+<?php
+
+/**
+ * This is the model class for table "T_H2H_REF_DETAIL".
+ *
+ * The followings are the available columns in table 'T_H2H_REF_DETAIL':
+ * @property integer $row_id
+ * @property string $trx_ref
+ * @property string $trf_id
+ * @property string $status
+ * @property string $description
+ */
+class Th2hrefdetail extends AActiveRecordSP
+{
+	//AH: #BEGIN search (datetime || date) additional comparison	//AH: #END search (datetime || date)  additional comparison
+	
+	public function __construct($scenario = 'insert')
+	{
+		parent::__construct($scenario);
+		$this->logRecord=true;
+	}
+	
+	public static function model($className=__CLASS__)
+	{
+		return parent::model($className);
+	}
+    
+
+	public function tableName()
+	{
+		return 'T_H2H_REF_DETAIL';
+	}
+
+	public function rules()
+	{
+		return array(
+		
+			array('row_id', 'application.components.validator.ANumberSwitcherValidator'),
+			
+			array('row_id', 'numerical', 'integerOnly'=>true),
+			array('trx_ref', 'length', 'max'=>17),
+			array('trf_id', 'length', 'max'=>8),
+			array('status', 'length', 'max'=>1),
+			array('description', 'length', 'max'=>50),
+
+			// The following rule is used by search().
+			// Please remove those attributes that should not be searched.
+	
+			array('row_id, trx_ref, trf_id, status, description', 'safe', 'on'=>'search'),
+		);
+	}
+
+	public function relations()
+	{
+		return array(
+		);
+	}
+
+	public function attributeLabels()
+	{
+		return array(
+			'row_id' => 'No',
+			'trx_ref' => 'Transaction Ref',
+			'trf_id' => 'Transfer ID',
+			'acct_name' => $this->scenario=='inbox'?'Receiver Name':'Name',
+			'rdi_acct' => $this->scenario=='inbox'?'From Account Number':'RDI Account',
+			'client_bank_acct' => $this->scenario=='inbox'?'To Account Number':'Client Bank Account',
+			'bank_name' =>  $this->scenario=='inbox'?'Receiver Bank Name':'Bank',
+			'trf_amt' => 'Amount',
+			'status' => 'Status',
+			'description' => 'Description',
+		);
+	}
+
+	public function executeSp($exec_status,$old_trf_id, $old_trx_ref,$record_seq)
+	{ 
+		$connection  = Yii::app()->db;
+				
+		try{
+			$query  = "CALL  SP_T_H2H_REF_DETAIL(:P_SEARCH_TRF_ID,
+												:P_SEARCH_TRX_REF,
+												:P_ROW_ID,
+												:P_TRX_REF,
+												:P_TRF_ID,
+												:P_ACCT_NAME,
+												:P_RDI_ACCT,
+												:P_CLIENT_BANK_ACCT,
+												:P_BANK_NAME,
+												:P_TRF_AMT,
+												:P_STATUS,
+												:P_DESCRIPTION,
+												:P_UPD_STATUS,
+												:p_ip_address,
+												:p_cancel_reason,
+												TO_DATE(:p_update_date,'YYYY-MM-DD HH24:MI:SS'),
+												:p_update_seq,
+												:p_record_seq,
+												:p_error_code,
+												:p_error_msg)";
+			
+			$command = $connection->createCommand($query);
+			$command->bindValue(":P_SEARCH_TRF_ID",$old_trf_id,PDO::PARAM_STR);
+			$command->bindValue(":P_SEARCH_TRX_REF",$old_trx_ref,PDO::PARAM_STR);
+			$command->bindValue(":P_ROW_ID",$this->row_id,PDO::PARAM_STR);
+			$command->bindValue(":P_TRX_REF",$this->trx_ref,PDO::PARAM_STR);
+			$command->bindValue(":P_TRF_ID",$this->trf_id,PDO::PARAM_STR);
+			$command->bindValue(":P_ACCT_NAME",$this->acct_name,PDO::PARAM_STR);
+			$command->bindValue(":P_RDI_ACCT",$this->rdi_acct,PDO::PARAM_STR);
+			$command->bindValue(":P_CLIENT_BANK_ACCT",$this->client_bank_acct,PDO::PARAM_STR);
+			$command->bindValue(":P_BANK_NAME",$this->bank_name,PDO::PARAM_STR);
+			$command->bindValue(":P_TRF_AMT",$this->trf_amt,PDO::PARAM_STR);
+			$command->bindValue(":P_STATUS",$this->status,PDO::PARAM_STR);
+			$command->bindValue(":P_DESCRIPTION",$this->description,PDO::PARAM_STR);
+			$command->bindValue(":P_UPD_STATUS",$exec_status,PDO::PARAM_STR);								
+			$command->bindValue(":P_IP_ADDRESS",$this->ip_address,PDO::PARAM_STR);
+			$command->bindValue(":P_CANCEL_REASON",$this->cancel_reason,PDO::PARAM_STR);
+			$command->bindValue(":P_UPDATE_DATE",$this->update_date,PDO::PARAM_STR);
+			$command->bindValue(":P_UPDATE_SEQ",$this->update_seq,PDO::PARAM_STR);
+			$command->bindValue(":P_RECORD_SEQ",$record_seq,PDO::PARAM_STR);	
+			$command->bindParam(":P_ERROR_CODE",$this->error_code,PDO::PARAM_INT,10);
+			$command->bindParam(":P_ERROR_MSG",$this->error_msg,PDO::PARAM_STR,1000);
+
+			$command->execute();
+			
+			//Commit baru akan dijalankan saat semua transaksi INSERT sukses
+			
+		}catch(Exception $ex){
+			if($this->error_code = -999)
+				$this->error_msg = $ex->getMessage();
+		}
+		
+		if($this->error_code < 0)
+			$this->addError('error_msg', 'Error '.$this->error_code.' '.$this->error_msg);
+		
+		return $this->error_code;
+	}
+	public function search()
+	{
+		$criteria = new CDbCriteria;
+		$criteria->join="join select null row_id, null trx_ref, null trf_id, null acct_name, null rdi_acct, null client_bank_acct,
+						null bank_name, null trf_amt, null status, null description from dual";
+		$criteria->compare('row_id',$this->row_id);
+		$criteria->compare('trx_ref',$this->trx_ref,true);
+		$criteria->compare('trf_id',$this->trf_id,true);
+		$criteria->compare('status',$this->status,true);
+		$criteria->compare('description',$this->description,true);
+
+		return new CActiveDataProvider($this, array(
+			'criteria'=>$criteria,
+		));
+	}
+}

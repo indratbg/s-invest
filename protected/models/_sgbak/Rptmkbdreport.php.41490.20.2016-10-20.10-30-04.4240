@@ -1,0 +1,569 @@
+<?php
+
+class Rptmkbdreport extends ARptForm
+{
+
+	public $gen_dt;
+	public $type;
+	public $ip_address;
+	public $vd51;
+	public $vd52;
+	public $vd53;
+	public $vd54;
+	public $vd55;
+	public $vd56;
+	public $vd57;
+	public $vd58;
+	public $vd59;
+	public $vd510a;
+	public $vd510b;
+	public $vd510c;
+	public $vd510d;
+	public $vd510e;
+	public $vd510f;
+	public $vd510g;
+	public $vd510h;
+	public $vd510i;
+	public $vd51_9;
+	public $vd510a_i;
+	public $both;
+	public $cancel_reason;
+	public $update_date;
+	public $update_seq;
+	public $r_1;
+	public $r_2;
+	public $r_3;
+	public $r_4;
+	public $r_5;
+	public $r_6;
+	public $r_7;
+	public $r_8;
+	public $r_9;
+	public $r_a;
+	public $r_b;
+	public $r_c;
+	public $r_d;
+	public $r_e;
+	public $r_f;
+	public $r_g;
+	public $r_h;
+	public $r_i;
+	public $all_r_1_9;
+	public $all_r_a_i;
+	public $all_r;
+	public $print_stat_a;
+	public $print_stat_e;
+	public $price_dt;
+	public function rules()
+	{
+		return array(
+			array('price_dt,print_stat_a,print_stat_e,r_1,r_2,r_3,r_4,r_5,r_6,r_7,r_8,r_9,r_a,r_b,r_c,r_d,r_e,r_f,r_g,r_h,r_i,all_r_1_9,all_r_a_i,all_r,vd51_9,both,vd510a_i,vd51,vd52,vd53,vd54,vd55,vd56,vd57,vd58,vd59,vd510a,vd510b,vd510c,vd510d,vd510e,vd510f,vd510g,vd510h,vd510i,gen_dt,type','safe'),
+			array('gen_dt','validasi','on'=>'generate'),
+			array('gen_dt','cek_total','on'=>'save')
+		);
+	}
+	
+	public function attributeLabels()
+	{
+		return array(
+			'print_stat_a'=>'Approve Status',
+			'gen_dt'=>'Generate',
+			'vd51'=>'VD 5-1 Asset',
+			 'vd52'=>'VD 5-2 Liabilities + Ekuitas',
+			 'vd53'=>'VD 5-3 Rangking Liabilities',
+			 'vd54'=>'VD 5-4 Reksadana',
+			 'vd55'=>'VD 5-5 Lindung Nilai',
+			 'vd56'=>'VD 5-6 Pembantu Dana',
+			 'vd57'=>'VD 5-7 Pembantu Efek',
+			 'vd58'=>'VD 5-8 MKBD diwajibkan',
+			 'vd59'=>'VD 5-9 MKBD',
+			 'vd510a'=>'VD 5-10 A Repo',
+			 'vd510b'=>'VD 5-10 B Repo',
+			 'vd510c'=>'VD 5-10 C Portofolio',
+			 'vd510d'=>'VD 5-10 D Margin',
+			 'vd510e'=>'VD 5-10 E Jaminan Margin',
+			 'vd510f'=>'VD 5-10 F Penjaminan Emisi Efek',
+			 'vd510g'=>'VD 5-10 G Penjaminan oleh perusahaan',
+			 'vd510h'=>'VD 5-10 H Komitmen belanja modal',
+			 'vd510i'=>'VD 5-10 I Transaksi dlm mata uang asing',
+			 'vd51_9'=>'All VD 5.1-5.9/clear all',
+			 'vd510a_i'=>'All VD 5-10/clear all',
+			 'both'=>'All VD 5.1-10/clear All'
+		);
+	}
+public function validasi(){
+	$begin_dt = DateTime::createFromFormat('Y-m-d',$this->gen_dt)->format('Y-m-01');
+	//validation T_DAY_TRS
+	$cek2  = Tdaytrs::model()->find("trs_dt = '$begin_dt'");
+	//validation T_SECU_BAL
+	$cek3 = Tsecubal::model()->find("bal_dt = '$begin_dt' ");
+	$cek_bond = Tbondtrx::model()->findAll("trx_date= '$this->gen_dt' and 
+	 Approved_Sts In ('E','A') And ((Nvl(Sett_Val,0) + Nvl(Sett_For_Curr,0)) = 0) And (Nvl(Journal_Status,'X') <> 'A' Or Doc_Num Is Null) ");
+	if(!$cek2){
+		//$date = DateTime::createFromFormat('Y-m-d',$this->gen_dt)->format('d M Y');
+		$this->addError('gen_dt', "Belum month end GL");
+	}
+	else if(!$cek3)
+	{
+		$this->addError('gen_dt', "Belum month end stock");
+	}
+	else if($cek_bond)
+	{
+		$this->addError('gen_dt', "Masih ada bond yang belum dijurnal");
+	}	
+	$this->cek_date();
+}
+
+public function cek_total()
+{
+		$cek=Vlapmkbdvd51::model()->find(array('condition'=>"update_date='$this->update_date' and update_seq = '$this->update_seq' and approved_stat='A'"));
+		if(!$cek)
+		{
+			$this->addError('gen_dt', "Cannot save text file, please check approval");
+		}
+		else 
+		{
+			//CEK APAKAH SAMA TOTAL VD51 DAN VD52
+			$vd51="SELECT round(C1,2) as c1 FROM INSISTPRO_RPT.LAP_MKBD_VD51 WHERE  mkbd_cd =113 AND update_date = '$this->update_date' and update_seq = '$this->update_seq' AND APPROVED_STAT='A' ";
+			$vd51_c1 =DAO::queryRowSql($vd51);
+			$vd52 = "SELECT round(C1,2) as c1 FROM INSISTPRO_RPT.LAP_MKBD_VD52 WHERE  mkbd_cd =173 AND update_date = '$this->update_date' and update_seq = '$this->update_seq' AND APPROVED_STAT='A'";				 
+			$vd52_c1=DAO::queryRowSql($vd52);
+			
+			$vd59 = "SELECT C2 FROM INSISTPRO_RPT.LAP_MKBD_VD59 WHERE  mkbd_cd =104 AND update_date = '$this->update_date' and update_seq = '$this->update_seq' AND APPROVED_STAT='A'";				 
+			$vd59_c2=DAO::queryRowSql($vd59);
+			
+			$vd51c1 = round($vd51_c1['c1'],2);
+			$vd52c1 = round($vd52_c1['c1'],2);
+			
+			if(($vd51c1 != $vd52c1) && ($vd51_c1 && $vd52_c1)){
+			$this->addError('vd51', 'Total MKBD VD51 tidak sama dengan MKBD VD52');
+			}
+			else if($vd59_c2['c2']<=0){
+				$this->addError('vd51','Tidak memenuhi nilai minimum MKBD, nilai saat ini adalah '.$vd59_c2['c2']);
+			}
+			
+			//cek vd51
+			$sql_vd51 = "select COUNT(1),MKBD_CD from INSISTPRO_RPT.LAP_MKBD_VD51 WHERE update_date = '$this->update_date' and update_seq = '$this->update_seq' AND APPROVED_STAT='A' 
+						 AND C1<0 GROUP BY MKBD_CD";
+			$cek_vd51 = DAO::queryAllSql($sql_vd51);	
+			
+			if($cek_vd51)
+			{	foreach($cek_vd51 as $row)
+				{
+					$this->addError('vd51', 'VD 5-1 bernilai minus pada kolom B baris '.$row['mkbd_cd']);	
+				}
+			}
+			
+			//cek vd52
+			$sql_vd52 = "select COUNT(1),MKBD_CD from INSISTPRO_RPT.LAP_MKBD_VD52 WHERE update_date = '$this->update_date' and update_seq = '$this->update_seq' AND APPROVED_STAT='A' 
+						 AND C1<0 GROUP BY MKBD_CD";
+			$cek_vd52 = DAO::queryAllSql($sql_vd52);	
+			
+			if($cek_vd52)
+			{	foreach($cek_vd52 as $row)
+				{
+					$this->addError('vd52', 'VD 5-2 bernilai minus pada kolom B baris '.$row['mkbd_cd']);	
+				}
+			}
+			//cek vd53
+			$sql_vd53 = "select COUNT(1),MKBD_CD from INSISTPRO_RPT.LAP_MKBD_VD53 WHERE update_date = '$this->update_date' and update_seq = '$this->update_seq' AND APPROVED_STAT='A' 
+						 AND C1<0 GROUP BY MKBD_CD";
+			$cek_vd53 = DAO::queryAllSql($sql_vd53);	
+			if($cek_vd53)
+			{	foreach($cek_vd53 as $row)
+				{
+					$this->addError('vd53', 'VD 5-3 bernilai minus pada kolom B baris '.$row['mkbd_cd']);	
+				}
+			}
+			//cek vd54
+			$sql_vd54 = "Select Count(1),Mkbd_Cd From INSISTPRO_RPT.LAP_MKBD_VD54 Where
+					 	update_date = '$this->update_date' and update_seq = '$this->update_seq' AND APPROVED_STAT='A'  
+					 	And	(market_value<0 or nab<0 or risiko_persen<0 or batasan_mkbd<0 or risiko<0)
+						 Group By Mkbd_Cd";
+			$cek_vd54 = DAO::queryAllSql($sql_vd54);	
+			if($cek_vd54)
+			{	foreach($cek_vd54 as $row)
+				{
+					$this->addError('vd54', 'VD 5-4 bernilai minus pada baris '.$row['mkbd_cd']);	
+				}
+			}
+			//cek vd55
+			$sql_vd55 = "Select Count(1),Mkbd_Cd From INSISTPRO_RPT.LAP_MKBD_VD55 Where
+					 	update_date = '$this->update_date' and update_seq = '$this->update_seq' AND APPROVED_STAT='A'  
+					 	And	(NILAI_EFEK<0 or NILAI_LINDUNG<0 or NILAI_TUTUP<0 or NILAI_HAIRCUT<0 or NILAI_HAIRCUT_LINDUNG<0 or PENGEMBALIAN<0)
+						 Group By Mkbd_Cd";
+			$cek_vd55 = DAO::queryAllSql($sql_vd55);	
+			if($cek_vd55)
+			{	foreach($cek_vd55 as $row)
+				{
+					$this->addError('vd55', 'VD 5-5 bernilai minus pada baris '.$row['mkbd_cd']);	
+				}
+			}
+	
+			//cek vd56
+			$sql_vd56 = "Select Count(1),Mkbd_Cd From INSISTPRO_RPT.LAP_MKBD_VD56 Where
+					 	update_date = '$this->update_date' and update_seq = '$this->update_seq' AND APPROVED_STAT='A'  
+					 	And	(c1<0 or c2<0 or c3<0 or c4<0)
+						 Group By Mkbd_Cd";
+			$cek_vd56 = DAO::queryAllSql($sql_vd56);	
+			if($cek_vd56)
+			{	foreach($cek_vd56 as $row)
+				{
+					$this->addError('vd56', 'VD 5-6 bernilai minus pada baris '.$row['mkbd_cd']);	
+				}
+			}
+			//cek vd57
+			$sql_vd57 = "Select Count(1),Mkbd_Cd From INSISTPRO_RPT.LAP_MKBD_VD57 Where
+					 	update_date = '$this->update_date' and update_seq = '$this->update_seq' AND APPROVED_STAT='A'  
+					 	And	(c1<0 or c2<0 or c3<0 or c4<0)
+						 Group By Mkbd_Cd";
+			$cek_vd57 = DAO::queryAllSql($sql_vd57);	
+			if($cek_vd57)
+			{	foreach($cek_vd57 as $row)
+				{
+					$this->addError('vd57', 'VD 5-7 bernilai minus pada baris '.$row['mkbd_cd']);	
+				}
+			}
+			//cek vd58
+			$sql_vd58 = "Select Count(1),Mkbd_Cd From INSISTPRO_RPT.LAP_MKBD_VD58 Where
+					 	update_date = '$this->update_date' and update_seq = '$this->update_seq' AND APPROVED_STAT='A'  
+					 	And	c1<0 
+						 Group By Mkbd_Cd";
+			$cek_vd58 = DAO::queryAllSql($sql_vd58);	
+			if($cek_vd58)
+			{	foreach($cek_vd58 as $row)
+				{
+					$this->addError('vd58', 'VD 5-8 bernilai minus pada baris '.$row['mkbd_cd']);	
+				}
+			}
+			//cek vd59
+			$sql_vd59 = "Select Count(1),Mkbd_Cd From INSISTPRO_RPT.LAP_MKBD_VD59 Where
+					 	update_date = '$this->update_date' and update_seq = '$this->update_seq' AND APPROVED_STAT='A'  
+					 	And	(c1<0 or c2<0 )
+						 Group By Mkbd_Cd";
+			$cek_vd59 = DAO::queryAllSql($sql_vd59);	
+			if($cek_vd59)
+			{	foreach($cek_vd59 as $row)
+				{
+					$this->addError('vd59', 'VD 5-9 bernilai minus pada baris '.$row['mkbd_cd']);	
+				}
+			}
+			//cek vd510A
+			$sql_vd510a = "Select Count(1),Mkbd_Cd From INSISTPRO_RPT.LAP_MKBD_VD510a Where
+					 	update_date = '$this->update_date' and update_seq = '$this->update_seq' AND APPROVED_STAT='A'  
+					 	And	(REPO_VAL<0 or RETURN_VAL<0 or SUM_QTY<0 or MARKET_VAL<0 or RANKING<0)
+						 Group By Mkbd_Cd";
+			$cek_vd510a = DAO::queryAllSql($sql_vd510a);	
+			if($cek_vd510a)
+			{	foreach($cek_vd510a as $row)
+				{
+					$this->addError('vd510a', 'VD 5-10 A bernilai minus pada baris '.$row['mkbd_cd']);	
+				}
+			}
+			//cek vd510B
+			$sql_vd510b = "Select Count(1),Mkbd_Cd From INSISTPRO_RPT.LAP_MKBD_VD510b Where
+					 	update_date = '$this->update_date' and update_seq = '$this->update_seq' AND APPROVED_STAT='A'  
+					 	And	(REPO_VAL<0 or RETURN_VAL<0 or SUM_QTY<0 or MARKET_VAL<0 or RANKING<0)
+						 Group By Mkbd_Cd";
+			$cek_vd510b = DAO::queryAllSql($sql_vd510b);	
+			if($cek_vd510b)
+			{	foreach($cek_vd510b as $row)
+				{
+					$this->addError('vd510b', 'VD 5-10 B bernilai minus pada baris '.$row['mkbd_cd']);	
+				}
+			}
+			//cek vd510C
+			$sql_vd510c = "Select Count(1),Mkbd_Cd From INSISTPRO_RPT.LAP_MKBD_VD510c Where
+					 	update_date = '$this->update_date' and update_seq = '$this->update_seq' AND APPROVED_STAT='A'  
+					 	And	(BUY_PRICE<0 or PRICE<0 or MARKET_VAL<0 or PERSEN_MARKET<0 or RANKING<0)
+						 Group By Mkbd_Cd";
+			$cek_vd510c = DAO::queryAllSql($sql_vd510c);	
+			if($cek_vd510c)
+			{	foreach($cek_vd510b as $row)
+				{
+					$this->addError('vd510c', 'VD 5-10 C bernilai minus pada baris '.$row['mkbd_cd']);	
+				}
+			}
+			//cek vd510D
+			$sql_vd510d = "Select Count(1),Mkbd_Cd From INSISTPRO_RPT.LAP_MKBD_VD510d Where
+					 	update_date = '$this->update_date' and update_seq = '$this->update_seq' AND APPROVED_STAT='A'  
+					 	And	(end_bal<0 or stk_val<0 or ratio<0 or lebih_client<0 or lebih_porto<0)
+						 Group By Mkbd_Cd";
+			$cek_vd510d = DAO::queryAllSql($sql_vd510d);	
+			if($cek_vd510d)
+			{	foreach($cek_vd510d as $row)
+				{
+					$this->addError('vd510d', 'VD 5-10 D bernilai minus pada baris '.$row['mkbd_cd']);	
+				}
+			}
+			//cek vd510E
+			$sql_vd510e = "Select Count(1),Mkbd_Cd From INSISTPRO_RPT.LAP_MKBD_VD510e Where
+					 	update_date = '$this->update_date' and update_seq = '$this->update_seq' AND APPROVED_STAT='A'  
+					 	And	(price<0 or market_val<0 )
+						 Group By Mkbd_Cd";
+			$cek_vd510e = DAO::queryAllSql($sql_vd510e);	
+			if($cek_vd510e)
+			{	foreach($cek_vd510e as $row)
+				{
+					$this->addError('vd510e', 'VD 5-10 E bernilai minus pada baris '.$row['mkbd_cd']);	
+				}
+			}
+			//cek vd510F
+			$sql_vd510f = "Select Count(1),Mkbd_Cd From INSISTPRO_RPT.LAP_MKBD_VD510f Where
+					 	update_date = '$this->update_date' and update_seq = '$this->update_seq' AND APPROVED_STAT='A'  
+					 	And	(nilai_komitment<0 or haircut<0 or unsubscribe_amt<0 or bank_garansi<0 or ranking<0)
+						 Group By Mkbd_Cd";
+			$cek_vd510f = DAO::queryAllSql($sql_vd510f);	
+			if($cek_vd510f)
+			{	foreach($cek_vd510f as $row)
+				{
+					$this->addError('vd510f', 'VD 5-10 F bernilai minus pada baris '.$row['mkbd_cd']);	
+				}
+			}
+	
+			//cek vd510G
+			$sql_vd510g = "Select Count(1),Mkbd_Cd From INSISTPRO_RPT.LAP_MKBD_VD510g Where
+					 	update_date = '$this->update_date' and update_seq = '$this->update_seq' AND APPROVED_STAT='A'  
+					 	And	(NILAI<0 or RANKING<0 )
+						 Group By Mkbd_Cd";
+			$cek_vd510g = DAO::queryAllSql($sql_vd510g);	
+			if($cek_vd510g)
+			{	foreach($cek_vd510g as $row)
+				{
+					$this->addError('vd510g', 'VD 5-10 G bernilai minus pada baris '.$row['mkbd_cd']);	
+				}
+			}
+			//cek vd510H
+			$sql_vd510h = "Select Count(1),Mkbd_Cd From INSISTPRO_RPT.LAP_MKBD_VD510h Where
+					 	update_date = '$this->update_date' and update_seq = '$this->update_seq' AND APPROVED_STAT='A'  
+					 	And	(SUDAH_REAL<0 or BELUM_REAL<0 and ranking<0 )
+						 Group By Mkbd_Cd";
+			$cek_vd510h = DAO::queryAllSql($sql_vd510h);	
+			if($cek_vd510h)
+			{	foreach($cek_vd510h as $row)
+				{
+					$this->addError('vd510h', 'VD 5-10 H bernilai minus pada baris '.$row['mkbd_cd']);	
+				}
+			}
+			//cek vd510I
+			$sql_vd510i = "Select Count(1),Mkbd_Cd From INSISTPRO_RPT.LAP_MKBD_VD510i Where
+					 	update_date = '$this->update_date' and update_seq = '$this->update_seq' AND APPROVED_STAT='A'  
+					 	And	(NILAI_RPH<0 or UNTUNG_RUGI<0 and RANKING<0 )
+						 Group By Mkbd_Cd";
+			$cek_vd510i = DAO::queryAllSql($sql_vd510i);	
+			if($cek_vd510i)
+			{	foreach($cek_vd510i as $row)
+				{
+					$this->addError('vd510i', 'VD 5-10 I bernilai minus pada baris '.$row['mkbd_cd']);	
+				}
+			}
+			
+		}
+	
+		$cek_bond = Tbondtrx::model()->findAll("trx_date= '$this->gen_dt' and  Approved_Sts In ('E','A') 
+				And ((Nvl(Sett_Val,0) + Nvl(Sett_For_Curr,0)) = 0) And (Nvl(Journal_Status,'X') <> 'A' Or Doc_Num Is Null)");
+		if($cek_bond)
+		{
+			$this->addError('gen_dt', "Masih ada bond yang belum dijurnal");
+		}	
+		
+}
+
+
+public function cek_date()
+{
+	$cek = Sysparam::model()->find("Param_Id='MKBD' And Param_Cd1='STARTNG' ")->ddate1;	
+	if($this->gen_dt < $cek)
+	{
+		$date = DateTime::createFromFormat('Y-m-d',$this->gen_dt)->format('d-M-Y');
+		$this->addError('gen_dt',"Batal generate report pada tanggal ".$date.", gunakan system lama untuk tanggal tahun lalu");
+	}
+}
+	
+public function executeSpHeader($exec_status,$menuName)
+	{
+		 
+		 $connection  = Yii::app()->dbrpt;
+		// $transaction = $connection->beginTransaction();
+		try{
+			$query  = "CALL SP_T_MANY_HEADER_INSERT(:P_MENU_NAME,
+													:P_STATUS,
+													:P_USER_ID,
+													:P_IP_ADDRESS,
+													:P_CANCEL_REASON,
+													:P_UPDATE_DATE,
+													:P_UPDATE_SEQ,
+													:P_vo_errcd,
+													:P_vo_errmsg)";
+			
+						
+			$command = $connection->createCommand($query);
+			$command->bindValue(":P_MENU_NAME",$menuName,PDO::PARAM_STR);
+			$command->bindValue(":P_STATUS",$exec_status,PDO::PARAM_STR);
+			$command->bindValue(":P_USER_ID",$this->vp_userid,PDO::PARAM_STR);			
+			$command->bindValue(":P_IP_ADDRESS",$this->ip_address,PDO::PARAM_STR);
+			$command->bindValue(":P_CANCEL_REASON",$this->cancel_reason,PDO::PARAM_STR);
+			$command->bindParam(":P_UPDATE_DATE",$this->update_date,PDO::PARAM_STR,30);
+			$command->bindParam(":P_UPDATE_SEQ",$this->update_seq,PDO::PARAM_STR,10);
+			$command->bindParam(":P_vo_errcd",$this->vo_errcd,PDO::PARAM_INT,10);
+			$command->bindParam(":P_vo_errmsg",$this->vo_errmsg,PDO::PARAM_STR,1000);
+
+			$command->execute();
+		//	$transaction->commit();
+			//Commit baru akan dijalankan saat semua transaksi INSERT sukses
+			
+		}catch(Exception $ex){
+		//	$transaction->rollback();
+			if($this->vo_errcd = -999)
+				$this->vo_errmsg = $ex->getMessage();
+		}
+		
+		if($this->vo_errcd < 0)
+			$this->addError('vo_errmsg', 'Error '.$this->vo_errcd.' '.$this->vo_errmsg);
+		
+		return $this->vo_errcd;
+	}
+	public function executeSpInbox($exec_status,$record_seq)
+	{
+		 
+		 $connection  = Yii::app()->dbrpt;
+	//	 $transaction = $connection->beginTransaction();
+		try{
+			$query  = "CALL SPR_MKBD_Upd(TO_DATE(:P_MKBD_DATE,'YYYY-MM-DD'),
+										:P_UPD_STATUS,
+										TO_DATE(:P_UPDATE_DATE,'YYYY-MM-DD HH24:MI:SS'),
+										:P_UPDATE_SEQ,
+										:p_record_seq,
+										:p_error_code,
+										:p_error_msg)";
+			
+						
+			$command = $connection->createCommand($query);
+			$command->bindValue(":P_MKBD_DATE",$this->gen_dt,PDO::PARAM_STR);
+			$command->bindValue(":P_UPD_STATUS",$exec_status,PDO::PARAM_STR);
+			$command->bindValue(":P_UPDATE_DATE",$this->update_date,PDO::PARAM_STR,30);
+			$command->bindValue(":P_UPDATE_SEQ",$this->update_seq,PDO::PARAM_STR,10);
+			$command->bindValue(":p_record_seq",$record_seq,PDO::PARAM_STR,10);
+			$command->bindParam(":p_error_code",$this->vo_errcd,PDO::PARAM_INT,10);
+			$command->bindParam(":p_error_msg",$this->vo_errmsg,PDO::PARAM_STR,1000);
+
+			$command->execute();
+			//$transaction->commit();
+			//Commit baru akan dijalankan saat semua transaksi INSERT sukses
+			
+		}catch(Exception $ex){
+			//$transaction->rollback();
+			if($this->vo_errcd = -999)
+				$this->vo_errmsg = $ex->getMessage();
+		}
+		
+		if($this->vo_errcd < 0)
+			$this->addError('vo_errmsg', 'Error '.$this->vo_errcd.' '.$this->vo_errmsg);
+		
+		return $this->vo_errcd;
+	}
+
+	public function executeVd($vd)
+	{
+		 
+		 $connection  = Yii::app()->dbrpt;
+		// $transaction = $connection->beginTransaction();
+		try{
+			
+			$query  = "CALL  SP_MKBD_VD".$vd. " (TO_DATE(:p_update_date,'YYYY-MM-DD HH24:MI:SS'),
+												:p_update_seq,
+												to_date(:p_mkbd_date,'yyyy-mm-dd'),
+												to_date(:p_price_date,'yyyy-mm-dd'),
+												:p_user_id,
+												:p_error_code,
+												:p_error_msg)";
+									
+			$command = $connection->createCommand($query);
+			$command->bindValue(":P_UPDATE_DATE",$this->update_date,PDO::PARAM_STR);
+			$command->bindValue(":P_UPDATE_SEQ",$this->update_seq,PDO::PARAM_INT);
+			$command->bindValue(":P_MKBD_DATE",$this->gen_dt,PDO::PARAM_STR);
+			$command->bindValue(":P_PRICE_DATE",$this->price_dt,PDO::PARAM_STR);
+			$command->bindValue(":p_user_id",$this->vp_userid,PDO::PARAM_STR);
+			$command->bindParam(":p_error_code",$this->vo_errcd,PDO::PARAM_INT,10);
+			$command->bindParam(":p_error_msg",$this->vo_errmsg,PDO::PARAM_STR,200);
+			$command->execute();
+		//	$transaction->commit();
+			//Commit baru akan dijalankan saat semua transaksi INSERT sukses
+			
+		}catch(Exception $ex){
+		//	$transaction->rollback();
+			if($this->vo_errcd = -999)
+				$this->vo_errmsg = $ex->getMessage();
+		}
+		
+		if($this->vo_errcd < 0)
+			$this->addError('vo_errmsg', 'Error '.$this->vo_errcd.' '.$this->vo_errmsg);
+		
+		return $this->vo_errcd;
+	}
+	public function executeRemoveMkbd($table_name)
+	{
+		 $connection  = Yii::app()->dbrpt;
+	//	 $transaction = $connection->beginTransaction();
+		try{
+			$query  = "CALL  SP_REMOVE_LAP_MKBD (:P_TABLE_NAME,
+												:P_USER_ID,
+												TO_DATE(:P_MKBD_DATE,'YYYY-MM-DD'),
+												:p_error_code,
+												:p_error_msg)";
+									
+			$command = $connection->createCommand($query);
+			$command->bindValue(":P_TABLE_NAME",$table_name,PDO::PARAM_STR,50);
+			$command->bindValue(":P_USER_ID",$this->vp_userid,PDO::PARAM_INT,10);
+			$command->bindValue(":P_MKBD_DATE",$this->gen_dt,PDO::PARAM_STR);
+			$command->bindParam(":p_error_code",$this->vo_errcd,PDO::PARAM_INT,10);
+			$command->bindParam(":p_error_msg",$this->vo_errmsg,PDO::PARAM_STR,200);
+			$command->execute();
+		//	$transaction->commit();
+			//Commit baru akan dijalankan saat semua transaksi INSERT sukses
+			
+		}catch(Exception $ex){
+		//	$transaction->rollback();
+			if($this->vo_errcd = -999)
+				$this->vo_errmsg = $ex->getMessage();
+		}
+		
+		if($this->vo_errcd < 0)
+			$this->addError('vo_errmsg', 'Error '.$this->vo_errcd.' '.$this->vo_errmsg);
+		
+		return $this->vo_errcd;
+	}
+	public function executeSaveMKbd($date, $amount, $user_id)
+	{
+		 $connection  = Yii::app()->db;
+		 $transaction = $connection->beginTransaction();
+		try{
+			$query  = "CALL  SP_SAVE_MKBD(  to_date(:P_DATE,'YYYY-MM-DD'),
+										    :P_AMOUNT,
+										    :P_USER_ID,
+										    :P_ERROR_CODE,
+										    :P_ERROR_MSG)";
+									
+			$command = $connection->createCommand($query);
+			$command->bindValue(":P_DATE",$date,PDO::PARAM_STR,50);
+			$command->bindValue(":P_AMOUNT",$amount,PDO::PARAM_STR,50);
+			$command->bindValue(":P_USER_ID",$user_id,PDO::PARAM_INT,10);
+			$command->bindParam(":P_ERROR_CODE",$this->vo_errcd,PDO::PARAM_INT,10);
+			$command->bindParam(":P_ERROR_MSG",$this->vo_errmsg,PDO::PARAM_STR,200);
+			$command->execute();
+			$transaction->commit();
+			//Commit baru akan dijalankan saat semua transaksi INSERT sukses
+			
+		}catch(Exception $ex){
+			$transaction->rollback();
+			if($this->vo_errcd = -999)
+				$this->vo_errmsg = $ex->getMessage();
+		}
+		
+		if($this->vo_errcd < 0)
+			$this->addError('vo_errmsg', 'Error '.$this->vo_errcd.' '.$this->vo_errmsg);
+		
+		return $this->vo_errcd;
+	}
+
+}

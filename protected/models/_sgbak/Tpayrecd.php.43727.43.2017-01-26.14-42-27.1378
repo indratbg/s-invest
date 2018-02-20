@@ -1,0 +1,715 @@
+<?php
+
+/**
+ * This is the model class for table "T_PAYRECD".
+ *
+ * The followings are the available columns in table 'T_PAYRECD':
+ * @property string $payrec_num
+ * @property string $payrec_type
+ * @property string $payrec_date
+ * @property string $client_cd
+ * @property string $gl_acct_cd
+ * @property string $sl_acct_cd
+ * @property string $db_cr_flg
+ * @property string $cre_dt
+ * @property string $upd_dt
+ * @property string $approved_sts
+ * @property string $approved_by
+ * @property string $approved_dt
+ * @property double $payrec_amt
+ * @property string $user_id
+ * @property string $doc_ref_num
+ * @property integer $tal_id
+ * @property string $remarks
+ * @property string $record_source
+ * @property string $doc_date
+ * @property string $ref_folder_cd
+ * @property string $gl_ref_num
+ * @property double $sett_for_curr
+ * @property double $sett_val
+ * @property string $brch_cd
+ * @property integer $doc_tal_id
+ * @property string $source_type
+ * @property string $due_date
+ */
+class Tpayrecd extends AActiveRecordSP
+{
+	//AH: #BEGIN search (datetime || date) additional comparison
+	public $payrec_date_date;
+	public $payrec_date_month;
+	public $payrec_date_year;
+
+	public $cre_dt_date;
+	public $cre_dt_month;
+	public $cre_dt_year;
+
+	public $upd_dt_date;
+	public $upd_dt_month;
+	public $upd_dt_year;
+
+	public $approved_dt_date;
+	public $approved_dt_month;
+	public $approved_dt_year;
+
+	public $doc_date_date;
+	public $doc_date_month;
+	public $doc_date_year;
+
+	public $due_date_date;
+	public $due_date_month;
+	public $due_date_year;
+	//AH: #END search (datetime || date)  additional comparison
+	
+	public $cancel_flg = 'N';
+	public $save_flg = 'N';
+	
+	public $rowid;
+	public $old_tal_id;
+	public $old_payrec_amt;
+	public $old_db_cr_flg;
+	
+	public $contr_dt;
+	public $buy_sell_ind;
+	public $outs_amt;
+	public $buy_sett_amt;
+	public $sell_sett_amt;
+	public $amt_for_curr;
+	public $check;
+	
+	public $contr_num;
+	public $budget_cd;
+	
+	public $trx_date;
+	public $due_date;
+	public $protect_cd;
+	
+	public $system_generated;
+	public $inserted = true;
+	public $updated = false;
+	public $payrec_amt_diff;
+	public $old_outs_amt;
+	public $selisih_qty;
+	
+	public $cash_withdraw_amt;
+	public $cash_withdraw_reason;
+	
+	public function __construct($scenario = 'insert')
+	{
+		parent::__construct($scenario);
+		$this->logRecord=true;
+	}
+	
+	public static function model($className=__CLASS__)
+	{
+		return parent::model($className);
+	}
+    
+	public function afterFind()
+	{
+		$this->old_payrec_amt = $this->payrec_amt;
+		$this->old_db_cr_flg = $this->db_cr_flg;
+		$this->old_outs_amt = $this->outs_amt;
+	}
+	
+	public function tableName()
+	{
+		return 'T_PAYRECD';
+	}
+	
+	public static function getOutstandingArapSql($startDt, $voucherDt, $clientCd)
+	{
+		$sql = "SELECT  DECODE(b.doc_ref_num, NULL,b.xn_doc_num,b.doc_ref_num) contr_num,		
+        		DECODE(SUBSTR(b.record_source,2,3),'DUE',b.netting_date,b.doc_date) contr_dt,		
+				DECODE(SUBSTR(DECODE(b.doc_ref_num, NULL,b.xn_doc_num,b.doc_ref_num),5,2),'BR','B','BI','B','JR','J','JI','J',b.db_cr_flg) BUY_SELL_IND,
+				b.curr_val AMT_FOR_CURR, (NVL(b.CURR_VAL,0) - NVL(b.SETT_VAL,0) - NVL(b.SETT_FOR_CURR,0)) OUTS_AMT,		
+		        0 BUY_sett_amt, 0 SELL_sett_amt, b.LEDGER_NAR remarks, b.db_cr_flg, b.sl_acct_cd, trim(b.gl_acct_cd) GL_ACCT_CD, 
+				---b.FOLDER_CD ref_folder_cd, b.TAL_ID, b.TAL_ID doc_tal_id, b.RECORD_SOURCE, b.cre_dt sortkey1, b.xn_doc_num gl_ref_num, b.due_Date, budget_cd, brch_cd		
+				b.FOLDER_CD ref_folder_cd, b.TAL_ID, DECODE(substr(b.record_source,2,3),'DUE',b.netting_flg,b.tal_id) doc_tal_id, b.RECORD_SOURCE, b.cre_dt sortkey1, b.xn_doc_num gl_ref_num, b.due_Date, budget_cd, brch_cd
+		 		FROM
+		 		( 
+		 			SELECT GREATEST(acct_open_dt -30,'$startDt') AS begin_dt		
+				 	FROM MST_CLIENT 
+				 	WHERE client_cd  = '$clientCd' 
+				 ) m,
+	 			T_ACCOUNT_LEDGER b 		
+	 			WHERE doc_date >  m.begin_dt 		
+	  			AND b.sl_acct_cd = '$clientCd' 		
+	  			AND (b.record_source <> 'RV' AND b.record_source <> 'PV' ) 		
+		  		AND (b.CURR_VAL - NVL(b.SETT_VAL,0) - NVL(b.SETT_FOR_CURR,0)) > 0 		
+		 		AND due_date <= '$voucherDt'
+		 		AND b.reversal_jur = 'N'		
+		  		AND b.approved_sts = 'A'
+		  		AND b.record_source <> 'RE'		
+		  		AND ((b.doc_ref_num IS NOT NULL) OR b.acct_type = 'ARAP' OR b.record_source <> 'CG' OR b.budget_cd= 'BONDTRANS')  -- hindari broker pasar nego
+		  		ORDER BY b.due_date, b.doc_date, buy_sell_ind
+		  		--FOR UPDATE NOWAIT";
+	
+		return $sql;
+	}
+	
+	public static function getUpdateOutstandingArapSql($startDt, $voucherDt, $clientCd, $payrec_num)
+	{
+		$sql = "SELECT  DECODE(b.doc_ref_num, NULL,b.xn_doc_num,b.doc_ref_num) contr_num,		
+        		DECODE(SUBSTR(b.record_source,2,3),'DUE',b.netting_date,b.doc_date) contr_dt,		
+				DECODE(SUBSTR(DECODE(b.doc_ref_num, NULL,b.xn_doc_num,b.doc_ref_num),5,2),'BR','B','BI','B','JR','J','JI','J',b.db_cr_flg) BUY_SELL_IND,
+				b.curr_val AMT_FOR_CURR, (NVL(b.CURR_VAL,0) - NVL(b.SETT_VAL,0) - NVL(b.SETT_FOR_CURR,0)) OUTS_AMT,			
+		        0 BUY_sett_amt, 0 SELL_sett_amt, b.LEDGER_NAR remarks, b.db_cr_flg, b.sl_acct_cd, trim(b.gl_acct_cd) GL_ACCT_CD, 
+				b.FOLDER_CD ref_folder_cd, b.TAL_ID, b.TAL_ID doc_tal_id, b.RECORD_SOURCE, b.cre_dt sortkey1, b.xn_doc_num gl_ref_num, b.due_Date, budget_cd, brch_cd		
+		 		FROM
+		 		( 
+		 			SELECT GREATEST(acct_open_dt -30,'$startDt',TO_DATE('$voucherDt','YYYY-MM-DD HH24:MI:SS')-30) AS begin_dt		
+				 	FROM MST_CLIENT 
+				 	WHERE client_cd  = '$clientCd' 
+				 ) m,
+	 			T_ACCOUNT_LEDGER b 		
+	 			WHERE doc_date >  m.begin_dt 		
+	  			AND b.sl_acct_cd = '$clientCd' 		
+	  			AND (b.record_source <> 'RV' AND b.record_source <> 'PV' ) 		
+		 		AND due_date <= '$voucherDt'
+		 		AND b.reversal_jur = 'N'		
+		  		AND b.approved_sts = 'A'	
+		  		AND b.xn_doc_num <> '$payrec_num'
+		  		AND b.record_source <> 'RE'
+		  		AND ((b.doc_ref_num IS NOT NULL) OR b.acct_type = 'ARAP' OR b.record_source <> 'CG' OR b.budget_cd= 'BONDTRANS')  -- hindari broker pasar nego
+				ORDER BY b.due_date, b.doc_date, buy_sell_ind";
+	
+		return $sql;
+	}
+	
+	public static function getOutstandingArapKpeiSql($beginDt, $endDt, $beginDue, $endDue, $kpei1, $kpei2, $nego1, $nego2)
+	{
+		$sql = "SELECT T.GL_ACCT_CD GL_ACCT_CD, T.SL_ACCT_CD SL_ACCT_CD, T.DOC_DATE TRX_DATE, trunc(T.DUE_DATE) DUE_DATE, T.DB_CR_FLG buy_sell_ind, 		
+         		sum(T.CURR_VAL) outs_amt, T.LEDGER_NAR remarks, 'KPEI' contr_num,	0 buy_sett_amt, 0 sell_sett_amt, 'N' checked, 0 protect_cd, 0 tal_id	
+    			FROM T_ACCOUNT_LEDGER T 			
+   				WHERE (T.DOC_DATE between TO_DATE('$beginDt','YYYY-MM-DD') and TO_DATE('$endDt','YYYY-MM-DD') ) 
+   				AND	(T.RECORD_SOURCE IN ('CG','GL') ) 
+   				AND	(T.APPROVED_STS = 'A' )
+				AND T.REVERSAL_JUR = 'N'
+         		AND ((T.CURR_VAL - nvl(T.SETT_VAL,0) - nvl(T.SETT_FOR_CURR,0)) > 0 ) 
+         		AND ( ( trim(T.GL_ACCT_CD) = '$kpei1' ) OR ( trim(T.GL_ACCT_CD) = '$kpei2' ) )  
+         		AND (T.DUE_DATE between TO_DATE('$beginDue','YYYY-MM-DD') and TO_DATE('$endDue','YYYY-MM-DD')) 			
+   				GROUP BY  T.DOC_DATE,T.DUE_DATE, T.GL_ACCT_CD,T.SL_ACCT_CD, T.DB_CR_FLG, T.LEDGER_NAR   			
+				UNION		
+				SELECT A.GL_ACCT_CD GL_ACCT_CD, A.SL_ACCT_CD SL_ACCT_CD, A.DOC_DATE, trunc(A.DUE_DATE) DUE_DATE, A.DB_CR_FLG, A.CURR_VAL - NVL(SETT_VAL,0) - NVL(SETT_FOR_CURR,0) ,
+				A.LEDGER_NAR ledger_nar, A.XN_DOC_NUM contr_num, 0 deb_amt, 0 cre_amt, 'N' checked,	DECODE(A.DB_CR_FLG, 'D', 1,2) protect_cd, tal_id			
+    			FROM T_ACCOUNT_LEDGER A 			
+   				WHERE (A.DOC_DATE between TO_DATE('$beginDt','YYYY-MM-DD') and TO_DATE('$endDt','YYYY-MM-DD') ) 
+   				AND (A.APPROVED_STS = 'A') 
+				AND A.REVERSAL_JUR = 'N'
+   				AND ((A.CURR_VAL - nvl(A.SETT_VAL,0)- nvl(A.SETT_FOR_CURR,0)) > 0 ) 
+   				AND	(A.RECORD_SOURCE IN ('CG','GL')) 
+   				AND	(substr(A.XN_DOC_NUM,6,1) <> 'I' ) 
+   				AND ((trim(A.GL_ACCT_CD) = '$nego1' ) OR ( trim(A.GL_ACCT_CD) = '$nego2' ) )
+				AND ( A.BUDGET_CD is null OR budget_cd = 'CG') 
+				AND (A.DUE_DATE between TO_DATE('$beginDue','YYYY-MM-DD') AND TO_DATE('$endDue','YYYY-MM-DD')) 			
+				ORDER BY  Protect_cd, GL_ACCT_CD, SL_ACCT_CD, due_date, trx_date";
+	
+		return $sql;
+	}
+	
+	public static function getOutstandingArapSlSql($beginDt, $endDt, $beginDue, $endDue, $nego1, $nego2)
+	{
+		$sql = "SELECT T.GL_ACCT_CD GL_ACCT_CD,	T.SL_ACCT_CD SL_ACCT_CD, T.BRCH_CD BRCH_CD, T.DOC_DATE trx_date, TRUNC(T.DUE_DATE) DUE_DATE, T.DB_CR_FLG buy_sell_ind, SUM(T.CURR_VAL) outs_amt,										
+         		T.LEDGER_NAR remarks, 'GSSL' contr_num, 0 buy_sett_amt, 0 sell_sett_amt, 'N' checked, 0 protect_cd, 0 tal_id									
+    			FROM
+    			( 
+    				SELECT contr_num										
+	        		FROM T_CONTRACTS									
+					WHERE contr_dt 	BETWEEN TO_DATE('$beginDt','YYYY-MM-DD') AND TO_DATE('$endDt','YYYY-MM-DD')						
+			  		AND kpei_due_dt BETWEEN TO_DATE('$beginDue','YYYY-MM-DD') AND TO_DATE('$endDue','YYYY-MM-DD')							
+			  		AND brch_cd = 'SL'							
+			  		AND contr_stat <> 'C'
+				) a,							
+	    		T_ACCOUNT_LEDGER T,
+	    		T_HEAD_BRANCH_RVPV R							
+   				WHERE TRIM(T.ACCT_TYPE) IN ('KPEI', 'BEJ', 'PPH', 'UBYBEI', 'UBYLPP', 'UBYLKP', 'UBYJAM') 
+   				AND T.APPROVED_STS = 'A' 
+				AND T.REVERSAL_JUR = 'N'
+				AND T.RECORD_SOURCE = 'CG' 
+				AND T.DOC_DATE BETWEEN TO_DATE('$beginDt','YYYY-MM-DD') AND TO_DATE('$endDt','YYYY-MM-DD') 
+				AND T.DUE_DATE BETWEEN TO_DATE('$beginDue','YYYY-MM-DD') AND TO_DATE('$endDue','YYYY-MM-DD') 
+				AND t.xn_doc_num = a.contr_num  
+				AND t.xn_doc_num = r.xn_doc_num (+)
+				AND t.tal_id = r.tal_id (+)
+				AND r.branch_rvpv_number IS NULL							
+   				GROUP BY T.DOC_DATE,T.DUE_DATE, T.BRCH_CD, T.GL_ACCT_CD,T.SL_ACCT_CD, T.DB_CR_FLG, T.LEDGER_NAR   										
+   				UNION ALL										
+    			SELECT T.GL_ACCT_CD GL_ACCT_CD, T.SL_ACCT_CD SL_ACCT_CD, T.BRCH_CD BRCH_CD, T.DOC_DATE, TRUNC(T.DUE_DATE) DUE_DATE, T.DB_CR_FLG, (T.CURR_VAL) sum_amt,										
+         		T.LEDGER_NAR ledger_nar, contr_num, 0 deb_amt, 0 cre_amt, 'N' checked, 0 protect_cd, t.tal_id									
+    			FROM
+    			( 
+    				SELECT contr_num										
+	        		FROM T_CONTRACTS									
+					WHERE contr_dt 	BETWEEN TO_DATE('$beginDt','YYYY-MM-DD') AND TO_DATE('$endDt','YYYY-MM-DD')						
+			  		AND kpei_due_dt BETWEEN TO_DATE('$beginDue','YYYY-MM-DD') AND TO_DATE('$endDue','YYYY-MM-DD')							
+			  		AND brch_cd = 'SL'							
+			  		AND contr_stat <> 'C'
+				) a,							
+	    		T_ACCOUNT_LEDGER T,
+	    		T_HEAD_BRANCH_RVPV R								
+   				WHERE TRIM(t.gl_acct_cd) IN ('$nego1','$nego2') 
+   				AND T.APPROVED_STS = 'A' 
+   				AND T.REVERSAL_JUR = 'N' 
+   				AND T.RECORD_SOURCE = 'CG' 
+   				AND T.DOC_DATE BETWEEN TO_DATE('$beginDt','YYYY-MM-DD') AND TO_DATE('$endDt','YYYY-MM-DD') 
+   				AND T.DUE_DATE BETWEEN TO_DATE('$beginDue','YYYY-MM-DD') AND TO_DATE('$endDue','YYYY-MM-DD') 
+   				AND t.xn_doc_num = a.contr_num 
+   				AND t.xn_doc_num = r.xn_doc_num (+)
+   				AND t.tal_id = r.tal_id (+)
+   				AND r.branch_rvpv_number IS NULL			
+				ORDER BY Protect_cd, trx_date, due_date, GL_ACCT_CD, SL_ACCT_CD";
+		
+		return $sql;
+	}
+	
+	public static function getOutstandingArapJkSql($beginDt, $endDt, $beginDue, $endDue, $nego1, $nego2)
+	{
+		$sql = "SELECT T.GL_ACCT_CD GL_ACCT_CD,	T.SL_ACCT_CD SL_ACCT_CD, T.BRCH_CD BRCH_CD, T.DOC_DATE trx_date, TRUNC(T.DUE_DATE) DUE_DATE, DECODE(T.DB_CR_FLG,'D','C','D') buy_sell_ind,
+		 		SUM(T.CURR_VAL) outs_amt, T.LEDGER_NAR remarks, 'GSJK' contr_num, 0 buy_sett_amt, 0 sell_sett_amt, 'N' checked, 0 protect_cd, 0 tal_id										
+    			FROM
+    			( 
+    				SELECT contr_num										
+	        		FROM T_CONTRACTS									
+					WHERE contr_dt 	BETWEEN TO_DATE('$beginDt','YYYY-MM-DD') AND TO_DATE('$endDt','YYYY-MM-DD')						
+			  		AND kpei_due_dt BETWEEN TO_DATE('$beginDue','YYYY-MM-DD') AND TO_DATE('$endDue','YYYY-MM-DD')							
+			  		AND brch_cd = 'SL'							
+			  		AND contr_stat <> 'C'
+				) a,							
+	    		T_ACCOUNT_LEDGER T,
+	    		T_HEAD_BRANCH_RVPV R								
+   				WHERE TRIM(T.ACCT_TYPE) IN ('KPEI', 'BEJ', 'PPH', 'UBYBEI', 'UBYLPP', 'UBYLKP', 'UBYJAM') 
+   				AND T.APPROVED_STS = 'A'  
+         		AND T.REVERSAL_JUR = 'N'  
+         		AND T.RECORD_SOURCE = 'CG'  
+         		AND T.DOC_DATE BETWEEN TO_DATE('$beginDt','YYYY-MM-DD') AND TO_DATE('$endDt','YYYY-MM-DD')  
+         		AND T.DUE_DATE BETWEEN TO_DATE('$beginDue','YYYY-MM-DD') AND TO_DATE('$endDue','YYYY-MM-DD') 
+		 		AND t.xn_doc_num = a.contr_num
+		 		AND t.xn_doc_num = r.xn_doc_num (+)
+   				AND t.tal_id = r.tal_id (+)
+   				AND r.head_rvpv_number IS NULL  						
+   				GROUP BY T.DOC_DATE,T.DUE_DATE, T.BRCH_CD, T.GL_ACCT_CD,T.SL_ACCT_CD, T.DB_CR_FLG, T.LEDGER_NAR   										
+   				UNION ALL										
+    			SELECT T.GL_ACCT_CD GL_ACCT_CD, T.SL_ACCT_CD SL_ACCT_CD, T.BRCH_CD BRCH_CD, T.DOC_DATE, TRUNC(T.DUE_DATE) DUE_DATE, DECODE(T.DB_CR_FLG,'D','C','D') db_cr_flg,
+    			(T.CURR_VAL) sum_amt, T.LEDGER_NAR ledger_nar, contr_num, 0 deb_amt, 0 cre_amt, 'N' checked, 0 protect_cd, t.tal_id									
+    			FROM
+    			( 
+    				SELECT contr_num										
+	        		FROM T_CONTRACTS									
+					WHERE contr_dt 	BETWEEN TO_DATE('$beginDt','YYYY-MM-DD') AND TO_DATE('$endDt','YYYY-MM-DD')						
+			  		AND kpei_due_dt BETWEEN TO_DATE('$beginDue','YYYY-MM-DD') AND TO_DATE('$endDue','YYYY-MM-DD')							
+			  		AND brch_cd = 'SL'							
+			  		AND contr_stat <> 'C'
+				) a,							
+	    		T_ACCOUNT_LEDGER T,
+	    		T_HEAD_BRANCH_RVPV R							
+   				WHERE trim(t.gl_acct_cd) IN ('$nego1','$nego2') 
+   				AND T.APPROVED_STS = 'A' 
+         		AND T.REVERSAL_JUR = 'N' 
+         		AND T.RECORD_SOURCE = 'CG' 
+         		AND T.DOC_DATE BETWEEN TO_DATE('$beginDt','YYYY-MM-DD') AND TO_DATE('$endDt','YYYY-MM-DD')
+         		AND T.DUE_DATE BETWEEN TO_DATE('$beginDue','YYYY-MM-DD') AND TO_DATE('$endDue','YYYY-MM-DD')
+		 		AND t.xn_doc_num = a.contr_num 
+		 		AND t.xn_doc_num = r.xn_doc_num (+)
+   				AND t.tal_id = r.tal_id (+)
+   				AND r.head_rvpv_number IS NULL  								
+				ORDER BY Protect_cd, trx_date, due_date, GL_ACCT_CD, SL_ACCT_CD";
+		
+		return $sql;
+	}
+	
+	/*public static function getUpdateOutstandingArapKpeiSql($beginDt, $endDt, $beginDue, $endDue, $kpei1, $kpei2, $nego1, $nego2, $payrec_num)
+	{
+		$sql = "SELECT T.GL_ACCT_CD GL_ACCT_CD, T.SL_ACCT_CD SL_ACCT_CD, T.DOC_DATE TRX_DATE, trunc(T.DUE_DATE) DUE_DATE, T.DB_CR_FLG buy_sell_ind, 		
+         		sum(T.CURR_VAL) outs_amt, T.LEDGER_NAR remarks, 'KPEI' contr_num,	0 buy_sett_amt, 0 sell_sett_amt, 'N' checked, 0 protect_cd, 0 tal_id	
+    			FROM T_ACCOUNT_LEDGER T 			
+   				WHERE (T.DOC_DATE between TO_DATE('$beginDt','YYYY-MM-DD') and TO_DATE('$endDt','YYYY-MM-DD') ) 
+   				AND	(T.RECORD_SOURCE = 'CG' ) 
+   				AND	(T.APPROVED_STS = 'A' )
+				AND T.REVERSAL_JUR = 'N'
+         		AND T.xn_doc_num <> '$payrec_num'
+         		AND ( ( trim(T.GL_ACCT_CD) = '$kpei1' ) OR ( trim(T.GL_ACCT_CD) = '$kpei2' ) )  
+         		AND (T.DUE_DATE between TO_DATE('$beginDue','YYYY-MM-DD') and TO_DATE('$endDue','YYYY-MM-DD')) 			
+   				GROUP BY  T.DOC_DATE,T.DUE_DATE, T.GL_ACCT_CD,T.SL_ACCT_CD, T.DB_CR_FLG, T.LEDGER_NAR   			
+				UNION		
+				SELECT A.GL_ACCT_CD GL_ACCT_CD, A.SL_ACCT_CD SL_ACCT_CD, A.DOC_DATE, trunc(A.DUE_DATE) DUE_DATE, A.DB_CR_FLG, A.CURR_VAL - NVL(SETT_VAL,0) - NVL(SETT_FOR_CURR,0) ,
+				A.LEDGER_NAR ledger_nar, A.XN_DOC_NUM contr_num, 0 deb_amt, 0 cre_amt, 'N' checked,	DECODE(A.DB_CR_FLG, 'D', 1,2) protect_cd, tal_id			
+    			FROM T_ACCOUNT_LEDGER A 			
+   				WHERE (A.DOC_DATE between TO_DATE('$beginDt','YYYY-MM-DD') and TO_DATE('$endDt','YYYY-MM-DD') ) 
+   				AND (A.APPROVED_STS = 'A') 
+				AND A.REVERSAL_JUR = 'N'
+   				AND A.xn_doc_num <> '$payrec_num'
+   				AND	(A.RECORD_SOURCE = 'CG') 
+   				AND	(substr(A.XN_DOC_NUM,6,1) <> 'I' ) 
+   				AND ((trim(A.GL_ACCT_CD) = '$nego1' ) OR ( trim(A.GL_ACCT_CD) = '$nego2' ) )
+				AND ( A.BUDGET_CD is null) 
+				AND (A.DUE_DATE between TO_DATE('$beginDue','YYYY-MM-DD') AND TO_DATE('$endDue','YYYY-MM-DD')) 			
+				ORDER BY  Protect_cd, GL_ACCT_CD, SL_ACCT_CD";
+	
+		return $sql;
+	}*/
+	
+	public function executeSp($exec_status,$old_payrec_num,$old_doc_ref_num,$old_tal_id,$update_date,$update_seq,$record_seq)
+	{
+		$connection  = Yii::app()->db;
+		
+		try{
+			$query  = "CALL SP_T_PAYRECD_UPD(
+						:P_SEARCH_PAYREC_NUM,
+						:P_SEARCH_DOC_REF_NUM,
+						:P_SEARCH_TAL_ID,
+						:P_PAYREC_NUM,
+						:P_PAYREC_TYPE,
+						TO_DATE(:P_PAYREC_DATE,'YYYY-MM-DD'),
+						:P_CLIENT_CD,
+						:P_GL_ACCT_CD,
+						:P_SL_ACCT_CD,
+						:P_DB_CR_FLG,
+						:P_PAYREC_AMT,
+						:P_DOC_REF_NUM,
+						:P_TAL_ID,
+						:P_REMARKS,
+						:P_RECORD_SOURCE,
+						TO_DATE(:P_DOC_DATE,'YYYY-MM-DD'),
+						:P_REF_FOLDER_CD,
+						:P_GL_REF_NUM,
+						:P_SETT_FOR_CURR,
+						:P_SETT_VAL,
+						:P_BRCH_CD,
+						:P_DOC_TAL_ID,
+						:P_SOURCE_TYPE,
+						TO_DATE(:P_DUE_DATE,'YYYY-MM-DD'),		
+						:P_USER_ID,
+						TO_DATE(:P_CRE_DT,'YYYY-MM-DD HH24:MI:SS'),
+						:P_UPD_BY,
+						TO_DATE(:P_UPD_DT,'YYYY-MM-DD HH24:MI:SS'),		
+						:P_UPD_STATUS,
+						:P_IP_ADDRESS,
+						:P_CANCEL_REASON,
+						TO_DATE(:P_UPDATE_DATE,'YYYY-MM-DD HH24:MI:SS'),
+						:P_UPDATE_SEQ,
+						:P_RECORD_SEQ,
+						:P_ERROR_CODE,
+						:P_ERROR_MSG)";
+			
+			$command = $connection->createCommand($query);
+			$command->bindValue(":P_SEARCH_PAYREC_NUM",$old_payrec_num,PDO::PARAM_STR);
+			$command->bindValue(":P_SEARCH_DOC_REF_NUM",$old_doc_ref_num,PDO::PARAM_STR);
+			$command->bindValue(":P_SEARCH_TAL_ID",$old_tal_id,PDO::PARAM_STR);
+			$command->bindValue(":P_PAYREC_NUM",$this->payrec_num,PDO::PARAM_STR);
+			$command->bindValue(":P_PAYREC_TYPE",$this->payrec_type,PDO::PARAM_STR);
+			$command->bindValue(":P_PAYREC_DATE",$this->payrec_date,PDO::PARAM_STR);
+			$command->bindValue(":P_CLIENT_CD",$this->client_cd,PDO::PARAM_STR);
+			$command->bindValue(":P_GL_ACCT_CD",$this->gl_acct_cd,PDO::PARAM_STR);
+			$command->bindValue(":P_SL_ACCT_CD",$this->sl_acct_cd,PDO::PARAM_STR);
+			$command->bindValue(":P_DB_CR_FLG",$this->db_cr_flg,PDO::PARAM_STR);
+			$command->bindValue(":P_PAYREC_AMT",$this->payrec_amt,PDO::PARAM_STR);
+			$command->bindValue(":P_DOC_REF_NUM",$this->doc_ref_num,PDO::PARAM_STR);
+			$command->bindValue(":P_TAL_ID",$this->tal_id,PDO::PARAM_STR);
+			$command->bindValue(":P_REMARKS",$this->remarks,PDO::PARAM_STR);
+			$command->bindValue(":P_RECORD_SOURCE",$this->record_source,PDO::PARAM_STR);
+			$command->bindValue(":P_DOC_DATE",$this->doc_date,PDO::PARAM_STR);
+			$command->bindValue(":P_REF_FOLDER_CD",$this->ref_folder_cd,PDO::PARAM_STR);
+			$command->bindValue(":P_GL_REF_NUM",$this->gl_ref_num,PDO::PARAM_STR);
+			$command->bindValue(":P_SETT_FOR_CURR",$this->sett_for_curr,PDO::PARAM_STR);
+			$command->bindValue(":P_SETT_VAL",$this->sett_val,PDO::PARAM_STR);
+			$command->bindValue(":P_BRCH_CD",$this->brch_cd,PDO::PARAM_STR);
+			$command->bindValue(":P_DOC_TAL_ID",$this->doc_tal_id,PDO::PARAM_STR);
+			$command->bindValue(":P_SOURCE_TYPE",$this->source_type,PDO::PARAM_STR);
+			$command->bindValue(":P_DUE_DATE",$this->due_date,PDO::PARAM_STR);
+			$command->bindValue(":P_USER_ID",$this->user_id,PDO::PARAM_STR);
+			$command->bindValue(":P_CRE_DT",$this->cre_dt,PDO::PARAM_STR);
+			$command->bindValue(":P_UPD_BY",$this->upd_by,PDO::PARAM_STR);
+			$command->bindValue(":P_UPD_DT",$this->upd_dt,PDO::PARAM_STR);
+			$command->bindValue(":P_UPD_STATUS",$exec_status,PDO::PARAM_STR);
+			$command->bindValue(":P_IP_ADDRESS",$this->ip_address,PDO::PARAM_STR);
+			$command->bindValue(":P_CANCEL_REASON",$this->cancel_reason,PDO::PARAM_STR);
+			$command->bindValue(":P_UPDATE_DATE",$update_date,PDO::PARAM_STR);
+			$command->bindValue(":P_UPDATE_SEQ",$update_seq,PDO::PARAM_STR);
+			$command->bindValue(":P_RECORD_SEQ",$record_seq,PDO::PARAM_STR);
+						
+			$command->bindParam(":P_ERROR_CODE",$this->error_code,PDO::PARAM_INT,10);
+			$command->bindParam(":P_ERROR_MSG",$this->error_msg,PDO::PARAM_STR,1000);
+
+			$command->execute();
+			
+		}catch(Exception $ex){
+			if($this->error_code = -999)
+				$this->error_msg = $ex->getMessage();
+		}
+		
+		if($this->error_code < 0)
+			$this->addError('error_msg', 'Error '.$this->error_code.' '.$this->error_msg);
+		
+		return $this->error_code;
+	}
+
+	public function executeSpRvpvSettled($exec_status)
+	{
+		$connection  = Yii::app()->db;
+		
+		try{
+			$query  = "CALL SP_RVPV_SETTLED(
+						:P_CONTR_NUM,
+						:P_CLIENT_CD,
+						:P_AMT,
+--						:P_RVPV_NUMBER,
+						:P_GL_REF_NUM,
+						:P_GL_ACCT_CD,
+						:P_TAL_ID,
+						:P_RECORD_SOURCE,
+						TO_DATE(:P_DOC_DATE,'YYYY-MM-DD'),
+						TO_DATE(:P_DUE_DATE,'YYYY-MM-DD'),
+						:P_STATUS,
+						:P_USER_ID)";
+			
+			$command = $connection->createCommand($query);
+			$command->bindValue(":P_CONTR_NUM",$this->contr_num,PDO::PARAM_STR);
+			$command->bindValue(":P_CLIENT_CD",$this->client_cd,PDO::PARAM_STR);
+			$command->bindValue(":P_AMT",$this->payrec_amt,PDO::PARAM_STR);
+//			$command->bindValue(":P_RVPV_NUMBER",$this->payrec_num,PDO::PARAM_STR);
+			$command->bindValue(":P_GL_REF_NUM",$this->gl_ref_num,PDO::PARAM_STR);
+			$command->bindValue(":P_GL_ACCT_CD",$this->gl_acct_cd,PDO::PARAM_STR);
+			$command->bindValue(":P_TAL_ID",$this->tal_id,PDO::PARAM_STR);
+			$command->bindValue(":P_RECORD_SOURCE",$this->record_source,PDO::PARAM_STR);
+			$command->bindValue(":P_DOC_DATE",$this->doc_date,PDO::PARAM_STR);
+			$command->bindValue(":P_DUE_DATE",$this->due_date,PDO::PARAM_STR);
+			$command->bindValue(":P_STATUS",$exec_status,PDO::PARAM_STR);
+			$command->bindValue(":P_USER_ID",$this->user_id,PDO::PARAM_STR);
+
+			$command->execute();
+			return 1;
+			
+		}catch(Exception $ex){
+			$this->error_msg = $ex->getMessage();
+			$this->addError('error_msg', 'Error '.$this->error_code.' '.$this->error_msg);
+			return 0;
+		}	
+	}
+
+	public function rules()
+	{
+		return array(
+		
+			array('payrec_date, approved_dt, doc_date, due_date', 'application.components.validator.ADatePickerSwitcherValidatorSP'),
+		
+			array('amt_for_curr, payrec_amt, tal_id, sett_for_curr, sett_val, doc_tal_id', 'application.components.validator.ANumberSwitcherValidator'),
+			
+			array('gl_acct_cd, payrec_amt, db_cr_flg','required'),
+			array('sl_acct_cd','checkRequired'),
+			array('sl_acct_cd','checkExist'),
+			
+			array('doc_tal_id', 'numerical', 'integerOnly'=>true),
+			array('payrec_amt, sett_for_curr, sett_val', 'numerical'),
+			array('payrec_type', 'length', 'max'=>2),
+			array('client_cd, gl_acct_cd, sl_acct_cd', 'length', 'max'=>12),
+			array('db_cr_flg, approved_sts, source_type', 'length', 'max'=>1),
+			array('approved_by', 'length', 'max'=>20),
+			array('user_id', 'length', 'max'=>10),
+			array('remarks', 'length', 'max'=>50),
+			array('record_source', 'length', 'max'=>30),
+			array('ref_folder_cd', 'length', 'max'=>8),
+			array('gl_ref_num', 'length', 'max'=>17),
+			array('brch_cd', 'length', 'max'=>3),
+			array('cash_withdraw_amt, cash_withdraw_reason, selisih_qty, old_outs_amt, protect_cd, trx_date, due_date, save_flg, cancel_flg, rowid, old_tal_id, contr_num, contr_dt, budget_cd, buy_sell_ind, outs_amt, buy_sett_amt, sell_sett_amt, check, payrec_date, cre_dt, upd_dt, approved_dt, doc_date, due_date', 'safe'),
+
+			// The following rule is used by search().
+			// Please remove those attributes that should not be searched.
+	
+			array('payrec_num, payrec_type, payrec_date, client_cd, gl_acct_cd, sl_acct_cd, db_cr_flg, cre_dt, upd_dt, approved_sts, approved_by, approved_dt, payrec_amt, user_id, doc_ref_num, tal_id, remarks, record_source, doc_date, ref_folder_cd, gl_ref_num, sett_for_curr, sett_val, brch_cd, doc_tal_id, source_type, due_date,payrec_date_date,payrec_date_month,payrec_date_year,cre_dt_date,cre_dt_month,cre_dt_year,upd_dt_date,upd_dt_month,upd_dt_year,approved_dt_date,approved_dt_month,approved_dt_year,doc_date_date,doc_date_month,doc_date_year,due_date_date,due_date_month,due_date_year', 'safe', 'on'=>'search'),
+		);
+	}
+
+	public function checkRequired()
+	{
+		//$check = Parameter::model()->find("prm_cd_1 = 'BNKFLG' AND prm_cd_2 = '$this->gl_acct_cd'");
+		
+		if($this->gl_acct_cd != 'NA' && !$this->sl_acct_cd)
+		{
+			$this->addError('sl_acct_cd', 'SL Account must be filled');
+		}
+	}
+	
+	public function checkExist()
+	{
+		if($this->gl_acct_cd != 'NA')
+		{
+			$check = DAO::queryRowSql
+					("
+						SELECT COUNT(*) cnt
+						FROM MST_GL_ACCOUNT
+						WHERE TRIM(gl_a) = TRIM('$this->gl_acct_cd') 
+						AND sl_a LIKE '$this->sl_acct_cd'
+						AND prt_type <> 'S'
+						AND acct_stat = 'A'
+						AND approved_stat = 'A'
+					");
+			
+			if($check['cnt'] == 0)$this->addError('sl_acct_cd', "$this->gl_acct_cd $this->sl_acct_cd not found in chart of accounts");
+			else
+			{
+				// Validate GL Account of affiliated client
+				
+				/* -- METHOD 1: No Database Function -- */
+				
+				
+				if($this->system_generated != 'Y')
+				{
+					$affiliatedGl = DAO::queryRowSql("SELECT dstr1, dstr2 FROM MST_SYS_PARAM WHERE param_id = 'SYSTEM' AND param_cd1 = 'GL' AND param_cd2 = 'AFILIASI' ");
+					
+					if($affiliatedGl)
+					{
+						$gl1 = $affiliatedGl['dstr1'];
+						$gl2 = $affiliatedGl['dstr2'];
+						
+						$affiliated = DAO::queryRowSql("SELECT cust_client_flg FROM MST_CLIENT WHERE client_cd = '$this->sl_acct_cd'");
+	
+						if($affiliated)
+						{
+							$affiliatedFlg = $affiliated['cust_client_flg'];
+							
+							if($affiliatedFlg == 'A' && trim($this->gl_acct_cd) != $gl1 && trim($this->gl_acct_cd) != $gl2)
+							{
+								$this->addError('gl_acct_cd', "If the client is affiliated, GL Account must be either $gl1 or $gl2");
+							}
+						}
+					}
+				}
+				
+				/* -- METHOD 2: Using Database Function -- */
+				
+				/*
+				if($this->system_generated != 'Y')
+				{
+					$affiliated = DAO::queryRowSql("SELECT cust_client_flg FROM MST_CLIENT WHERE client_cd = '$this->sl_acct_cd'");
+	
+					if($affiliated)
+					{
+						$affiliatedFlg = $affiliated['cust_client_flg'];
+						
+						if($affiliatedFlg == 'A')
+						{
+							$db_cr_flg = substr($this->db_cr_flg,0,1);
+							
+							$result = DAO::queryRowSql("SELECT F_GL_ACCT_T3_JAN2016('$this->sl_acct_cd','$this->db_cr_flg') gl FROM dual");
+							
+							$gl = $result['gl'];
+							
+							if(trim($this->gl_acct_cd) != trim($gl))
+							{
+								$db_cr_txt = $db_cr_flg == 'D' ? 'DEBIT' : 'CREDIT';
+								
+								$this->addError('gl_acct_cd', "If the client is affiliated and the entry is $db_cr_txt, GL Account must be $gl");
+							}
+						}
+					}
+				}*/
+			}
+		}
+	}
+
+	public function relations()
+	{
+		return array(
+		);
+	}
+
+	public function attributeLabels()
+	{
+		return array(
+			'payrec_num' => 'Payrec Num',
+			'payrec_type' => 'Payrec Type',
+			'payrec_date' => 'Payrec Date',
+			'client_cd' => 'Client Code',
+			'gl_acct_cd' => 'Gl Account',
+			'sl_acct_cd' => 'Sl Account',
+			'db_cr_flg' => 'Db Cr Flg',
+			'cre_dt' => 'Cre Date',
+			'upd_dt' => 'Upd Date',
+			'approved_sts' => 'Approved Sts',
+			'approved_by' => 'Approved By',
+			'approved_dt' => 'Approved Date',
+			'payrec_amt' => 'Payrec Amt',
+			'user_id' => 'User',
+			'doc_ref_num' => 'Doc Ref Num',
+			'tal_id' => 'Tal',
+			'remarks' => 'Remarks',
+			'record_source' => 'Record Source',
+			'doc_date' => 'Doc Date',
+			'ref_folder_cd' => 'Ref Folder Code',
+			'gl_ref_num' => 'Gl Ref Num',
+			'sett_for_curr' => 'Sett For Curr',
+			'sett_val' => 'Sett Val',
+			'brch_cd' => 'Brch Code',
+			'doc_tal_id' => 'Doc Tal',
+			'source_type' => 'Source Type',
+			'due_date' => 'Due Date',
+		);
+	}
+
+
+	public function search()
+	{
+		$criteria = new CDbCriteria;
+		$criteria->compare('payrec_num',$this->payrec_num,true);
+		$criteria->compare('payrec_type',$this->payrec_type,true);
+
+		if(!empty($this->payrec_date_date))
+			$criteria->addCondition("TO_CHAR(t.payrec_date,'DD') LIKE '%".$this->payrec_date_date."%'");
+		if(!empty($this->payrec_date_month))
+			$criteria->addCondition("TO_CHAR(t.payrec_date,'MM') LIKE '%".$this->payrec_date_month."%'");
+		if(!empty($this->payrec_date_year))
+			$criteria->addCondition("TO_CHAR(t.payrec_date,'YYYY') LIKE '%".$this->payrec_date_year."%'");		$criteria->compare('client_cd',$this->client_cd,true);
+		$criteria->compare('gl_acct_cd',$this->gl_acct_cd,true);
+		$criteria->compare('sl_acct_cd',$this->sl_acct_cd,true);
+		$criteria->compare('db_cr_flg',$this->db_cr_flg,true);
+
+		if(!empty($this->cre_dt_date))
+			$criteria->addCondition("TO_CHAR(t.cre_dt,'DD') LIKE '%".$this->cre_dt_date."%'");
+		if(!empty($this->cre_dt_month))
+			$criteria->addCondition("TO_CHAR(t.cre_dt,'MM') LIKE '%".$this->cre_dt_month."%'");
+		if(!empty($this->cre_dt_year))
+			$criteria->addCondition("TO_CHAR(t.cre_dt,'YYYY') LIKE '%".$this->cre_dt_year."%'");
+		if(!empty($this->upd_dt_date))
+			$criteria->addCondition("TO_CHAR(t.upd_dt,'DD') LIKE '%".$this->upd_dt_date."%'");
+		if(!empty($this->upd_dt_month))
+			$criteria->addCondition("TO_CHAR(t.upd_dt,'MM') LIKE '%".$this->upd_dt_month."%'");
+		if(!empty($this->upd_dt_year))
+			$criteria->addCondition("TO_CHAR(t.upd_dt,'YYYY') LIKE '%".$this->upd_dt_year."%'");		$criteria->compare('approved_sts',$this->approved_sts,true);
+		$criteria->compare('approved_by',$this->approved_by,true);
+
+		if(!empty($this->approved_dt_date))
+			$criteria->addCondition("TO_CHAR(t.approved_dt,'DD') LIKE '%".$this->approved_dt_date."%'");
+		if(!empty($this->approved_dt_month))
+			$criteria->addCondition("TO_CHAR(t.approved_dt,'MM') LIKE '%".$this->approved_dt_month."%'");
+		if(!empty($this->approved_dt_year))
+			$criteria->addCondition("TO_CHAR(t.approved_dt,'YYYY') LIKE '%".$this->approved_dt_year."%'");		$criteria->compare('payrec_amt',$this->payrec_amt);
+		$criteria->compare('user_id',$this->user_id,true);
+		$criteria->compare('doc_ref_num',$this->doc_ref_num,true);
+		$criteria->compare('tal_id',$this->tal_id);
+		$criteria->compare('remarks',$this->remarks,true);
+		$criteria->compare('record_source',$this->record_source,true);
+
+		if(!empty($this->doc_date_date))
+			$criteria->addCondition("TO_CHAR(t.doc_date,'DD') LIKE '%".$this->doc_date_date."%'");
+		if(!empty($this->doc_date_month))
+			$criteria->addCondition("TO_CHAR(t.doc_date,'MM') LIKE '%".$this->doc_date_month."%'");
+		if(!empty($this->doc_date_year))
+			$criteria->addCondition("TO_CHAR(t.doc_date,'YYYY') LIKE '%".$this->doc_date_year."%'");		$criteria->compare('ref_folder_cd',$this->ref_folder_cd,true);
+		$criteria->compare('gl_ref_num',$this->gl_ref_num,true);
+		$criteria->compare('sett_for_curr',$this->sett_for_curr);
+		$criteria->compare('sett_val',$this->sett_val);
+		$criteria->compare('brch_cd',$this->brch_cd,true);
+		$criteria->compare('doc_tal_id',$this->doc_tal_id);
+		$criteria->compare('source_type',$this->source_type,true);
+
+		if(!empty($this->due_date_date))
+			$criteria->addCondition("TO_CHAR(t.due_date,'DD') LIKE '%".$this->due_date_date."%'");
+		if(!empty($this->due_date_month))
+			$criteria->addCondition("TO_CHAR(t.due_date,'MM') LIKE '%".$this->due_date_month."%'");
+		if(!empty($this->due_date_year))
+			$criteria->addCondition("TO_CHAR(t.due_date,'YYYY') LIKE '%".$this->due_date_year."%'");
+		return new CActiveDataProvider($this, array(
+			'criteria'=>$criteria,
+		));
+	}
+}

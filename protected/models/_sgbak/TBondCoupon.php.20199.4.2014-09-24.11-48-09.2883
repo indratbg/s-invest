@@ -1,0 +1,188 @@
+<?php
+
+/**
+ * This is the model class for table "T_BOND_COUPON".
+ *
+ * The followings are the available columns in table 'T_BOND_COUPON':
+ * @property string $bond_cd
+ * @property string $period_from
+ * @property string $period_to
+ * @property integer $period_days
+ * @property double $int_rate
+ * @property string $cre_dt
+ * @property string $user_id
+ * @property string $upd_dt
+ * @property string $upd_by
+ * @property string $approved_dt
+ * @property string $approved_by
+ * @property string $approved_sts
+ */
+class TBondCoupon extends AActiveRecord
+{
+	//AH: #BEGIN search (datetime || date) additional comparison
+	public $period_from_date;
+	public $period_from_month;
+	public $period_from_year;
+
+	public $period_to_date;
+	public $period_to_month;
+	public $period_to_year;
+
+	public $cre_dt_date;
+	public $cre_dt_month;
+	public $cre_dt_year;
+
+	public $upd_dt_date;
+	public $upd_dt_month;
+	public $upd_dt_year;
+
+	public $approved_dt_date;
+	public $approved_dt_month;
+	public $approved_dt_year;
+	//AH: #END search (datetime || date)  additional comparison
+	
+	public function __construct($scenario = 'insert')
+	{
+		parent::__construct($scenario);
+		$this->logRecord=true;
+	}
+	
+	public static function model($className=__CLASS__)
+	{
+		return parent::model($className);
+	}
+    
+
+	public function tableName()
+	{
+		return 'T_BOND_COUPON';
+	}
+
+	public function rules()
+	{
+		return array(
+		
+			array('period_from, period_to, approved_dt', 'application.components.validator.ADatePickerSwitcherValidatorSP'),
+		
+			array('period_days, int_rate', 'application.components.validator.ANumberSwitcherValidator'),
+			
+			array('bond_cd, period_from, period_to', 'required'),
+			array('period_days', 'numerical', 'integerOnly'=>true),
+			array('int_rate', 'numerical'),
+			array('bond_cd', 'length', 'max'=>20),
+			array('user_id, upd_by, approved_by', 'length', 'max'=>10),
+			array('approved_sts', 'length', 'max'=>1),
+			array('cre_dt, upd_dt, approved_dt', 'safe'),
+
+			// The following rule is used by search().
+			// Please remove those attributes that should not be searched.
+	
+			array('bond_cd, period_from, period_to, period_days, int_rate, cre_dt, user_id, upd_dt, upd_by, approved_dt, approved_by, approved_sts,period_from_date,period_from_month,period_from_year,period_to_date,period_to_month,period_to_year,cre_dt_date,cre_dt_month,cre_dt_year,upd_dt_date,upd_dt_month,upd_dt_year,approved_dt_date,approved_dt_month,approved_dt_year', 'safe', 'on'=>'search'),
+		);
+	}
+
+	public function relations()
+	{
+		return array(
+		);
+	}
+
+	public function attributeLabels()
+	{
+		return array(
+			'bond_cd' => 'Bond Code',
+			'period_from' => 'Period From',
+			'period_to' => 'Period To',
+			'period_days' => 'Period Days',
+			'int_rate' => 'Int Rate',
+			'cre_dt' => 'Cre Date',
+			'user_id' => 'User',
+			'upd_dt' => 'Upd Date',
+			'upd_by' => 'Upd By',
+			'approved_dt' => 'Approved Date',
+			'approved_by' => 'Approved By',
+			'approved_sts' => 'Approved Sts',
+		);
+	}
+
+
+	public function search()
+	{
+		$criteria = new CDbCriteria;
+		$criteria->compare('bond_cd',$this->bond_cd,true);
+
+		if(!empty($this->period_from_date))
+			$criteria->addCondition("TO_CHAR(t.period_from,'DD') LIKE '%".$this->period_from_date."%'");
+		if(!empty($this->period_from_month))
+			$criteria->addCondition("TO_CHAR(t.period_from,'MM') LIKE '%".$this->period_from_month."%'");
+		if(!empty($this->period_from_year))
+			$criteria->addCondition("TO_CHAR(t.period_from,'YYYY') LIKE '%".$this->period_from_year."%'");
+		if(!empty($this->period_to_date))
+			$criteria->addCondition("TO_CHAR(t.period_to,'DD') LIKE '%".$this->period_to_date."%'");
+		if(!empty($this->period_to_month))
+			$criteria->addCondition("TO_CHAR(t.period_to,'MM') LIKE '%".$this->period_to_month."%'");
+		if(!empty($this->period_to_year))
+			$criteria->addCondition("TO_CHAR(t.period_to,'YYYY') LIKE '%".$this->period_to_year."%'");		$criteria->compare('period_days',$this->period_days);
+		$criteria->compare('int_rate',$this->int_rate);
+
+		if(!empty($this->cre_dt_date))
+			$criteria->addCondition("TO_CHAR(t.cre_dt,'DD') LIKE '%".$this->cre_dt_date."%'");
+		if(!empty($this->cre_dt_month))
+			$criteria->addCondition("TO_CHAR(t.cre_dt,'MM') LIKE '%".$this->cre_dt_month."%'");
+		if(!empty($this->cre_dt_year))
+			$criteria->addCondition("TO_CHAR(t.cre_dt,'YYYY') LIKE '%".$this->cre_dt_year."%'");		$criteria->compare('user_id',$this->user_id,true);
+
+		if(!empty($this->upd_dt_date))
+			$criteria->addCondition("TO_CHAR(t.upd_dt,'DD') LIKE '%".$this->upd_dt_date."%'");
+		if(!empty($this->upd_dt_month))
+			$criteria->addCondition("TO_CHAR(t.upd_dt,'MM') LIKE '%".$this->upd_dt_month."%'");
+		if(!empty($this->upd_dt_year))
+			$criteria->addCondition("TO_CHAR(t.upd_dt,'YYYY') LIKE '%".$this->upd_dt_year."%'");		$criteria->compare('upd_by',$this->upd_by,true);
+
+		if(!empty($this->approved_dt_date))
+			$criteria->addCondition("TO_CHAR(t.approved_dt,'DD') LIKE '%".$this->approved_dt_date."%'");
+		if(!empty($this->approved_dt_month))
+			$criteria->addCondition("TO_CHAR(t.approved_dt,'MM') LIKE '%".$this->approved_dt_month."%'");
+		if(!empty($this->approved_dt_year))
+			$criteria->addCondition("TO_CHAR(t.approved_dt,'YYYY') LIKE '%".$this->approved_dt_year."%'");		$criteria->compare('approved_by',$this->approved_by,true);
+		$criteria->compare('approved_sts',$this->approved_sts,true);
+
+		return new CActiveDataProvider($this, array(
+			'criteria'=>$criteria,
+		));
+	}
+public function executeSpGenerate($date,$bond_cd)
+	{
+		$connection  = Yii::app()->db;
+		$transaction = $connection->beginTransaction();	
+		
+		try{
+			$query  = "CALL SP_BOND_COUPON_SCHED(
+			TO_DATE(:P_SETTLE_DAT,'YYYY-MM-DD'),
+			:P_BOND_CD,
+			:P_USER_ID,
+			:P_ERROR_CODE,
+			:P_ERROR_MSG
+						)";
+			
+			$command = $connection->createCommand($query);			
+			$command->bindValue(":P_SETTLE_DAT",$date,PDO::PARAM_STR);
+			$command->bindValue(":P_BOND_CD",$bond_cd,PDO::PARAM_STR);
+			$command->bindValue(":P_USER_ID",$this->user_id,PDO::PARAM_STR);
+			$command->bindParam(":P_ERROR_CODE",$this->error_code,PDO::PARAM_INT,10);
+			$command->bindParam(":P_ERROR_MSG",$this->error_msg,PDO::PARAM_STR,100);
+			$command->execute();
+			$transaction->commit();
+		}catch(Exception $ex){
+			$transaction->rollback();
+			if($this->error_code == -999)
+				$this->error_msg = $ex->getMessage();
+		}
+		
+		if($this->error_code < 0)
+			$this->addError('error_msg', 'Error '.$this->error_code.' '.$this->error_msg);
+		
+		return $this->error_code;
+	}
+	
+}

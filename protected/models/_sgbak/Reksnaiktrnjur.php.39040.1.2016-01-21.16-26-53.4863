@@ -1,0 +1,60 @@
+<?php 
+class Reksnaiktrnjur extends CFormModel
+{
+	public $error_code 	  = -999;
+	public $error_msg  	  = 'Initial Value';
+	
+	public $jur_date;
+	public $folder_cd;
+	
+	public $dummy_dt;
+	public $ip_address;
+		
+	public function rules()
+	{
+		return array(
+			array('jur_date','required'),
+			array('folder_cd','safe')
+		);
+	}
+	 
+	
+	public function executeSp()
+	{
+		 
+		$connection  = Yii::app()->db;
+		
+		try{
+			$query  = "CALL  Sp_Reks_Naik_Turun_Jur(to_date(:p_date,'dd/mm/yyyy'),
+											:p_folder_cd,
+											:p_user_id,	
+											:p_ip_address
+											:p_error_code,				
+											:p_error_msg)";
+			
+			$command = $connection->createCommand($query);
+			$command->bindValue(":P_DATE",$this->jur_date,PDO::PARAM_STR);
+			$command->bindValue(":P_FOLDER_CD",$this->folder_cd,PDO::PARAM_STR);
+			$command->bindValue(":P_USER_ID",Yii::app()->user->id,PDO::PARAM_STR);
+			$command->bindValue(":P_IP_ADDRESS",$this->ip_address,PDO::PARAM_STR);
+			$command->bindParam(":P_ERROR_CODE",$this->error_code,PDO::PARAM_INT,10);
+			$command->bindParam(":P_ERROR_MSG",$this->error_msg,PDO::PARAM_STR,1000);
+			$command->execute();
+			
+			
+		}catch(Exception $ex){
+			if($this->error_code = -999){
+				$this->error_msg = $ex->getMessage();
+			}
+		}
+		
+		if($this->error_code < 0){
+			$this->addError('error_msg', 'Error '.$this->error_code.' '.$this->error_msg);
+			
+		}
+		  
+		return $this->error_code;
+	}
+	
+}
+ ?>

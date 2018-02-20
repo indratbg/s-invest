@@ -1,0 +1,259 @@
+<?php
+
+class Rptmkbdreport extends ARptForm
+{
+
+	public $gen_dt;
+	public $type;
+	public $ip_address;
+	public $vd51;
+	public $vd52;
+	public $vd53;
+	public $vd54;
+	public $vd55;
+	public $vd56;
+	public $vd57;
+	public $vd58;
+	public $vd59;
+	public $vd510a;
+	public $vd510b;
+	public $vd510c;
+	public $vd510d;
+	public $vd510e;
+	public $vd510f;
+	public $vd510g;
+	public $vd510h;
+	public $vd510i;
+	public $vd51_9;
+	public $vd510a_i;
+	public $both;
+	public $cancel_reason;
+	public $update_date;
+	public $update_seq;
+	public $r_1;
+	public $r_2;
+	public $r_3;
+	public $r_4;
+	public $r_5;
+	public $r_6;
+	public $r_7;
+	public $r_8;
+	public $r_9;
+	public $r_a;
+	public $r_b;
+	public $r_c;
+	public $r_d;
+	public $r_e;
+	public $r_f;
+	public $r_g;
+	public $r_h;
+	public $r_i;
+	public $all_r_1_9;
+	public $all_r_a_i;
+	public $all_r;
+	public $print_stat_a;
+	public $print_stat_e;
+	public $price_dt;
+	public function rules()
+	{
+		return array(
+			array('price_dt,print_stat_a,print_stat_e,r_1,r_2,r_3,r_4,r_5,r_6,r_7,r_8,r_9,r_a,r_b,r_c,r_d,r_e,r_f,r_g,r_h,r_i,all_r_1_9,all_r_a_i,all_r,vd51_9,both,vd510a_i,vd51,vd52,vd53,vd54,vd55,vd56,vd57,vd58,vd59,vd510a,vd510b,vd510c,vd510d,vd510e,vd510f,vd510g,vd510h,vd510i,gen_dt,type','safe'),
+			array('gen_dt','validasi','on'=>'generate')
+		);
+	}
+	
+	public function attributeLabels()
+	{
+		return array(
+			'print_stat_a'=>'Approve Status',
+			'gen_dt'=>'Generate',
+			'vd51'=>'VD 5-1 Asset',
+			 'vd52'=>'VD 5-2 Liabilities + Ekuitas',
+			 'vd53'=>'VD 5-3 Rangking Liabilities',
+			 'vd54'=>'VD 5-4 Reksadana',
+			 'vd55'=>'VD 5-5 Lindung Nilai',
+			 'vd56'=>'VD 5-6 Pembantu Dana',
+			 'vd57'=>'VD 5-7 Pembantu Efek',
+			 'vd58'=>'VD 5-8 MKBD diwajibkan',
+			 'vd59'=>'VD 5-9 MKBD',
+			 'vd510a'=>'VD 5-10 A Repo',
+			 'vd510b'=>'VD 5-10 B Repo',
+			 'vd510c'=>'VD 5-10 C Portofolio',
+			 'vd510d'=>'VD 5-10 D Margin',
+			 'vd510e'=>'VD 5-10 E Jaminan Margin',
+			 'vd510f'=>'VD 5-10 F Penjaminan Emisi Efek',
+			 'vd510g'=>'VD 5-10 G Penjaminan oleh perusahaan',
+			 'vd510h'=>'VD 5-10 H Komitmen belanja modal',
+			 'vd510i'=>'VD 5-10 I Transaksi dlm mata uang asing',
+			 'vd51_9'=>'All VD 5.1-5.9/clear all',
+			 'vd510a_i'=>'All VD 5-10/clear all',
+			 'both'=>'All VD 5.1-10/clear All'
+		);
+	}
+public function validasi(){
+	$begin_dt = DateTime::createFromFormat('Y-m-d',$this->gen_dt)->format('Y-m-01');
+	//validation T_DAY_TRS
+			$cek2  = Tdaytrs::model()->find("trs_dt = '$begin_dt'");
+			//validation T_SECU_BAL
+			$cek3 = Tsecubal::model()->find("bal_dt = '$begin_dt' ");
+	if(!$cek2 || !$cek3){
+		$date = DateTime::createFromFormat('Y-m-d',$this->gen_dt)->format('d M Y');
+		$this->addError('gen_dt', "Transaksi tidak ditemukan pada tanggal $date , tidak bisa dilanjutkan");
+	}		
+}
+	
+public function executeSpHeader($exec_status,$menuName)
+	{
+		 
+		 $connection  = Yii::app()->db;
+		 $transaction = $connection->beginTransaction();
+		try{
+			$query  = "CALL SP_T_MANY_HEADER_INSERT(:P_MENU_NAME,
+													:P_STATUS,
+													:P_USER_ID,
+													:P_IP_ADDRESS,
+													:P_CANCEL_REASON,
+													:P_UPDATE_DATE,
+													:P_UPDATE_SEQ,
+													:P_vo_errcd,
+													:P_vo_errmsg)";
+			
+						
+			$command = $connection->createCommand($query);
+			$command->bindValue(":P_MENU_NAME",$menuName,PDO::PARAM_STR);
+			$command->bindValue(":P_STATUS",$exec_status,PDO::PARAM_STR);
+			$command->bindValue(":P_USER_ID",$this->vp_userid,PDO::PARAM_STR);			
+			$command->bindValue(":P_IP_ADDRESS",$this->ip_address,PDO::PARAM_STR);
+			$command->bindValue(":P_CANCEL_REASON",$this->cancel_reason,PDO::PARAM_STR);
+			$command->bindParam(":P_UPDATE_DATE",$this->update_date,PDO::PARAM_STR,30);
+			$command->bindParam(":P_UPDATE_SEQ",$this->update_seq,PDO::PARAM_STR,10);
+			$command->bindParam(":P_vo_errcd",$this->vo_errcd,PDO::PARAM_INT,10);
+			$command->bindParam(":P_vo_errmsg",$this->vo_errmsg,PDO::PARAM_STR,1000);
+
+			$command->execute();
+			$transaction->commit();
+			//Commit baru akan dijalankan saat semua transaksi INSERT sukses
+			
+		}catch(Exception $ex){
+			$transaction->rollback();
+			if($this->vo_errcd = -999)
+				$this->vo_errmsg = $ex->getMessage();
+		}
+		
+		if($this->vo_errcd < 0)
+			$this->addError('vo_errmsg', 'Error '.$this->vo_errcd.' '.$this->vo_errmsg);
+		
+		return $this->vo_errcd;
+	}
+	public function executeSpInbox($exec_status,$record_seq)
+	{
+		 
+		 $connection  = Yii::app()->dbrpt;
+		 $transaction = $connection->beginTransaction();
+		try{
+			$query  = "CALL SPR_MKBD_Upd(TO_DATE(:P_MKBD_DATE,'YYYY-MM-DD'),
+										:P_UPD_STATUS,
+										TO_DATE(:P_UPDATE_DATE,'YYYY-MM-DD HH24:MI:SS'),
+										:P_UPDATE_SEQ,
+										:p_record_seq,
+										:p_error_code,
+										:p_error_msg)";
+			
+						
+			$command = $connection->createCommand($query);
+			$command->bindValue(":P_MKBD_DATE",$this->gen_dt,PDO::PARAM_STR);
+			$command->bindValue(":P_UPD_STATUS",$exec_status,PDO::PARAM_STR);
+			$command->bindValue(":P_UPDATE_DATE",$this->update_date,PDO::PARAM_STR,30);
+			$command->bindValue(":P_UPDATE_SEQ",$this->update_seq,PDO::PARAM_STR,10);
+			$command->bindValue(":p_record_seq",$record_seq,PDO::PARAM_STR,10);
+			$command->bindParam(":p_error_code",$this->vo_errcd,PDO::PARAM_INT,10);
+			$command->bindParam(":p_error_msg",$this->vo_errmsg,PDO::PARAM_STR,1000);
+
+			$command->execute();
+			$transaction->commit();
+			//Commit baru akan dijalankan saat semua transaksi INSERT sukses
+			
+		}catch(Exception $ex){
+			$transaction->rollback();
+			if($this->vo_errcd = -999)
+				$this->vo_errmsg = $ex->getMessage();
+		}
+		
+		if($this->vo_errcd < 0)
+			$this->addError('vo_errmsg', 'Error '.$this->vo_errcd.' '.$this->vo_errmsg);
+		
+		return $this->vo_errcd;
+	}
+
+	public function executeVd($vd)
+	{
+		 
+		 $connection  = Yii::app()->dbrpt;
+		 $transaction = $connection->beginTransaction();
+		try{
+			
+			$query  = "CALL  SP_MKBD_VD".$vd. " (TO_DATE(:p_update_date,'YYYY-MM-DD HH24:MI:SS'),
+												:p_update_seq,
+												to_date(:p_mkbd_date,'yyyy-mm-dd'),
+												to_date(:p_price_date,'yyyy-mm-dd'),
+												:p_user_id,
+												:p_error_code,
+												:p_error_msg)";
+									
+			$command = $connection->createCommand($query);
+			$command->bindValue(":P_UPDATE_DATE",$this->update_date,PDO::PARAM_STR);
+			$command->bindValue(":P_UPDATE_SEQ",$this->update_seq,PDO::PARAM_INT);
+			$command->bindValue(":P_MKBD_DATE",$this->gen_dt,PDO::PARAM_STR);
+			$command->bindValue(":P_PRICE_DATE",$this->price_dt,PDO::PARAM_STR);
+			$command->bindValue(":p_user_id",$this->vp_userid,PDO::PARAM_STR);
+			$command->bindParam(":p_error_code",$this->vo_errcd,PDO::PARAM_INT,10);
+			$command->bindParam(":p_error_msg",$this->vo_errmsg,PDO::PARAM_STR,200);
+			$command->execute();
+			$transaction->commit();
+			//Commit baru akan dijalankan saat semua transaksi INSERT sukses
+			
+		}catch(Exception $ex){
+			$transaction->rollback();
+			if($this->vo_errcd = -999)
+				$this->vo_errmsg = $ex->getMessage();
+		}
+		
+		if($this->vo_errcd < 0)
+			$this->addError('vo_errmsg', 'Error '.$this->vo_errcd.' '.$this->vo_errmsg);
+		
+		return $this->vo_errcd;
+	}
+	public function executeRemoveMkbd($table_name)
+	{
+		 $connection  = Yii::app()->dbrpt;
+		 $transaction = $connection->beginTransaction();
+		try{
+			$query  = "CALL  SP_REMOVE_LAP_MKBD (:P_TABLE_NAME,
+												:P_USER_ID,
+												TO_DATE(:P_MKBD_DATE,'YYYY-MM-DD'),
+												:p_error_code,
+												:p_error_msg)";
+									
+			$command = $connection->createCommand($query);
+			$command->bindValue(":P_TABLE_NAME",$table_name,PDO::PARAM_STR,50);
+			$command->bindValue(":P_USER_ID",$this->vp_userid,PDO::PARAM_INT,10);
+			$command->bindValue(":P_MKBD_DATE",$this->gen_dt,PDO::PARAM_STR);
+			$command->bindParam(":p_error_code",$this->vo_errcd,PDO::PARAM_INT,10);
+			$command->bindParam(":p_error_msg",$this->vo_errmsg,PDO::PARAM_STR,200);
+			$command->execute();
+			$transaction->commit();
+			//Commit baru akan dijalankan saat semua transaksi INSERT sukses
+			
+		}catch(Exception $ex){
+			$transaction->rollback();
+			if($this->vo_errcd = -999)
+				$this->vo_errmsg = $ex->getMessage();
+		}
+		
+		if($this->vo_errcd < 0)
+			$this->addError('vo_errmsg', 'Error '.$this->vo_errcd.' '.$this->vo_errmsg);
+		
+		return $this->vo_errcd;
+	}
+
+}

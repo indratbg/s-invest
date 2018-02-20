@@ -1,0 +1,1030 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="d09883d9-f255-40af-8ad3-77bc1226c129" name="Default" comment="" />
+    <ignored path="insistpro.iws" />
+    <ignored path=".idea/workspace.xml" />
+    <ignored path=".idea/dataSources.local.xml" />
+    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
+    <option name="TRACKING_ENABLED" value="true" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ChangesViewManager" flattened_view="true" show_ignored="false" />
+  <component name="CreatePatchCommitExecutor">
+    <option name="PATCH_PATH" value="" />
+  </component>
+  <component name="ExecutionTargetManager" SELECTED_TARGET="default_target" />
+  <component name="FavoritesManager">
+    <favorites_list name="insistpro" />
+  </component>
+  <component name="FileEditorManager">
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+      <file leaf-file-name="RptrepoharianController.php" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/protected/modules/glaccounting/controllers/RptrepoharianController.php">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="408">
+              <caret line="25" column="26" selection-start-line="25" selection-start-column="26" selection-end-line="25" selection-end-column="26" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="packages.php" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/framework/web/js/packages.php">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="170">
+              <caret line="32" column="6" selection-start-line="32" selection-start-column="6" selection-end-line="32" selection-end-column="6" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
+  </component>
+  <component name="IdeDocumentHistory">
+    <option name="CHANGED_PATHS">
+      <list>
+        <option value="$PROJECT_DIR$/protected/modules/custody/views/corpactjournal/index.php" />
+        <option value="$PROJECT_DIR$/protected/models/GenKBB.php" />
+        <option value="$PROJECT_DIR$/protected/components/xml/Xml.php" />
+        <option value="$PROJECT_DIR$/protected/modules/finance/controllers/H2honlinetransferController.php" />
+        <option value="$PROJECT_DIR$/protected/modules/finance/controllers/OnlinetransferController.php" />
+        <option value="$PROJECT_DIR$/protected/components/Constanta.php" />
+        <option value="$PROJECT_DIR$/protected/models/Tmanyheader.php" />
+        <option value="$PROJECT_DIR$/protected/modules/glaccounting/controllers/RptrepoharianController.php" />
+      </list>
+    </option>
+  </component>
+  <component name="JsBuildToolGruntFileManager" detection-done="true" sorting="DEFINITION_ORDER" />
+  <component name="JsBuildToolPackageJson" detection-done="true" sorting="DEFINITION_ORDER" />
+  <component name="JsGulpfileManager">
+    <detection-done>true</detection-done>
+    <sorting>DEFINITION_ORDER</sorting>
+  </component>
+  <component name="PhpServers">
+    <servers />
+  </component>
+  <component name="PhpWorkspaceProjectConfiguration" backward_compatibility_performed="true" />
+  <component name="ProjectFrameBounds">
+    <option name="x" value="-8" />
+    <option name="y" value="-8" />
+    <option name="width" value="1456" />
+    <option name="height" value="876" />
+  </component>
+  <component name="ProjectLevelVcsManager" settingsEditedManually="false">
+    <OptionsSetting value="true" id="Add" />
+    <OptionsSetting value="true" id="Remove" />
+    <OptionsSetting value="true" id="Checkout" />
+    <OptionsSetting value="true" id="Update" />
+    <OptionsSetting value="true" id="Status" />
+    <OptionsSetting value="true" id="Edit" />
+    <ConfirmationsSetting value="0" id="Add" />
+    <ConfirmationsSetting value="0" id="Remove" />
+  </component>
+  <component name="ProjectView">
+    <navigator currentView="ProjectPane" proportions="" version="1">
+      <flattenPackages />
+      <showMembers />
+      <showModules />
+      <showLibraryContents />
+      <hideEmptyPackages />
+      <abbreviatePackageNames />
+      <autoscrollToSource />
+      <autoscrollFromSource />
+      <sortByType />
+      <manualOrder />
+      <foldersAlwaysOnTop value="true" />
+    </navigator>
+    <panes>
+      <pane id="Scope" />
+      <pane id="Scratches" />
+      <pane id="ProjectPane">
+        <subPane>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="insistpro" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="insistpro" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="insistpro" />
+              <option name="myItemType" value="com.jetbrains.php.projectView.PhpTreeStructureProvider$1" />
+            </PATH_ELEMENT>
+          </PATH>
+        </subPane>
+      </pane>
+    </panes>
+  </component>
+  <component name="PropertiesComponent">
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="SearchEverywhereHistoryKey" value="RPTARA&#9;null&#9;null&#10;RPTREPOHARIA&#9;null&#9;null&#10;tpayrechcontr&#9;null&#9;null&#10;AUTO&#9;null&#9;null&#10;GENKBB&#9;FILE&#9;file://D:/onwork/web/php/insistpro/protected/models/GenKBB.php&#10;rptbala&#9;null&#9;null&#10;genxmlsettlecustody&#9;null&#9;null&#10;consta&#9;null&#9;null&#10;tmanyheader&#9;FILE&#9;file://D:/onwork/web/php/insistpro/protected/models/Tmanyheader.php&#10;TPAYRECHAL&#9;FILE&#9;file://D:/onwork/web/php/insistpro/protected/modules/inbox/controllers/TpayrechallController.php&#10;TBANKMUTAT&#9;null&#9;null&#10;genkbb&#9;FILE&#9;file://D:/onwork/web/php/insistpro/protected/models/GenKBB.php&#10;tmany&#9;FILE&#9;file://D:/onwork/web/php/insistpro/protected/models/Tmanyheader.php&#10;tmanyheade&#9;FILE&#9;file://D:/onwork/web/php/insistpro/protected/models/Tmanyheader.php&#10;GENKB&#9;null&#9;null&#10;corpact&#9;null&#9;null&#10;tpayrechall&#9;null&#9;null" />
+    <property name="js-jscs-nodeInterpreter" value="C:\Program Files (x86)\nodejs\node.exe" />
+  </component>
+  <component name="RunManager">
+    <configuration default="true" type="JavascriptDebugType" factoryName="JavaScript Debug">
+      <method />
+    </configuration>
+    <configuration default="true" type="PHPUnitRunConfigurationType" factoryName="PHPUnit">
+      <TestRunner />
+      <method />
+    </configuration>
+    <configuration default="true" type="PhpBehatConfigurationType" factoryName="Behat">
+      <BehatRunner />
+      <method />
+    </configuration>
+    <configuration default="true" type="PhpLocalRunConfigurationType" factoryName="PHP Console">
+      <method />
+    </configuration>
+    <configuration default="true" type="js.build_tools.gulp" factoryName="Gulp.js">
+      <node-interpreter>project</node-interpreter>
+      <node-options />
+      <gulpfile />
+      <tasks />
+      <arguments />
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="true" type="js.build_tools.npm" factoryName="npm">
+      <command value="run-script" />
+      <scripts />
+      <node-interpreter value="project" />
+      <envs />
+      <method />
+    </configuration>
+  </component>
+  <component name="ShelveChangesManager" show_recycled="false">
+    <option name="remove_strategy" value="false" />
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="d09883d9-f255-40af-8ad3-77bc1226c129" name="Default" comment="" />
+      <created>1489025641079</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1489025641079</updated>
+      <workItem from="1489025642274" duration="3362000" />
+      <workItem from="1489033023930" duration="729000" />
+      <workItem from="1489034373324" duration="296000" />
+      <workItem from="1489050875361" duration="154000" />
+      <workItem from="1489110746422" duration="9389000" />
+      <workItem from="1489369719290" duration="302000" />
+      <workItem from="1489370255710" duration="3042000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TimeTrackingManager">
+    <option name="totallyTimeSpent" value="17274000" />
+  </component>
+  <component name="ToolWindowManager">
+    <frame x="-8" y="-8" width="1456" height="876" extended-state="6" />
+    <editor active="false" />
+    <layout>
+      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.20416667" sideWeight="0.5" order="1" side_tool="false" content_ui="combo" />
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="true" content_ui="tabs" />
+      <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="true" content_ui="tabs" />
+      <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="3" side_tool="false" content_ui="combo" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32985657" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+    </layout>
+  </component>
+  <component name="Vcs.Log.UiProperties">
+    <option name="RECENTLY_FILTERED_USER_GROUPS">
+      <collection />
+    </option>
+    <option name="RECENTLY_FILTERED_BRANCH_GROUPS">
+      <collection />
+    </option>
+  </component>
+  <component name="VcsContentAnnotationSettings">
+    <option name="myLimit" value="2678400000" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager />
+    <watches-manager />
+  </component>
+  <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/protected/models/Tmanyheader.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="21675">
+          <caret line="1275" column="26" selection-start-line="1275" selection-start-column="26" selection-end-line="1275" selection-end-column="26" />
+          <folding>
+            <marker date="1489375567440" expanded="true" signature="41688:42050" ph="UPDATE T_man... " />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/protected/models/GenKBB.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="9775">
+          <caret line="575" column="45" selection-start-line="575" selection-start-column="45" selection-end-line="575" selection-end-column="45" />
+          <folding>
+            <marker date="1489030625478" expanded="true" signature="2276:6340" ph="SELECT REPLA... client_cd" />
+            <marker date="1489030625478" expanded="true" signature="2706:5389" ph="SELECT clien... CLIENT_CD" />
+            <marker date="1489030625478" expanded="true" signature="2805:3822" ph="SELECT CLIEN... CLIENT_CD" />
+            <marker date="1489030625478" expanded="true" signature="2925:3567" ph="SELECT P1.CL... payrec_num" />
+            <marker date="1489030625478" expanded="true" signature="3035:3290" ph="SELECT payre... T_PAYRECH" />
+            <marker date="1489030625478" expanded="true" signature="3336:3504" ph="SELECT doc_n... t_fund_movement" />
+            <marker date="1489030625478" expanded="true" signature="3612:3729" ph="SELECT doc_n... T_FUND_TRF" />
+            <marker date="1489030625478" expanded="true" signature="3841:4972" ph="SELECT MAX(c... DECODE" />
+            <marker date="1489030625478" expanded="true" signature="3976:4752" ph="SELECT DECOD... T_MANY_DETAIL" />
+            <marker date="1489030625478" expanded="true" signature="5010:5266" ph="SELECT d.trx... T_H2H_REF_DETAIL" />
+            <marker date="1489030625478" expanded="true" signature="5416:6259" ph="SELECT * FRO... client_cd" />
+            <marker date="1489030625478" expanded="true" signature="5460:6209" ph="SELECT mst_c... mst_client_flacct" />
+            <marker date="1489030625478" expanded="true" signature="6436:10419" ph="SELECT m.BAN... client_cd" />
+            <marker date="1489030625478" expanded="true" signature="6735:9388" ph="SELECT clien... CLIENT_CD" />
+            <marker date="1489030625478" expanded="true" signature="6826:7822" ph="SELECT CLIEN... CLIENT_CD" />
+            <marker date="1489030625478" expanded="true" signature="6937:7573" ph="SELECT P1.CL... payrec_num" />
+            <marker date="1489030625478" expanded="true" signature="7031:7298" ph="SELECT payre... T_PAYRECH" />
+            <marker date="1489030625478" expanded="true" signature="7342:7510" ph="SELECT doc_n... t_fund_movement" />
+            <marker date="1489030625478" expanded="true" signature="7613:7730" ph="SELECT doc_n... T_FUND_TRF" />
+            <marker date="1489030625478" expanded="true" signature="7845:8976" ph="SELECT MAX(c... DECODE" />
+            <marker date="1489030625478" expanded="true" signature="7980:8756" ph="SELECT DECOD... T_MANY_DETAIL" />
+            <marker date="1489030625478" expanded="true" signature="9016:9272" ph="SELECT d.trx... T_H2H_REF_DETAIL" />
+            <marker date="1489030625478" expanded="true" signature="9419:10325" ph="SELECT clien... client_cd" />
+            <marker date="1489030625478" expanded="true" signature="9534:10279" ph="SELECT mst_c... mst_client" />
+            <marker date="1489030625478" expanded="true" signature="10530:14188" ph="SELECT REPLA... CLIENT_CD" />
+            <marker date="1489030625478" expanded="true" signature="10950:13237" ph="SELECT CLIEN... CLIENT_CD" />
+            <marker date="1489030625478" expanded="true" signature="11061:12827" ph="SELECT CLIEN... CLIENT_CD" />
+            <marker date="1489030625478" expanded="true" signature="11186:12065" ph="SELECT P1.CL... payrec_num" />
+            <marker date="1489030625478" expanded="true" signature="11308:11799" ph="SELECT payre... T_PAYRECH" />
+            <marker date="1489030625478" expanded="true" signature="11833:12002" ph="SELECT doc_n... t_fund_movement" />
+            <marker date="1489030625478" expanded="true" signature="12100:12460" ph="SELECT clien... t_fund_movement" />
+            <marker date="1489030625478" expanded="true" signature="12501:12713" ph="SELECT doc_n... T_FUND_TRF" />
+            <marker date="1489030625478" expanded="true" signature="12865:13121" ph="SELECT d.trx... T_H2H_REF_DETAIL" />
+            <marker date="1489030625478" expanded="true" signature="13264:14107" ph="SELECT * FRO... client_cd" />
+            <marker date="1489030625478" expanded="true" signature="13308:14057" ph="SELECT mst_c... mst_client_flacct" />
+            <marker date="1489030625478" expanded="true" signature="14296:18544" ph="SELECT t.doc... client_cd" />
+            <marker date="1489030625478" expanded="true" signature="14912:17411" ph="SELECT t.cli... client_Cd" />
+            <marker date="1489030625478" expanded="true" signature="15140:15178" ph="/*NVL(v.bank... " />
+            <marker date="1489030625478" expanded="true" signature="15333:16416" ph="SELECT a.cli... client_Cd" />
+            <marker date="1489030625478" expanded="true" signature="15547:15863" ph="SELECT clien... t_fund_movement" />
+            <marker date="1489030625478" expanded="true" signature="15915:16356" ph="SELECT doc_n... t_fund_movement" />
+            <marker date="1489030625478" expanded="true" signature="16455:16821" ph="SELECT clien... mst_client" />
+            <marker date="1489030625478" expanded="true" signature="16860:16977" ph="SELECT prm_c... mst_parameter" />
+            <marker date="1489030625478" expanded="true" signature="17453:17605" ph="SELECT TRF_D... T_FUND_TRF" />
+            <marker date="1489030625478" expanded="true" signature="17641:17893" ph="SELECT d.trx... T_H2H_REF_DETAIL" />
+            <marker date="1489030625478" expanded="true" signature="17973:18146" ph="SELECT dstr1... mst_sys_param" />
+            <marker date="1489030625478" expanded="true" signature="18654:21603" ph="SELECT t.doc... client_cd" />
+            <marker date="1489030625478" expanded="true" signature="19270:20845" ph="SELECT t.cli... client_Cd" />
+            <marker date="1489030625478" expanded="true" signature="19665:19995" ph="SELECT clien... t_fund_movement" />
+            <marker date="1489030625478" expanded="true" signature="20034:20412" ph="SELECT clien... mst_client" />
+            <marker date="1489030625478" expanded="true" signature="20451:20568" ph="SELECT prm_c... mst_parameter" />
+            <marker date="1489030625478" expanded="true" signature="20891:21043" ph="SELECT TRF_D... T_FUND_TRF" />
+            <marker date="1489030625478" expanded="true" signature="21089:21262" ph="SELECT dstr1... mst_sys_param" />
+            <marker date="1489030625478" expanded="true" signature="28685:30746" ph="SELECT b.ban... MAX" />
+            <marker date="1489030625478" expanded="true" signature="29103:30124" ph="SELECT MAX(c... DECODE" />
+            <marker date="1489030625478" expanded="true" signature="29219:29909" ph="SELECT DECOD... T_MANY_DETAIL" />
+            <marker date="1489030625478" expanded="true" signature="30201:30418" ph="SELECT bank_... mst_bank_acct" />
+            <marker date="1489030625478" expanded="true" signature="30444:30572" ph="SELECT TRIM(... MST_PARAMETER" />
+            <marker date="1489030625478" expanded="true" signature="33295:33607" ph="INSERT INTO T_H2H_REF_HEADER... " />
+            <marker date="1489030625478" expanded="true" signature="33963:34041" ph="INSERT INTO T_H2H_REF_DETAIL... " />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/protected/models/Autotrfselection.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1802">
+          <caret line="106" column="36" selection-start-line="106" selection-start-column="36" selection-end-line="106" selection-end-column="36" />
+          <folding>
+            <marker date="1481784551442" expanded="true" signature="1175:3166" ph="select t.doc... doc_date" />
+            <marker date="1481784551442" expanded="true" signature="1554:2577" ph="select doc_d... client_cd" />
+            <marker date="1481784551442" expanded="true" signature="1788:2034" ph="select clien... mst_client" />
+            <marker date="1481784551442" expanded="true" signature="2610:2705" ph="select disti... t_fund_trf" />
+            <marker date="1481784551442" expanded="true" signature="2731:2820" ph="select prm_c... mst_parameter" />
+            <marker date="1481784551442" expanded="true" signature="3269:7182" ph="select m.bra... client_cd" />
+            <marker date="1481784551442" expanded="true" signature="3733:4400" ph="select clien... client_cd" />
+            <marker date="1481784551442" expanded="true" signature="3825:4341" ph="select mst_c... mst_client_flacct" />
+            <marker date="1481784551442" expanded="true" signature="4422:4857" ph="select payre... T_PAYRECH" />
+            <marker date="1481784551442" expanded="true" signature="4883:5199" ph="select doc_d... t_fund_movement" />
+            <marker date="1481784551442" expanded="true" signature="5228:6841" ph="SELECT TO_DA... DECODE" />
+            <marker date="1481784551442" expanded="true" signature="5505:6631" ph="SELECT DECOD... T_MANY_DETAIL" />
+            <marker date="1481784551442" expanded="true" signature="6894:6978" ph="select prm_c... mst_parameter" />
+            <marker date="1481784551442" expanded="true" signature="7291:9107" ph="select acct_... CLIENT_CD" />
+            <marker date="1481784551442" expanded="true" signature="7586:8288" ph="SELECT CLIEN... doc_num" />
+            <marker date="1481784551442" expanded="true" signature="7688:7819" ph="select doc_n... t_fund_trf" />
+            <marker date="1481784551442" expanded="true" signature="7844:8247" ph="select doc_n... t_fund_movement" />
+            <marker date="1481784551442" expanded="true" signature="8314:9011" ph="SELECT * FRO... client_cd" />
+            <marker date="1481784551442" expanded="true" signature="8340:8966" ph="select mst_c... mst_client_flacct" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/protected/config/main.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="510">
+          <caret line="30" column="41" selection-start-line="30" selection-start-column="41" selection-end-line="30" selection-end-column="41" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/framework/web/CClientScript.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/protected/models/Tmanyheader.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="21675">
+          <caret line="1275" column="26" selection-start-line="1275" selection-start-column="26" selection-end-line="1275" selection-end-column="26" />
+          <folding>
+            <marker date="1489375567440" expanded="true" signature="41688:42050" ph="UPDATE T_man... " />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/protected/models/GenKBB.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="9775">
+          <caret line="575" column="45" selection-start-line="575" selection-start-column="45" selection-end-line="575" selection-end-column="45" />
+          <folding>
+            <marker date="1489030625478" expanded="true" signature="2276:6340" ph="SELECT REPLA... client_cd" />
+            <marker date="1489030625478" expanded="true" signature="2706:5389" ph="SELECT clien... CLIENT_CD" />
+            <marker date="1489030625478" expanded="true" signature="2805:3822" ph="SELECT CLIEN... CLIENT_CD" />
+            <marker date="1489030625478" expanded="true" signature="2925:3567" ph="SELECT P1.CL... payrec_num" />
+            <marker date="1489030625478" expanded="true" signature="3035:3290" ph="SELECT payre... T_PAYRECH" />
+            <marker date="1489030625478" expanded="true" signature="3336:3504" ph="SELECT doc_n... t_fund_movement" />
+            <marker date="1489030625478" expanded="true" signature="3612:3729" ph="SELECT doc_n... T_FUND_TRF" />
+            <marker date="1489030625478" expanded="true" signature="3841:4972" ph="SELECT MAX(c... DECODE" />
+            <marker date="1489030625478" expanded="true" signature="3976:4752" ph="SELECT DECOD... T_MANY_DETAIL" />
+            <marker date="1489030625478" expanded="true" signature="5010:5266" ph="SELECT d.trx... T_H2H_REF_DETAIL" />
+            <marker date="1489030625478" expanded="true" signature="5416:6259" ph="SELECT * FRO... client_cd" />
+            <marker date="1489030625478" expanded="true" signature="5460:6209" ph="SELECT mst_c... mst_client_flacct" />
+            <marker date="1489030625478" expanded="true" signature="6436:10419" ph="SELECT m.BAN... client_cd" />
+            <marker date="1489030625478" expanded="true" signature="6735:9388" ph="SELECT clien... CLIENT_CD" />
+            <marker date="1489030625478" expanded="true" signature="6826:7822" ph="SELECT CLIEN... CLIENT_CD" />
+            <marker date="1489030625478" expanded="true" signature="6937:7573" ph="SELECT P1.CL... payrec_num" />
+            <marker date="1489030625478" expanded="true" signature="7031:7298" ph="SELECT payre... T_PAYRECH" />
+            <marker date="1489030625478" expanded="true" signature="7342:7510" ph="SELECT doc_n... t_fund_movement" />
+            <marker date="1489030625478" expanded="true" signature="7613:7730" ph="SELECT doc_n... T_FUND_TRF" />
+            <marker date="1489030625478" expanded="true" signature="7845:8976" ph="SELECT MAX(c... DECODE" />
+            <marker date="1489030625478" expanded="true" signature="7980:8756" ph="SELECT DECOD... T_MANY_DETAIL" />
+            <marker date="1489030625478" expanded="true" signature="9016:9272" ph="SELECT d.trx... T_H2H_REF_DETAIL" />
+            <marker date="1489030625478" expanded="true" signature="9419:10325" ph="SELECT clien... client_cd" />
+            <marker date="1489030625478" expanded="true" signature="9534:10279" ph="SELECT mst_c... mst_client" />
+            <marker date="1489030625478" expanded="true" signature="10530:14188" ph="SELECT REPLA... CLIENT_CD" />
+            <marker date="1489030625478" expanded="true" signature="10950:13237" ph="SELECT CLIEN... CLIENT_CD" />
+            <marker date="1489030625478" expanded="true" signature="11061:12827" ph="SELECT CLIEN... CLIENT_CD" />
+            <marker date="1489030625478" expanded="true" signature="11186:12065" ph="SELECT P1.CL... payrec_num" />
+            <marker date="1489030625478" expanded="true" signature="11308:11799" ph="SELECT payre... T_PAYRECH" />
+            <marker date="1489030625478" expanded="true" signature="11833:12002" ph="SELECT doc_n... t_fund_movement" />
+            <marker date="1489030625478" expanded="true" signature="12100:12460" ph="SELECT clien... t_fund_movement" />
+            <marker date="1489030625478" expanded="true" signature="12501:12713" ph="SELECT doc_n... T_FUND_TRF" />
+            <marker date="1489030625478" expanded="true" signature="12865:13121" ph="SELECT d.trx... T_H2H_REF_DETAIL" />
+            <marker date="1489030625478" expanded="true" signature="13264:14107" ph="SELECT * FRO... client_cd" />
+            <marker date="1489030625478" expanded="true" signature="13308:14057" ph="SELECT mst_c... mst_client_flacct" />
+            <marker date="1489030625478" expanded="true" signature="14296:18544" ph="SELECT t.doc... client_cd" />
+            <marker date="1489030625478" expanded="true" signature="14912:17411" ph="SELECT t.cli... client_Cd" />
+            <marker date="1489030625478" expanded="true" signature="15140:15178" ph="/*NVL(v.bank... " />
+            <marker date="1489030625478" expanded="true" signature="15333:16416" ph="SELECT a.cli... client_Cd" />
+            <marker date="1489030625478" expanded="true" signature="15547:15863" ph="SELECT clien... t_fund_movement" />
+            <marker date="1489030625478" expanded="true" signature="15915:16356" ph="SELECT doc_n... t_fund_movement" />
+            <marker date="1489030625478" expanded="true" signature="16455:16821" ph="SELECT clien... mst_client" />
+            <marker date="1489030625478" expanded="true" signature="16860:16977" ph="SELECT prm_c... mst_parameter" />
+            <marker date="1489030625478" expanded="true" signature="17453:17605" ph="SELECT TRF_D... T_FUND_TRF" />
+            <marker date="1489030625478" expanded="true" signature="17641:17893" ph="SELECT d.trx... T_H2H_REF_DETAIL" />
+            <marker date="1489030625478" expanded="true" signature="17973:18146" ph="SELECT dstr1... mst_sys_param" />
+            <marker date="1489030625478" expanded="true" signature="18654:21603" ph="SELECT t.doc... client_cd" />
+            <marker date="1489030625478" expanded="true" signature="19270:20845" ph="SELECT t.cli... client_Cd" />
+            <marker date="1489030625478" expanded="true" signature="19665:19995" ph="SELECT clien... t_fund_movement" />
+            <marker date="1489030625478" expanded="true" signature="20034:20412" ph="SELECT clien... mst_client" />
+            <marker date="1489030625478" expanded="true" signature="20451:20568" ph="SELECT prm_c... mst_parameter" />
+            <marker date="1489030625478" expanded="true" signature="20891:21043" ph="SELECT TRF_D... T_FUND_TRF" />
+            <marker date="1489030625478" expanded="true" signature="21089:21262" ph="SELECT dstr1... mst_sys_param" />
+            <marker date="1489030625478" expanded="true" signature="28685:30746" ph="SELECT b.ban... MAX" />
+            <marker date="1489030625478" expanded="true" signature="29103:30124" ph="SELECT MAX(c... DECODE" />
+            <marker date="1489030625478" expanded="true" signature="29219:29909" ph="SELECT DECOD... T_MANY_DETAIL" />
+            <marker date="1489030625478" expanded="true" signature="30201:30418" ph="SELECT bank_... mst_bank_acct" />
+            <marker date="1489030625478" expanded="true" signature="30444:30572" ph="SELECT TRIM(... MST_PARAMETER" />
+            <marker date="1489030625478" expanded="true" signature="33295:33607" ph="INSERT INTO T_H2H_REF_HEADER... " />
+            <marker date="1489030625478" expanded="true" signature="33963:34041" ph="INSERT INTO T_H2H_REF_DETAIL... " />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/protected/models/Autotrfselection.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1802">
+          <caret line="106" column="36" selection-start-line="106" selection-start-column="36" selection-end-line="106" selection-end-column="36" />
+          <folding>
+            <marker date="1481784551442" expanded="true" signature="1175:3166" ph="select t.doc... doc_date" />
+            <marker date="1481784551442" expanded="true" signature="1554:2577" ph="select doc_d... client_cd" />
+            <marker date="1481784551442" expanded="true" signature="1788:2034" ph="select clien... mst_client" />
+            <marker date="1481784551442" expanded="true" signature="2610:2705" ph="select disti... t_fund_trf" />
+            <marker date="1481784551442" expanded="true" signature="2731:2820" ph="select prm_c... mst_parameter" />
+            <marker date="1481784551442" expanded="true" signature="3269:7182" ph="select m.bra... client_cd" />
+            <marker date="1481784551442" expanded="true" signature="3733:4400" ph="select clien... client_cd" />
+            <marker date="1481784551442" expanded="true" signature="3825:4341" ph="select mst_c... mst_client_flacct" />
+            <marker date="1481784551442" expanded="true" signature="4422:4857" ph="select payre... T_PAYRECH" />
+            <marker date="1481784551442" expanded="true" signature="4883:5199" ph="select doc_d... t_fund_movement" />
+            <marker date="1481784551442" expanded="true" signature="5228:6841" ph="SELECT TO_DA... DECODE" />
+            <marker date="1481784551442" expanded="true" signature="5505:6631" ph="SELECT DECOD... T_MANY_DETAIL" />
+            <marker date="1481784551442" expanded="true" signature="6894:6978" ph="select prm_c... mst_parameter" />
+            <marker date="1481784551442" expanded="true" signature="7291:9107" ph="select acct_... CLIENT_CD" />
+            <marker date="1481784551442" expanded="true" signature="7586:8288" ph="SELECT CLIEN... doc_num" />
+            <marker date="1481784551442" expanded="true" signature="7688:7819" ph="select doc_n... t_fund_trf" />
+            <marker date="1481784551442" expanded="true" signature="7844:8247" ph="select doc_n... t_fund_movement" />
+            <marker date="1481784551442" expanded="true" signature="8314:9011" ph="SELECT * FRO... client_cd" />
+            <marker date="1481784551442" expanded="true" signature="8340:8966" ph="select mst_c... mst_client_flacct" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/protected/config/main.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="510">
+          <caret line="30" column="41" selection-start-line="30" selection-start-column="41" selection-end-line="30" selection-end-column="41" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/framework/web/CClientScript.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="12937">
+          <caret line="768" column="30" selection-start-line="768" selection-start-column="30" selection-end-line="768" selection-end-column="30" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/protected/components/AHelper.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="527">
+          <caret line="31" column="36" selection-start-line="31" selection-start-column="36" selection-end-line="31" selection-end-column="36" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/protected/modules/finance/controllers/TpayrechController.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/protected/models/Tmanyheader.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="21063">
+          <caret line="1239" column="6" selection-start-line="1239" selection-start-column="6" selection-end-line="1239" selection-end-column="6" />
+          <folding>
+            <marker date="1489375567440" expanded="true" signature="41688:42050" ph="UPDATE T_man... " />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/protected/models/GenKBB.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <marker date="1489030625478" expanded="true" signature="2276:6340" ph="SELECT REPLA... client_cd" />
+            <marker date="1489030625478" expanded="true" signature="2706:5389" ph="SELECT clien... CLIENT_CD" />
+            <marker date="1489030625478" expanded="true" signature="2805:3822" ph="SELECT CLIEN... CLIENT_CD" />
+            <marker date="1489030625478" expanded="true" signature="2925:3567" ph="SELECT P1.CL... payrec_num" />
+            <marker date="1489030625478" expanded="true" signature="3035:3290" ph="SELECT payre... T_PAYRECH" />
+            <marker date="1489030625478" expanded="true" signature="3336:3504" ph="SELECT doc_n... t_fund_movement" />
+            <marker date="1489030625478" expanded="true" signature="3612:3729" ph="SELECT doc_n... T_FUND_TRF" />
+            <marker date="1489030625478" expanded="true" signature="3841:4972" ph="SELECT MAX(c... DECODE" />
+            <marker date="1489030625478" expanded="true" signature="3976:4752" ph="SELECT DECOD... T_MANY_DETAIL" />
+            <marker date="1489030625478" expanded="true" signature="5010:5266" ph="SELECT d.trx... T_H2H_REF_DETAIL" />
+            <marker date="1489030625478" expanded="true" signature="5416:6259" ph="SELECT * FRO... client_cd" />
+            <marker date="1489030625478" expanded="true" signature="5460:6209" ph="SELECT mst_c... mst_client_flacct" />
+            <marker date="1489030625478" expanded="true" signature="6436:10419" ph="SELECT m.BAN... client_cd" />
+            <marker date="1489030625478" expanded="true" signature="6735:9388" ph="SELECT clien... CLIENT_CD" />
+            <marker date="1489030625478" expanded="true" signature="6826:7822" ph="SELECT CLIEN... CLIENT_CD" />
+            <marker date="1489030625478" expanded="true" signature="6937:7573" ph="SELECT P1.CL... payrec_num" />
+            <marker date="1489030625478" expanded="true" signature="7031:7298" ph="SELECT payre... T_PAYRECH" />
+            <marker date="1489030625478" expanded="true" signature="7342:7510" ph="SELECT doc_n... t_fund_movement" />
+            <marker date="1489030625478" expanded="true" signature="7613:7730" ph="SELECT doc_n... T_FUND_TRF" />
+            <marker date="1489030625478" expanded="true" signature="7845:8976" ph="SELECT MAX(c... DECODE" />
+            <marker date="1489030625478" expanded="true" signature="7980:8756" ph="SELECT DECOD... T_MANY_DETAIL" />
+            <marker date="1489030625478" expanded="true" signature="9016:9272" ph="SELECT d.trx... T_H2H_REF_DETAIL" />
+            <marker date="1489030625478" expanded="true" signature="9419:10325" ph="SELECT clien... client_cd" />
+            <marker date="1489030625478" expanded="true" signature="9534:10279" ph="SELECT mst_c... mst_client" />
+            <marker date="1489030625478" expanded="true" signature="10530:14188" ph="SELECT REPLA... CLIENT_CD" />
+            <marker date="1489030625478" expanded="true" signature="10950:13237" ph="SELECT CLIEN... CLIENT_CD" />
+            <marker date="1489030625478" expanded="true" signature="11061:12827" ph="SELECT CLIEN... CLIENT_CD" />
+            <marker date="1489030625478" expanded="true" signature="11186:12065" ph="SELECT P1.CL... payrec_num" />
+            <marker date="1489030625478" expanded="true" signature="11308:11799" ph="SELECT payre... T_PAYRECH" />
+            <marker date="1489030625478" expanded="true" signature="11833:12002" ph="SELECT doc_n... t_fund_movement" />
+            <marker date="1489030625478" expanded="true" signature="12100:12460" ph="SELECT clien... t_fund_movement" />
+            <marker date="1489030625478" expanded="true" signature="12501:12713" ph="SELECT doc_n... T_FUND_TRF" />
+            <marker date="1489030625478" expanded="true" signature="12865:13121" ph="SELECT d.trx... T_H2H_REF_DETAIL" />
+            <marker date="1489030625478" expanded="true" signature="13264:14107" ph="SELECT * FRO... client_cd" />
+            <marker date="1489030625478" expanded="true" signature="13308:14057" ph="SELECT mst_c... mst_client_flacct" />
+            <marker date="1489030625478" expanded="true" signature="14296:18544" ph="SELECT t.doc... client_cd" />
+            <marker date="1489030625478" expanded="true" signature="14912:17411" ph="SELECT t.cli... client_Cd" />
+            <marker date="1489030625478" expanded="true" signature="15140:15178" ph="/*NVL(v.bank... " />
+            <marker date="1489030625478" expanded="true" signature="15333:16416" ph="SELECT a.cli... client_Cd" />
+            <marker date="1489030625478" expanded="true" signature="15547:15863" ph="SELECT clien... t_fund_movement" />
+            <marker date="1489030625478" expanded="true" signature="15915:16356" ph="SELECT doc_n... t_fund_movement" />
+            <marker date="1489030625478" expanded="true" signature="16455:16821" ph="SELECT clien... mst_client" />
+            <marker date="1489030625478" expanded="true" signature="16860:16977" ph="SELECT prm_c... mst_parameter" />
+            <marker date="1489030625478" expanded="true" signature="17453:17605" ph="SELECT TRF_D... T_FUND_TRF" />
+            <marker date="1489030625478" expanded="true" signature="17641:17893" ph="SELECT d.trx... T_H2H_REF_DETAIL" />
+            <marker date="1489030625478" expanded="true" signature="17973:18146" ph="SELECT dstr1... mst_sys_param" />
+            <marker date="1489030625478" expanded="true" signature="18654:21603" ph="SELECT t.doc... client_cd" />
+            <marker date="1489030625478" expanded="true" signature="19270:20845" ph="SELECT t.cli... client_Cd" />
+            <marker date="1489030625478" expanded="true" signature="19665:19995" ph="SELECT clien... t_fund_movement" />
+            <marker date="1489030625478" expanded="true" signature="20034:20412" ph="SELECT clien... mst_client" />
+            <marker date="1489030625478" expanded="true" signature="20451:20568" ph="SELECT prm_c... mst_parameter" />
+            <marker date="1489030625478" expanded="true" signature="20891:21043" ph="SELECT TRF_D... T_FUND_TRF" />
+            <marker date="1489030625478" expanded="true" signature="21089:21262" ph="SELECT dstr1... mst_sys_param" />
+            <marker date="1489030625478" expanded="true" signature="28685:30746" ph="SELECT b.ban... MAX" />
+            <marker date="1489030625478" expanded="true" signature="29103:30124" ph="SELECT MAX(c... DECODE" />
+            <marker date="1489030625478" expanded="true" signature="29219:29909" ph="SELECT DECOD... T_MANY_DETAIL" />
+            <marker date="1489030625478" expanded="true" signature="30201:30418" ph="SELECT bank_... mst_bank_acct" />
+            <marker date="1489030625478" expanded="true" signature="30444:30572" ph="SELECT TRIM(... MST_PARAMETER" />
+            <marker date="1489030625478" expanded="true" signature="33295:33607" ph="INSERT INTO T_H2H_REF_HEADER... " />
+            <marker date="1489030625478" expanded="true" signature="33963:34041" ph="INSERT INTO T_H2H_REF_DETAIL... " />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/protected/models/Tmanyheader.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="21063">
+          <caret line="1239" column="6" selection-start-line="1239" selection-start-column="6" selection-end-line="1239" selection-end-column="6" />
+          <folding>
+            <marker date="1489375567440" expanded="true" signature="41688:42050" ph="UPDATE T_man... " />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/protected/models/GenKBB.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <marker date="1489030625478" expanded="true" signature="2276:6340" ph="SELECT REPLA... client_cd" />
+            <marker date="1489030625478" expanded="true" signature="2706:5389" ph="SELECT clien... CLIENT_CD" />
+            <marker date="1489030625478" expanded="true" signature="2805:3822" ph="SELECT CLIEN... CLIENT_CD" />
+            <marker date="1489030625478" expanded="true" signature="2925:3567" ph="SELECT P1.CL... payrec_num" />
+            <marker date="1489030625478" expanded="true" signature="3035:3290" ph="SELECT payre... T_PAYRECH" />
+            <marker date="1489030625478" expanded="true" signature="3336:3504" ph="SELECT doc_n... t_fund_movement" />
+            <marker date="1489030625478" expanded="true" signature="3612:3729" ph="SELECT doc_n... T_FUND_TRF" />
+            <marker date="1489030625478" expanded="true" signature="3841:4972" ph="SELECT MAX(c... DECODE" />
+            <marker date="1489030625478" expanded="true" signature="3976:4752" ph="SELECT DECOD... T_MANY_DETAIL" />
+            <marker date="1489030625478" expanded="true" signature="5010:5266" ph="SELECT d.trx... T_H2H_REF_DETAIL" />
+            <marker date="1489030625478" expanded="true" signature="5416:6259" ph="SELECT * FRO... client_cd" />
+            <marker date="1489030625478" expanded="true" signature="5460:6209" ph="SELECT mst_c... mst_client_flacct" />
+            <marker date="1489030625478" expanded="true" signature="6436:10419" ph="SELECT m.BAN... client_cd" />
+            <marker date="1489030625478" expanded="true" signature="6735:9388" ph="SELECT clien... CLIENT_CD" />
+            <marker date="1489030625478" expanded="true" signature="6826:7822" ph="SELECT CLIEN... CLIENT_CD" />
+            <marker date="1489030625478" expanded="true" signature="6937:7573" ph="SELECT P1.CL... payrec_num" />
+            <marker date="1489030625478" expanded="true" signature="7031:7298" ph="SELECT payre... T_PAYRECH" />
+            <marker date="1489030625478" expanded="true" signature="7342:7510" ph="SELECT doc_n... t_fund_movement" />
+            <marker date="1489030625478" expanded="true" signature="7613:7730" ph="SELECT doc_n... T_FUND_TRF" />
+            <marker date="1489030625478" expanded="true" signature="7845:8976" ph="SELECT MAX(c... DECODE" />
+            <marker date="1489030625478" expanded="true" signature="7980:8756" ph="SELECT DECOD... T_MANY_DETAIL" />
+            <marker date="1489030625478" expanded="true" signature="9016:9272" ph="SELECT d.trx... T_H2H_REF_DETAIL" />
+            <marker date="1489030625478" expanded="true" signature="9419:10325" ph="SELECT clien... client_cd" />
+            <marker date="1489030625478" expanded="true" signature="9534:10279" ph="SELECT mst_c... mst_client" />
+            <marker date="1489030625478" expanded="true" signature="10530:14188" ph="SELECT REPLA... CLIENT_CD" />
+            <marker date="1489030625478" expanded="true" signature="10950:13237" ph="SELECT CLIEN... CLIENT_CD" />
+            <marker date="1489030625478" expanded="true" signature="11061:12827" ph="SELECT CLIEN... CLIENT_CD" />
+            <marker date="1489030625478" expanded="true" signature="11186:12065" ph="SELECT P1.CL... payrec_num" />
+            <marker date="1489030625478" expanded="true" signature="11308:11799" ph="SELECT payre... T_PAYRECH" />
+            <marker date="1489030625478" expanded="true" signature="11833:12002" ph="SELECT doc_n... t_fund_movement" />
+            <marker date="1489030625478" expanded="true" signature="12100:12460" ph="SELECT clien... t_fund_movement" />
+            <marker date="1489030625478" expanded="true" signature="12501:12713" ph="SELECT doc_n... T_FUND_TRF" />
+            <marker date="1489030625478" expanded="true" signature="12865:13121" ph="SELECT d.trx... T_H2H_REF_DETAIL" />
+            <marker date="1489030625478" expanded="true" signature="13264:14107" ph="SELECT * FRO... client_cd" />
+            <marker date="1489030625478" expanded="true" signature="13308:14057" ph="SELECT mst_c... mst_client_flacct" />
+            <marker date="1489030625478" expanded="true" signature="14296:18544" ph="SELECT t.doc... client_cd" />
+            <marker date="1489030625478" expanded="true" signature="14912:17411" ph="SELECT t.cli... client_Cd" />
+            <marker date="1489030625478" expanded="true" signature="15140:15178" ph="/*NVL(v.bank... " />
+            <marker date="1489030625478" expanded="true" signature="15333:16416" ph="SELECT a.cli... client_Cd" />
+            <marker date="1489030625478" expanded="true" signature="15547:15863" ph="SELECT clien... t_fund_movement" />
+            <marker date="1489030625478" expanded="true" signature="15915:16356" ph="SELECT doc_n... t_fund_movement" />
+            <marker date="1489030625478" expanded="true" signature="16455:16821" ph="SELECT clien... mst_client" />
+            <marker date="1489030625478" expanded="true" signature="16860:16977" ph="SELECT prm_c... mst_parameter" />
+            <marker date="1489030625478" expanded="true" signature="17453:17605" ph="SELECT TRF_D... T_FUND_TRF" />
+            <marker date="1489030625478" expanded="true" signature="17641:17893" ph="SELECT d.trx... T_H2H_REF_DETAIL" />
+            <marker date="1489030625478" expanded="true" signature="17973:18146" ph="SELECT dstr1... mst_sys_param" />
+            <marker date="1489030625478" expanded="true" signature="18654:21603" ph="SELECT t.doc... client_cd" />
+            <marker date="1489030625478" expanded="true" signature="19270:20845" ph="SELECT t.cli... client_Cd" />
+            <marker date="1489030625478" expanded="true" signature="19665:19995" ph="SELECT clien... t_fund_movement" />
+            <marker date="1489030625478" expanded="true" signature="20034:20412" ph="SELECT clien... mst_client" />
+            <marker date="1489030625478" expanded="true" signature="20451:20568" ph="SELECT prm_c... mst_parameter" />
+            <marker date="1489030625478" expanded="true" signature="20891:21043" ph="SELECT TRF_D... T_FUND_TRF" />
+            <marker date="1489030625478" expanded="true" signature="21089:21262" ph="SELECT dstr1... mst_sys_param" />
+            <marker date="1489030625478" expanded="true" signature="28685:30746" ph="SELECT b.ban... MAX" />
+            <marker date="1489030625478" expanded="true" signature="29103:30124" ph="SELECT MAX(c... DECODE" />
+            <marker date="1489030625478" expanded="true" signature="29219:29909" ph="SELECT DECOD... T_MANY_DETAIL" />
+            <marker date="1489030625478" expanded="true" signature="30201:30418" ph="SELECT bank_... mst_bank_acct" />
+            <marker date="1489030625478" expanded="true" signature="30444:30572" ph="SELECT TRIM(... MST_PARAMETER" />
+            <marker date="1489030625478" expanded="true" signature="33295:33607" ph="INSERT INTO T_H2H_REF_HEADER... " />
+            <marker date="1489030625478" expanded="true" signature="33963:34041" ph="INSERT INTO T_H2H_REF_DETAIL... " />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/protected/models/Tmanyheader.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="21063">
+          <caret line="1239" column="6" selection-start-line="1239" selection-start-column="6" selection-end-line="1239" selection-end-column="6" />
+          <folding>
+            <marker date="1489375567440" expanded="true" signature="41688:42050" ph="UPDATE T_man... " />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/protected/models/GenKBB.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <marker date="1489030625478" expanded="true" signature="2276:6340" ph="SELECT REPLA... client_cd" />
+            <marker date="1489030625478" expanded="true" signature="2706:5389" ph="SELECT clien... CLIENT_CD" />
+            <marker date="1489030625478" expanded="true" signature="2805:3822" ph="SELECT CLIEN... CLIENT_CD" />
+            <marker date="1489030625478" expanded="true" signature="2925:3567" ph="SELECT P1.CL... payrec_num" />
+            <marker date="1489030625478" expanded="true" signature="3035:3290" ph="SELECT payre... T_PAYRECH" />
+            <marker date="1489030625478" expanded="true" signature="3336:3504" ph="SELECT doc_n... t_fund_movement" />
+            <marker date="1489030625478" expanded="true" signature="3612:3729" ph="SELECT doc_n... T_FUND_TRF" />
+            <marker date="1489030625478" expanded="true" signature="3841:4972" ph="SELECT MAX(c... DECODE" />
+            <marker date="1489030625478" expanded="true" signature="3976:4752" ph="SELECT DECOD... T_MANY_DETAIL" />
+            <marker date="1489030625478" expanded="true" signature="5010:5266" ph="SELECT d.trx... T_H2H_REF_DETAIL" />
+            <marker date="1489030625478" expanded="true" signature="5416:6259" ph="SELECT * FRO... client_cd" />
+            <marker date="1489030625478" expanded="true" signature="5460:6209" ph="SELECT mst_c... mst_client_flacct" />
+            <marker date="1489030625478" expanded="true" signature="6436:10419" ph="SELECT m.BAN... client_cd" />
+            <marker date="1489030625478" expanded="true" signature="6735:9388" ph="SELECT clien... CLIENT_CD" />
+            <marker date="1489030625478" expanded="true" signature="6826:7822" ph="SELECT CLIEN... CLIENT_CD" />
+            <marker date="1489030625478" expanded="true" signature="6937:7573" ph="SELECT P1.CL... payrec_num" />
+            <marker date="1489030625478" expanded="true" signature="7031:7298" ph="SELECT payre... T_PAYRECH" />
+            <marker date="1489030625478" expanded="true" signature="7342:7510" ph="SELECT doc_n... t_fund_movement" />
+            <marker date="1489030625478" expanded="true" signature="7613:7730" ph="SELECT doc_n... T_FUND_TRF" />
+            <marker date="1489030625478" expanded="true" signature="7845:8976" ph="SELECT MAX(c... DECODE" />
+            <marker date="1489030625478" expanded="true" signature="7980:8756" ph="SELECT DECOD... T_MANY_DETAIL" />
+            <marker date="1489030625478" expanded="true" signature="9016:9272" ph="SELECT d.trx... T_H2H_REF_DETAIL" />
+            <marker date="1489030625478" expanded="true" signature="9419:10325" ph="SELECT clien... client_cd" />
+            <marker date="1489030625478" expanded="true" signature="9534:10279" ph="SELECT mst_c... mst_client" />
+            <marker date="1489030625478" expanded="true" signature="10530:14188" ph="SELECT REPLA... CLIENT_CD" />
+            <marker date="1489030625478" expanded="true" signature="10950:13237" ph="SELECT CLIEN... CLIENT_CD" />
+            <marker date="1489030625478" expanded="true" signature="11061:12827" ph="SELECT CLIEN... CLIENT_CD" />
+            <marker date="1489030625478" expanded="true" signature="11186:12065" ph="SELECT P1.CL... payrec_num" />
+            <marker date="1489030625478" expanded="true" signature="11308:11799" ph="SELECT payre... T_PAYRECH" />
+            <marker date="1489030625478" expanded="true" signature="11833:12002" ph="SELECT doc_n... t_fund_movement" />
+            <marker date="1489030625478" expanded="true" signature="12100:12460" ph="SELECT clien... t_fund_movement" />
+            <marker date="1489030625478" expanded="true" signature="12501:12713" ph="SELECT doc_n... T_FUND_TRF" />
+            <marker date="1489030625478" expanded="true" signature="12865:13121" ph="SELECT d.trx... T_H2H_REF_DETAIL" />
+            <marker date="1489030625478" expanded="true" signature="13264:14107" ph="SELECT * FRO... client_cd" />
+            <marker date="1489030625478" expanded="true" signature="13308:14057" ph="SELECT mst_c... mst_client_flacct" />
+            <marker date="1489030625478" expanded="true" signature="14296:18544" ph="SELECT t.doc... client_cd" />
+            <marker date="1489030625478" expanded="true" signature="14912:17411" ph="SELECT t.cli... client_Cd" />
+            <marker date="1489030625478" expanded="true" signature="15140:15178" ph="/*NVL(v.bank... " />
+            <marker date="1489030625478" expanded="true" signature="15333:16416" ph="SELECT a.cli... client_Cd" />
+            <marker date="1489030625478" expanded="true" signature="15547:15863" ph="SELECT clien... t_fund_movement" />
+            <marker date="1489030625478" expanded="true" signature="15915:16356" ph="SELECT doc_n... t_fund_movement" />
+            <marker date="1489030625478" expanded="true" signature="16455:16821" ph="SELECT clien... mst_client" />
+            <marker date="1489030625478" expanded="true" signature="16860:16977" ph="SELECT prm_c... mst_parameter" />
+            <marker date="1489030625478" expanded="true" signature="17453:17605" ph="SELECT TRF_D... T_FUND_TRF" />
+            <marker date="1489030625478" expanded="true" signature="17641:17893" ph="SELECT d.trx... T_H2H_REF_DETAIL" />
+            <marker date="1489030625478" expanded="true" signature="17973:18146" ph="SELECT dstr1... mst_sys_param" />
+            <marker date="1489030625478" expanded="true" signature="18654:21603" ph="SELECT t.doc... client_cd" />
+            <marker date="1489030625478" expanded="true" signature="19270:20845" ph="SELECT t.cli... client_Cd" />
+            <marker date="1489030625478" expanded="true" signature="19665:19995" ph="SELECT clien... t_fund_movement" />
+            <marker date="1489030625478" expanded="true" signature="20034:20412" ph="SELECT clien... mst_client" />
+            <marker date="1489030625478" expanded="true" signature="20451:20568" ph="SELECT prm_c... mst_parameter" />
+            <marker date="1489030625478" expanded="true" signature="20891:21043" ph="SELECT TRF_D... T_FUND_TRF" />
+            <marker date="1489030625478" expanded="true" signature="21089:21262" ph="SELECT dstr1... mst_sys_param" />
+            <marker date="1489030625478" expanded="true" signature="28685:30746" ph="SELECT b.ban... MAX" />
+            <marker date="1489030625478" expanded="true" signature="29103:30124" ph="SELECT MAX(c... DECODE" />
+            <marker date="1489030625478" expanded="true" signature="29219:29909" ph="SELECT DECOD... T_MANY_DETAIL" />
+            <marker date="1489030625478" expanded="true" signature="30201:30418" ph="SELECT bank_... mst_bank_acct" />
+            <marker date="1489030625478" expanded="true" signature="30444:30572" ph="SELECT TRIM(... MST_PARAMETER" />
+            <marker date="1489030625478" expanded="true" signature="33295:33607" ph="INSERT INTO T_H2H_REF_HEADER... " />
+            <marker date="1489030625478" expanded="true" signature="33963:34041" ph="INSERT INTO T_H2H_REF_DETAIL... " />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/protected/models/Rptcorpactjournal.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="34">
+          <caret line="2" column="6" selection-start-line="2" selection-start-column="6" selection-end-line="2" selection-end-column="6" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/protected/modules/custody/controllers/CorpactjournalController.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="578">
+          <caret line="184" column="40" selection-start-line="184" selection-start-column="40" selection-end-line="184" selection-end-column="40" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/protected/modules/custody/views/corpactjournal/index.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="155">
+          <caret line="210" column="46" selection-start-line="210" selection-start-column="46" selection-end-line="210" selection-end-column="46" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/protected/models/_sgbak/GenKBB.php.46854.17.2017-01-24.16-49-55.8954">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="298">
+          <caret line="371" column="63" selection-start-line="371" selection-start-column="63" selection-end-line="371" selection-end-column="63" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/protected/models/Bankbi.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="85">
+          <caret line="5" column="54" selection-start-line="5" selection-start-column="54" selection-end-line="5" selection-end-column="54" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/protected/modules/finance/controllers/H2honlinetransferController.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="153">
+          <caret line="9" column="127" selection-start-line="9" selection-start-column="127" selection-end-line="9" selection-end-column="127" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/protected/modules/finance/controllers/OnlinetransferController.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="162">
+          <caret line="12" column="110" selection-start-line="12" selection-start-column="110" selection-end-line="12" selection-end-column="110" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/protected/modules/inbox/controllers/BankbiController.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="204">
+          <caret line="12" column="8" selection-start-line="12" selection-start-column="8" selection-end-line="12" selection-end-column="8" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/protected/components/xml/Xml.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="323">
+          <caret line="34" column="40" selection-start-line="34" selection-start-column="40" selection-end-line="34" selection-end-column="40" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/protected/models/Tbankmutation.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="297">
+          <caret line="415" column="54" selection-start-line="415" selection-start-column="54" selection-end-line="415" selection-end-column="54" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/protected/modules/inbox/controllers/TpayrechallController.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="68">
+          <caret line="4" column="223" selection-start-line="4" selection-start-column="223" selection-end-line="4" selection-end-column="223" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/protected/components/Constanta.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="136">
+          <caret line="8" column="26" selection-start-line="8" selection-start-column="26" selection-end-line="8" selection-end-column="26" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/protected/models/Rptbalancesheet.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="357">
+          <caret line="33" column="8" selection-start-line="33" selection-start-column="8" selection-end-line="33" selection-end-column="8" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/protected/models/GenXmlSettleCustody.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="280">
+          <caret line="156" column="52" selection-start-line="156" selection-start-column="28" selection-end-line="156" selection-end-column="52" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/protected/models/Tmanyheader.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="21675">
+          <caret line="1275" column="26" selection-start-line="1275" selection-start-column="26" selection-end-line="1275" selection-end-column="26" />
+          <folding>
+            <marker date="1489375567440" expanded="true" signature="41688:42050" ph="UPDATE T_man... " />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/protected/models/GenKBB.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="9775">
+          <caret line="575" column="45" selection-start-line="575" selection-start-column="45" selection-end-line="575" selection-end-column="45" />
+          <folding>
+            <marker date="1489030625478" expanded="true" signature="2276:6340" ph="SELECT REPLA... client_cd" />
+            <marker date="1489030625478" expanded="true" signature="2706:5389" ph="SELECT clien... CLIENT_CD" />
+            <marker date="1489030625478" expanded="true" signature="2805:3822" ph="SELECT CLIEN... CLIENT_CD" />
+            <marker date="1489030625478" expanded="true" signature="2925:3567" ph="SELECT P1.CL... payrec_num" />
+            <marker date="1489030625478" expanded="true" signature="3035:3290" ph="SELECT payre... T_PAYRECH" />
+            <marker date="1489030625478" expanded="true" signature="3336:3504" ph="SELECT doc_n... t_fund_movement" />
+            <marker date="1489030625478" expanded="true" signature="3612:3729" ph="SELECT doc_n... T_FUND_TRF" />
+            <marker date="1489030625478" expanded="true" signature="3841:4972" ph="SELECT MAX(c... DECODE" />
+            <marker date="1489030625478" expanded="true" signature="3976:4752" ph="SELECT DECOD... T_MANY_DETAIL" />
+            <marker date="1489030625478" expanded="true" signature="5010:5266" ph="SELECT d.trx... T_H2H_REF_DETAIL" />
+            <marker date="1489030625478" expanded="true" signature="5416:6259" ph="SELECT * FRO... client_cd" />
+            <marker date="1489030625478" expanded="true" signature="5460:6209" ph="SELECT mst_c... mst_client_flacct" />
+            <marker date="1489030625478" expanded="true" signature="6436:10419" ph="SELECT m.BAN... client_cd" />
+            <marker date="1489030625478" expanded="true" signature="6735:9388" ph="SELECT clien... CLIENT_CD" />
+            <marker date="1489030625478" expanded="true" signature="6826:7822" ph="SELECT CLIEN... CLIENT_CD" />
+            <marker date="1489030625478" expanded="true" signature="6937:7573" ph="SELECT P1.CL... payrec_num" />
+            <marker date="1489030625478" expanded="true" signature="7031:7298" ph="SELECT payre... T_PAYRECH" />
+            <marker date="1489030625478" expanded="true" signature="7342:7510" ph="SELECT doc_n... t_fund_movement" />
+            <marker date="1489030625478" expanded="true" signature="7613:7730" ph="SELECT doc_n... T_FUND_TRF" />
+            <marker date="1489030625478" expanded="true" signature="7845:8976" ph="SELECT MAX(c... DECODE" />
+            <marker date="1489030625478" expanded="true" signature="7980:8756" ph="SELECT DECOD... T_MANY_DETAIL" />
+            <marker date="1489030625478" expanded="true" signature="9016:9272" ph="SELECT d.trx... T_H2H_REF_DETAIL" />
+            <marker date="1489030625478" expanded="true" signature="9419:10325" ph="SELECT clien... client_cd" />
+            <marker date="1489030625478" expanded="true" signature="9534:10279" ph="SELECT mst_c... mst_client" />
+            <marker date="1489030625478" expanded="true" signature="10530:14188" ph="SELECT REPLA... CLIENT_CD" />
+            <marker date="1489030625478" expanded="true" signature="10950:13237" ph="SELECT CLIEN... CLIENT_CD" />
+            <marker date="1489030625478" expanded="true" signature="11061:12827" ph="SELECT CLIEN... CLIENT_CD" />
+            <marker date="1489030625478" expanded="true" signature="11186:12065" ph="SELECT P1.CL... payrec_num" />
+            <marker date="1489030625478" expanded="true" signature="11308:11799" ph="SELECT payre... T_PAYRECH" />
+            <marker date="1489030625478" expanded="true" signature="11833:12002" ph="SELECT doc_n... t_fund_movement" />
+            <marker date="1489030625478" expanded="true" signature="12100:12460" ph="SELECT clien... t_fund_movement" />
+            <marker date="1489030625478" expanded="true" signature="12501:12713" ph="SELECT doc_n... T_FUND_TRF" />
+            <marker date="1489030625478" expanded="true" signature="12865:13121" ph="SELECT d.trx... T_H2H_REF_DETAIL" />
+            <marker date="1489030625478" expanded="true" signature="13264:14107" ph="SELECT * FRO... client_cd" />
+            <marker date="1489030625478" expanded="true" signature="13308:14057" ph="SELECT mst_c... mst_client_flacct" />
+            <marker date="1489030625478" expanded="true" signature="14296:18544" ph="SELECT t.doc... client_cd" />
+            <marker date="1489030625478" expanded="true" signature="14912:17411" ph="SELECT t.cli... client_Cd" />
+            <marker date="1489030625478" expanded="true" signature="15140:15178" ph="/*NVL(v.bank... " />
+            <marker date="1489030625478" expanded="true" signature="15333:16416" ph="SELECT a.cli... client_Cd" />
+            <marker date="1489030625478" expanded="true" signature="15547:15863" ph="SELECT clien... t_fund_movement" />
+            <marker date="1489030625478" expanded="true" signature="15915:16356" ph="SELECT doc_n... t_fund_movement" />
+            <marker date="1489030625478" expanded="true" signature="16455:16821" ph="SELECT clien... mst_client" />
+            <marker date="1489030625478" expanded="true" signature="16860:16977" ph="SELECT prm_c... mst_parameter" />
+            <marker date="1489030625478" expanded="true" signature="17453:17605" ph="SELECT TRF_D... T_FUND_TRF" />
+            <marker date="1489030625478" expanded="true" signature="17641:17893" ph="SELECT d.trx... T_H2H_REF_DETAIL" />
+            <marker date="1489030625478" expanded="true" signature="17973:18146" ph="SELECT dstr1... mst_sys_param" />
+            <marker date="1489030625478" expanded="true" signature="18654:21603" ph="SELECT t.doc... client_cd" />
+            <marker date="1489030625478" expanded="true" signature="19270:20845" ph="SELECT t.cli... client_Cd" />
+            <marker date="1489030625478" expanded="true" signature="19665:19995" ph="SELECT clien... t_fund_movement" />
+            <marker date="1489030625478" expanded="true" signature="20034:20412" ph="SELECT clien... mst_client" />
+            <marker date="1489030625478" expanded="true" signature="20451:20568" ph="SELECT prm_c... mst_parameter" />
+            <marker date="1489030625478" expanded="true" signature="20891:21043" ph="SELECT TRF_D... T_FUND_TRF" />
+            <marker date="1489030625478" expanded="true" signature="21089:21262" ph="SELECT dstr1... mst_sys_param" />
+            <marker date="1489030625478" expanded="true" signature="28685:30746" ph="SELECT b.ban... MAX" />
+            <marker date="1489030625478" expanded="true" signature="29103:30124" ph="SELECT MAX(c... DECODE" />
+            <marker date="1489030625478" expanded="true" signature="29219:29909" ph="SELECT DECOD... T_MANY_DETAIL" />
+            <marker date="1489030625478" expanded="true" signature="30201:30418" ph="SELECT bank_... mst_bank_acct" />
+            <marker date="1489030625478" expanded="true" signature="30444:30572" ph="SELECT TRIM(... MST_PARAMETER" />
+            <marker date="1489030625478" expanded="true" signature="33295:33607" ph="INSERT INTO T_H2H_REF_HEADER... " />
+            <marker date="1489030625478" expanded="true" signature="33963:34041" ph="INSERT INTO T_H2H_REF_DETAIL... " />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/protected/modules/custody/controllers/GenxmlsettlecustodyController.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="374">
+          <caret line="22" column="12" selection-start-line="22" selection-start-column="12" selection-end-line="22" selection-end-column="12" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/framework/yiic">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/protected/models/Autotrfselection.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1802">
+          <caret line="106" column="36" selection-start-line="106" selection-start-column="36" selection-end-line="106" selection-end-column="36" />
+          <folding>
+            <marker date="1481784551442" expanded="true" signature="1175:3166" ph="select t.doc... doc_date" />
+            <marker date="1481784551442" expanded="true" signature="1554:2577" ph="select doc_d... client_cd" />
+            <marker date="1481784551442" expanded="true" signature="1788:2034" ph="select clien... mst_client" />
+            <marker date="1481784551442" expanded="true" signature="2610:2705" ph="select disti... t_fund_trf" />
+            <marker date="1481784551442" expanded="true" signature="2731:2820" ph="select prm_c... mst_parameter" />
+            <marker date="1481784551442" expanded="true" signature="3269:7182" ph="select m.bra... client_cd" />
+            <marker date="1481784551442" expanded="true" signature="3733:4400" ph="select clien... client_cd" />
+            <marker date="1481784551442" expanded="true" signature="3825:4341" ph="select mst_c... mst_client_flacct" />
+            <marker date="1481784551442" expanded="true" signature="4422:4857" ph="select payre... T_PAYRECH" />
+            <marker date="1481784551442" expanded="true" signature="4883:5199" ph="select doc_d... t_fund_movement" />
+            <marker date="1481784551442" expanded="true" signature="5228:6841" ph="SELECT TO_DA... DECODE" />
+            <marker date="1481784551442" expanded="true" signature="5505:6631" ph="SELECT DECOD... T_MANY_DETAIL" />
+            <marker date="1481784551442" expanded="true" signature="6894:6978" ph="select prm_c... mst_parameter" />
+            <marker date="1481784551442" expanded="true" signature="7291:9107" ph="select acct_... CLIENT_CD" />
+            <marker date="1481784551442" expanded="true" signature="7586:8288" ph="SELECT CLIEN... doc_num" />
+            <marker date="1481784551442" expanded="true" signature="7688:7819" ph="select doc_n... t_fund_trf" />
+            <marker date="1481784551442" expanded="true" signature="7844:8247" ph="select doc_n... t_fund_movement" />
+            <marker date="1481784551442" expanded="true" signature="8314:9011" ph="SELECT * FRO... client_cd" />
+            <marker date="1481784551442" expanded="true" signature="8340:8966" ph="select mst_c... mst_client_flacct" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/framework/web/helpers/CHtml.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-1436">
+          <caret line="266" column="37" selection-start-line="266" selection-start-column="37" selection-end-line="266" selection-end-column="37" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/protected/config/main.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="510">
+          <caret line="30" column="41" selection-start-line="30" selection-start-column="41" selection-end-line="30" selection-end-column="41" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/js/jquery.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/protected/modules/finance/controllers/TpayrechController.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="364">
+          <caret line="862" column="21" selection-start-line="862" selection-start-column="21" selection-end-line="862" selection-end-column="21" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/protected/components/AHelper.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="222">
+          <caret line="22" column="44" selection-start-line="22" selection-start-column="44" selection-end-line="22" selection-end-column="44" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/framework/web/CClientScript.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="305">
+          <caret line="755" column="25" selection-start-line="755" selection-start-column="25" selection-end-line="755" selection-end-column="25" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/protected/components/ARptForm.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="246">
+          <caret line="19" column="11" selection-start-line="19" selection-start-column="11" selection-end-line="19" selection-end-column="11" />
+          <folding>
+            <marker date="1488427274548" expanded="true" signature="4902:4986" ph="SELECT dstr1... MST_SYS_PARAM" />
+            <marker date="1488427274548" expanded="true" signature="6115:6199" ph="SELECT dstr1... MST_SYS_PARAM" />
+            <marker date="1488427274548" expanded="true" signature="6653:6737" ph="SELECT dstr1... MST_SYS_PARAM" />
+            <marker date="1488427274548" expanded="true" signature="7926:8010" ph="SELECT dstr1... MST_SYS_PARAM" />
+            <marker date="1488427274548" expanded="true" signature="8447:8531" ph="SELECT dstr1... MST_SYS_PARAM" />
+            <marker date="1488427274548" expanded="true" signature="9105:9189" ph="SELECT dstr1... MST_SYS_PARAM" />
+            <marker date="1488427274548" expanded="true" signature="9852:9936" ph="SELECT dstr1... MST_SYS_PARAM" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/protected/modules/glaccounting/controllers/RptarapagingformkbdController.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="339">
+          <caret line="42" column="0" selection-start-line="42" selection-start-column="0" selection-end-line="42" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/protected/modules/glaccounting/controllers/RptrepoharianController.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="408">
+          <caret line="25" column="26" selection-start-line="25" selection-start-column="26" selection-end-line="25" selection-end-column="26" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/framework/web/js/packages.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="170">
+          <caret line="32" column="6" selection-start-line="32" selection-start-column="6" selection-end-line="32" selection-end-column="6" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+  </component>
+</project>

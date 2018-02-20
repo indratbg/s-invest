@@ -1,0 +1,311 @@
+<?php
+
+/**
+ * This is the model class for table "T_JVCHH".
+ *
+ * The followings are the available columns in table 'T_JVCHH':
+ * @property string $jvch_num
+ * @property string $jvch_type
+ * @property string $jvch_date
+ * @property string $gl_acct_cd
+ * @property string $sl_acct_cd
+ * @property string $curr_cd
+ * @property double $curr_amt
+ * @property string $remarks
+ * @property string $user_id
+ * @property string $cre_dt
+ * @property string $upd_dt
+ * @property string $approved_sts
+ * @property string $approved_by
+ * @property string $approved_dt
+ * @property string $folder_cd
+ */
+class Tjvchh extends AActiveRecordSP
+{
+	//AH: #BEGIN search (datetime || date) additional comparison
+	public $jvch_date_date;
+	public $jvch_date_month;
+	public $jvch_date_year;
+
+	public $cre_dt_date;
+	public $cre_dt_month;
+	public $cre_dt_year;
+
+	public $upd_dt_date;
+	public $upd_dt_month;
+	public $upd_dt_year;
+
+	public $approved_dt_date;
+	public $approved_dt_month;
+	public $approved_dt_year;
+	public $update_date;
+	public $update_seq;
+	public $cancel_reason;
+	public $old_jvch_num;
+	public $rtn;
+	public $doc_num;
+	public $doc_date;
+	//AH: #END search (datetime || date)  additional comparison
+	
+	public function __construct($scenario = 'insert')
+	{
+		parent::__construct($scenario);
+		$this->logRecord=true;
+	}
+	
+	public static function model($className=__CLASS__)
+	{
+		return parent::model($className);
+	}
+    
+
+	public function tableName()
+	{
+		return 'T_JVCHH';
+	}
+
+	public function rules()
+	{
+		return array(
+		
+			array('jvch_date, approved_dt', 'application.components.validator.ADatePickerSwitcherValidatorSP'),
+		
+			array('curr_amt', 'application.components.validator.ANumberSwitcherValidator'),
+			
+			array('curr_amt', 'numerical'),
+			array('folder_cd,remarks','required'),
+			array('jvch_type', 'length', 'max'=>2),
+			array('gl_acct_cd, sl_acct_cd', 'length', 'max'=>12),
+			array('curr_cd', 'length', 'max'=>3),
+			array('remarks', 'length', 'max'=>50),
+			array('user_id', 'length', 'max'=>10),
+			array('approved_sts', 'length', 'max'=>1),
+			array('approved_by', 'length', 'max'=>20),
+			array('folder_cd', 'length', 'max'=>8),
+			array('folder_cd','checkFolderCd','on'=>'insert'),
+			array('rtn,doc_num,doc_date,old_jvch_num,jvch_date, cre_dt, upd_dt, approved_dt', 'safe'),
+
+			// The following rule is used by search().
+			// Please remove those attributes that should not be searched.
+	
+			array('jvch_num, jvch_type, jvch_date, gl_acct_cd, sl_acct_cd, curr_cd, curr_amt, remarks, user_id, cre_dt, upd_dt, approved_sts, approved_by, approved_dt, folder_cd,jvch_date_date,jvch_date_month,jvch_date_year,cre_dt_date,cre_dt_month,cre_dt_year,upd_dt_date,upd_dt_month,upd_dt_year,approved_dt_date,approved_dt_month,approved_dt_year', 'safe', 'on'=>'search'),
+		);
+	}
+
+	public function relations()
+	{
+		return array(
+		);
+	}
+
+public function executeSpHeader($exec_status,$menuName)
+	{
+		$connection  = Yii::app()->db;
+		
+		try{
+			$query  = "CALL SP_T_MANY_HEADER_INSERT(
+						:P_MENU_NAME,
+						:P_STATUS,
+						:P_USER_ID,
+						:P_IP_ADDRESS,
+						:P_CANCEL_REASON,
+						:P_UPDATE_DATE,
+						:P_UPDATE_SEQ,
+						:P_ERROR_CODE,
+						:P_ERROR_MSG)";
+			
+						
+			$command = $connection->createCommand($query);
+			$command->bindValue(":P_MENU_NAME",$menuName,PDO::PARAM_STR);
+			$command->bindValue(":P_STATUS",$exec_status,PDO::PARAM_STR);
+			$command->bindValue(":P_USER_ID",$this->user_id,PDO::PARAM_STR);			
+			$command->bindValue(":P_IP_ADDRESS",$this->ip_address,PDO::PARAM_STR);
+			$command->bindValue(":P_CANCEL_REASON",$this->cancel_reason,PDO::PARAM_STR);
+			
+			$command->bindParam(":P_UPDATE_DATE",$this->update_date,PDO::PARAM_STR,30);
+			$command->bindParam(":P_UPDATE_SEQ",$this->update_seq,PDO::PARAM_STR,10);
+			$command->bindParam(":P_ERROR_CODE",$this->error_code,PDO::PARAM_INT,10);
+			$command->bindParam(":P_ERROR_MSG",$this->error_msg,PDO::PARAM_STR,1000);
+
+			$command->execute();
+			
+			//Commit baru akan dijalankan saat semua transaksi INSERT sukses
+			
+		}catch(Exception $ex){
+			if($this->error_code = -999)
+				$this->error_msg = $ex->getMessage();
+		}
+		
+		if($this->error_code < 0)
+			$this->addError('error_msg', 'Error '.$this->error_code.' '.$this->error_msg);
+		
+		return $this->error_code;
+	}
+
+
+public function checkFolderCd()
+	{
+		$return;
+		$doc_num;
+		$user_id;
+		$doc_date;
+		
+		$connection  = Yii::app()->db;
+		//$transaction = $connection->beginTransaction();	
+		
+		$query  = "CALL CHECK_FOLDER_CD(
+					:P_FOLDER_CD,
+					TO_DATE(:P_DATE,'YYYY-MM-DD'),
+					:P_RTN,
+					:P_DOC_NUM,
+					:P_USER_ID,
+					:P_DOC_DATE)";
+					
+		$command = $connection->createCommand($query);
+		$command->bindValue(":P_FOLDER_CD",$this->folder_cd,PDO::PARAM_STR);
+		$command->bindValue(":P_DATE",$this->jvch_date,PDO::PARAM_STR);
+		$command->bindParam(":P_RTN",$return,PDO::PARAM_STR,1);
+		$command->bindParam(":P_DOC_NUM",$doc_num,PDO::PARAM_STR,100);
+		$command->bindParam(":P_USER_ID",$user_id,PDO::PARAM_STR,10);
+		$command->bindParam(":P_DOC_DATE",$doc_date,PDO::PARAM_STR,100);
+
+		$command->execute();
+		
+		if($doc_date)$doc_date = DateTime::createFromFormat('Y-m-d G:i:s',$doc_date)->format('d/m/Y');
+		
+		if($return == 1)$this->addError('folder_cd',"File Code is already used by $user_id $doc_num $doc_date");
+	}
+	
+	public function attributeLabels()
+	{
+		return array(
+			'jvch_num' => 'Journal Number',
+			'jvch_type' => 'Jvch Type',
+			'jvch_date' => 'Date',
+			'gl_acct_cd' => 'Gl Acct Code',
+			'sl_acct_cd' => 'Sl Acct Code',
+			'curr_cd' => 'Curr Code',
+			'curr_amt' => 'Curr Amt',
+			'remarks' => 'Remarks',
+			'user_id' => 'User',
+			'cre_dt' => 'Cre Date',
+			'upd_dt' => 'Upd Date',
+			'approved_sts' => 'Approved Sts',
+			'approved_by' => 'Approved By',
+			'approved_dt' => 'Approved Date',
+			'folder_cd' => 'File No.',
+		);
+	}
+public function executeSp($exec_status,$old_jvch_num,$record_seq)
+	{ 
+		$connection  = Yii::app()->db;
+				
+		try{
+			$query  = "CALL  Sp_T_JVCHH_Upd(:P_SEARCH_JVCH_NUM,
+											:P_JVCH_NUM,
+											:P_JVCH_TYPE,
+											TO_DATE(:P_JVCH_DATE,'YYYY-MM-DD'),
+											:P_GL_ACCT_CD,
+											:P_SL_ACCT_CD,
+											:P_CURR_CD,
+											:P_CURR_AMT,
+											:P_REMARKS,
+											:P_USER_ID,
+											TO_DATE(:P_CRE_DT,'YYYY-MM-DD HH24:MI:SS'),
+											TO_DATE(:P_UPD_DT,'YYYY-MM-DD HH24:MI:SS'),
+											:P_FOLDER_CD,
+											:P_REVERSAL_JUR,
+											:P_UPD_STATUS,
+											:p_ip_address,
+											:p_cancel_reason,
+											TO_DATE(:p_update_date,'YYYY-MM-DD HH24:MI:SS'),
+											:p_update_seq,
+											:p_record_seq,
+											:p_error_code,
+											:p_error_msg)";
+			
+			$command = $connection->createCommand($query);
+			$command->bindValue(":P_SEARCH_JVCH_NUM",$old_jvch_num,PDO::PARAM_STR);
+			$command->bindValue(":P_JVCH_NUM",$this->jvch_num,PDO::PARAM_STR);
+			$command->bindValue(":P_JVCH_TYPE",$this->jvch_type,PDO::PARAM_STR);
+			$command->bindValue(":P_JVCH_DATE",$this->jvch_date,PDO::PARAM_STR);
+			$command->bindValue(":P_GL_ACCT_CD",$this->gl_acct_cd,PDO::PARAM_STR);
+			$command->bindValue(":P_SL_ACCT_CD",$this->sl_acct_cd,PDO::PARAM_STR);
+			$command->bindValue(":P_CURR_CD",$this->curr_cd,PDO::PARAM_STR);
+			$command->bindValue(":P_CURR_AMT",$this->curr_amt,PDO::PARAM_STR);
+			$command->bindValue(":P_REMARKS",$this->remarks,PDO::PARAM_STR);
+			$command->bindValue(":P_USER_ID",$this->user_id,PDO::PARAM_STR);			
+			$command->bindValue(":P_CRE_DT",$this->cre_dt,PDO::PARAM_STR);			
+			$command->bindValue(":P_UPD_DT",$this->upd_dt,PDO::PARAM_STR);
+			$command->bindValue(":P_FOLDER_CD",$this->folder_cd,PDO::PARAM_STR);
+			$command->bindValue(":P_REVERSAL_JUR",$this->reversal_jur,PDO::PARAM_STR);
+			$command->bindValue(":P_UPD_STATUS",$exec_status,PDO::PARAM_STR);								
+			$command->bindValue(":P_IP_ADDRESS",$this->ip_address,PDO::PARAM_STR);
+			$command->bindValue(":P_CANCEL_REASON",$this->cancel_reason,PDO::PARAM_STR);
+			$command->bindValue(":P_UPDATE_DATE",$this->update_date,PDO::PARAM_STR);
+			$command->bindValue(":P_UPDATE_SEQ",$this->update_seq,PDO::PARAM_STR);
+			$command->bindValue(":P_RECORD_SEQ",$record_seq,PDO::PARAM_STR);	
+			$command->bindParam(":P_ERROR_CODE",$this->error_code,PDO::PARAM_INT,10);
+			$command->bindParam(":P_ERROR_MSG",$this->error_msg,PDO::PARAM_STR,1000);
+
+			$command->execute();
+			
+			//Commit baru akan dijalankan saat semua transaksi INSERT sukses
+			
+		}catch(Exception $ex){
+			if($this->error_code = -999)
+				$this->error_msg = $ex->getMessage();
+		}
+		
+		if($this->error_code < 0)
+			$this->addError('error_msg', 'Error '.$this->error_code.' '.$this->error_msg);
+		
+		return $this->error_code;
+	}
+
+	public function search()
+	{
+		$criteria = new CDbCriteria;
+		$criteria->compare('jvch_num',$this->jvch_num,true);
+		$criteria->compare('jvch_type',$this->jvch_type,true);
+		$criteria->compare('approved_sts',$this->approved_sts,true);
+		
+		
+		if(!empty($this->jvch_date_date))
+			$criteria->addCondition("TO_CHAR(t.jvch_date,'DD') LIKE '%".$this->jvch_date_date."%'");
+		if(!empty($this->jvch_date_month))
+			$criteria->addCondition("TO_CHAR(t.jvch_date,'MM') LIKE '%".$this->jvch_date_month."%'");
+		if(!empty($this->jvch_date_year))
+			$criteria->addCondition("TO_CHAR(t.jvch_date,'YYYY') LIKE '%".$this->jvch_date_year."%'");		$criteria->compare('gl_acct_cd',$this->gl_acct_cd,true);
+		$criteria->compare('sl_acct_cd',$this->sl_acct_cd,true);
+		$criteria->compare('curr_cd',$this->curr_cd,true);
+		$criteria->compare('curr_amt',$this->curr_amt);
+		$criteria->compare('remarks',$this->remarks,true);
+		$criteria->compare('user_id',$this->user_id,true);
+
+		if(!empty($this->cre_dt_date))
+			$criteria->addCondition("TO_CHAR(t.cre_dt,'DD') LIKE '%".$this->cre_dt_date."%'");
+		if(!empty($this->cre_dt_month))
+			$criteria->addCondition("TO_CHAR(t.cre_dt,'MM') LIKE '%".$this->cre_dt_month."%'");
+		if(!empty($this->cre_dt_year))
+			$criteria->addCondition("TO_CHAR(t.cre_dt,'YYYY') LIKE '%".$this->cre_dt_year."%'");
+		if(!empty($this->upd_dt_date))
+			$criteria->addCondition("TO_CHAR(t.upd_dt,'DD') LIKE '%".$this->upd_dt_date."%'");
+		if(!empty($this->upd_dt_month))
+			$criteria->addCondition("TO_CHAR(t.upd_dt,'MM') LIKE '%".$this->upd_dt_month."%'");
+		if(!empty($this->upd_dt_year))
+			$criteria->addCondition("TO_CHAR(t.upd_dt,'YYYY') LIKE '%".$this->upd_dt_year."%'");		$criteria->compare('approved_sts',$this->approved_sts,true);
+		$criteria->compare('approved_by',$this->approved_by,true);
+
+		if(!empty($this->approved_dt_date))
+			$criteria->addCondition("TO_CHAR(t.approved_dt,'DD') LIKE '%".$this->approved_dt_date."%'");
+		if(!empty($this->approved_dt_month))
+			$criteria->addCondition("TO_CHAR(t.approved_dt,'MM') LIKE '%".$this->approved_dt_month."%'");
+		if(!empty($this->approved_dt_year))
+			$criteria->addCondition("TO_CHAR(t.approved_dt,'YYYY') LIKE '%".$this->approved_dt_year."%'");		$criteria->compare('folder_cd',$this->folder_cd,true);
+
+		return new CActiveDataProvider($this, array(
+			'criteria'=>$criteria,
+		));
+	}
+}

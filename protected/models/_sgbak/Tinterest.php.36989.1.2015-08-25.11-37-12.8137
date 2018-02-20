@@ -1,0 +1,276 @@
+<?php
+
+/**
+ * This is the model class for table "T_INTEREST".
+ *
+ * The followings are the available columns in table 'T_INTEREST':
+ * @property string $int_dt
+ * @property string $client_cd
+ * @property string $xn_doc_num
+ * @property double $int_value
+ * @property double $int_per
+ * @property string $int_flg
+ * @property double $int_amt
+ * @property integer $int_day
+ * @property string $post_flg
+ * @property string $user_id
+ * @property string $cre_dt
+ * @property string $upd_dt
+ * @property double $int_accum
+ * @property string $ovr_flg
+ * @property double $today_trx
+ * @property double $nontrx
+ * @property string $trx_dt_beli
+ * @property string $trx_dt_jual
+ * @property double $int_cre_accum
+ * @property double $int_deb_accum
+ * @property double $sett_int_cre
+ * @property double $deposit
+ * @property string $upd_by
+ * @property string $approved_sts
+ * @property string $approved_by
+ * @property string $approved_dt
+ */
+class Tinterest extends AActiveRecordSP
+{
+	//AH: #BEGIN search (datetime || date) additional comparison
+	public $int_dt_date;
+	public $int_dt_month;
+	public $int_dt_year;
+
+	public $cre_dt_date;
+	public $cre_dt_month;
+	public $cre_dt_year;
+
+	public $upd_dt_date;
+	public $upd_dt_month;
+	public $upd_dt_year;
+
+	public $trx_dt_beli_date;
+	public $trx_dt_beli_month;
+	public $trx_dt_beli_year;
+
+	public $trx_dt_jual_date;
+	public $trx_dt_jual_month;
+	public $trx_dt_jual_year;
+
+	public $approved_dt_date;
+	public $approved_dt_month;
+	public $approved_dt_year;
+	public $option_posting;
+	public $client_name;
+	public $client_type;
+	public $type_desc;
+	public $bulan;
+	public $year;
+	public $int_dt_from;
+	public $int_dt_to;
+	public $journal_dt;
+	public $pay_late;
+	public $compensation;
+	public $save_flg;
+	public $total_pay_late;
+	public $total_compensation;
+	public $total_int_amt;
+	public $bgn_client;
+	public $end_client;
+	//AH: #END search (datetime || date)  additional comparison
+	
+	public function __construct($scenario = 'insert')
+	{
+		parent::__construct($scenario);
+		$this->logRecord=true;
+	}
+	
+	public static function model($className=__CLASS__)
+	{
+		return parent::model($className);
+	}
+    
+
+	public function tableName()
+	{
+		return 'T_INTEREST';
+	}
+
+	public function rules()
+	{
+		return array(
+		
+			array('int_dt_from,int_dt_to,journal_dt,int_dt, trx_dt_beli, trx_dt_jual, approved_dt', 'application.components.validator.ADatePickerSwitcherValidatorSP'),
+		
+			array('int_value, int_per, int_amt, int_day, int_accum, today_trx, nontrx, int_cre_accum, int_deb_accum, sett_int_cre, deposit', 'application.components.validator.ANumberSwitcherValidator'),
+			
+			array('int_day', 'numerical', 'integerOnly'=>true),
+			array('int_value, int_per, int_amt, int_accum, today_trx, nontrx, int_cre_accum, int_deb_accum, sett_int_cre, deposit', 'numerical'),
+			array('xn_doc_num', 'length', 'max'=>17),
+			array('int_flg, post_flg, ovr_flg, approved_sts', 'length', 'max'=>1,'except'=>'filter'),
+			array('user_id, upd_by, approved_by', 'length', 'max'=>10),
+			array('total_int_amt,total_compensation,total_pay_late,client_cd,save_flg,pay_late,compensation,journal_dt,int_dt_from,int_dt_to,year,bulan,type_desc,client_type,client_name,option_posting,cre_dt, upd_dt, trx_dt_beli, trx_dt_jual, approved_dt', 'safe'),
+
+			// The following rule is used by search().
+			// Please remove those attributes that should not be searched.
+	
+			array('int_dt, client_cd, xn_doc_num, int_value, int_per, int_flg, int_amt, int_day, post_flg, user_id, cre_dt, upd_dt, int_accum, ovr_flg, today_trx, nontrx, trx_dt_beli, trx_dt_jual, int_cre_accum, int_deb_accum, sett_int_cre, deposit, upd_by, approved_sts, approved_by, approved_dt,int_dt_date,int_dt_month,int_dt_year,cre_dt_date,cre_dt_month,cre_dt_year,upd_dt_date,upd_dt_month,upd_dt_year,trx_dt_beli_date,trx_dt_beli_month,trx_dt_beli_year,trx_dt_jual_date,trx_dt_jual_month,trx_dt_jual_year,approved_dt_date,approved_dt_month,approved_dt_year', 'safe', 'on'=>'search'),
+		);
+	}
+
+	public function relations()
+	{
+		return array(
+		);
+	}
+
+	public function attributeLabels()
+	{
+		return array(
+			'int_dt' => 'Int Date',
+			'client_cd' => 'Client Code',
+			'xn_doc_num' => 'Xn Doc Num',
+			'int_value' => 'Int Value',
+			'int_per' => 'Int Per',
+			'int_flg' => 'Int Flg',
+			'int_amt' => 'Int Amt',
+			'int_day' => 'Int Day',
+			'post_flg' => 'Post Flg',
+			'user_id' => 'User',
+			'cre_dt' => 'Cre Date',
+			'upd_dt' => 'Upd Date',
+			'int_accum' => 'Int Accum',
+			'ovr_flg' => 'Ovr Flg',
+			'today_trx' => 'Today Trx',
+			'nontrx' => 'Nontrx',
+			'trx_dt_beli' => 'Trx Date Beli',
+			'trx_dt_jual' => 'Trx Date Jual',
+			'int_cre_accum' => 'Int Cre Accum',
+			'int_deb_accum' => 'Int Deb Accum',
+			'sett_int_cre' => 'Sett Int Cre',
+			'deposit' => 'Deposit',
+			'upd_by' => 'Upd By',
+			'approved_sts' => 'Approved Sts',
+			'approved_by' => 'Approved By',
+			'approved_dt' => 'Approved Date',
+			
+		);
+	}
+
+	public static function getClient($client_cd, $bgn_dt,$end_dt)
+{
+	$sql=" SELECT INT_DT, CLIENT_CD, XN_DOC_NUM, INT_VALUE, INT_PER, INT_FLG,   					
+         			INT_AMT, INT_DAY, INT_ACCUM, OVR_FLG, POST_FLG,     
+         			USER_ID, CRE_DT, UPD_DT, TODAY_TRX, NONTRX, 					
+         			TRX_DT_BELI, TRX_DT_JUAL, INT_CRE_ACCUM, INT_DEB_ACCUM
+         			  FROM T_INTEREST a   					
+					WHERE CLIENT_CD = '$client_cd'					
+					and INT_DT between '$bgn_dt' and '$end_dt'
+					and approved_sts='A'					
+				ORDER BY CLIENT_CD, INT_DT	";
+	return $sql;
+}
+
+public function executeSp()
+	{
+		$connection  = Yii::app()->db;
+		$transaction = $connection->beginTransaction();	
+		try{
+			$query  = "CALL  SP_POSTING_INTEREST(to_date(:p_date,'yyyy-mm-dd'),
+					                              :p_bgn_client,
+					                              :p_end_client,
+					                              to_date(:p_bgn_date,'yyyy-mm-dd'),
+					                              to_date(:p_end_date,'yyyy-mm-dd'),
+					                              :p_user_id,
+					                              :P_IP_ADDRESS,
+					                              :P_ERROR_CD,
+					                              :P_ERROR_MSG)";
+		
+			$command = $connection->createCommand($query);
+			$command->bindValue(":p_date",$this->journal_dt,PDO::PARAM_STR);
+			$command->bindValue(":p_bgn_client",$this->bgn_client,PDO::PARAM_STR);
+			$command->bindValue(":p_end_client",$this->end_client,PDO::PARAM_STR);
+			$command->bindValue(":p_bgn_date",$this->int_dt_from,PDO::PARAM_STR);
+			$command->bindValue(":p_end_date",$this->int_dt_to,PDO::PARAM_STR);
+			$command->bindValue(":p_user_id",$this->user_id,PDO::PARAM_STR);
+			$command->bindValue(":P_IP_ADDRESS",$this->ip_address,PDO::PARAM_STR);
+			$command->bindParam(":P_ERROR_CD",$this->error_code,PDO::PARAM_INT,10);
+			$command->bindParam(":P_ERROR_MSG",$this->error_msg,PDO::PARAM_STR,100);
+
+			$command->execute();
+			$transaction->commit();
+		}catch(Exception $ex){
+			$transaction->rollback();
+			if($this->error_code == -999)
+				$this->error_msg = $ex->getMessage();
+		}
+		
+		if($this->error_code < 0)
+			$this->addError('error_msg', 'Error '.$this->error_code.' '.$this->error_msg);
+		
+		return $this->error_code;
+	}
+	
+	
+	public function search()
+	{
+		$criteria = new CDbCriteria;
+
+		if(!empty($this->int_dt_date))
+			$criteria->addCondition("TO_CHAR(t.int_dt,'DD') LIKE '%".$this->int_dt_date."%'");
+		if(!empty($this->int_dt_month))
+			$criteria->addCondition("TO_CHAR(t.int_dt,'MM') LIKE '%".$this->int_dt_month."%'");
+		if(!empty($this->int_dt_year))
+			$criteria->addCondition("TO_CHAR(t.int_dt,'YYYY') LIKE '%".$this->int_dt_year."%'");		$criteria->compare('client_cd',$this->client_cd,true);
+		$criteria->compare('xn_doc_num',$this->xn_doc_num,true);
+		$criteria->compare('int_value',$this->int_value);
+		$criteria->compare('int_per',$this->int_per);
+		$criteria->compare('int_flg',$this->int_flg,true);
+		$criteria->compare('int_amt',$this->int_amt);
+		$criteria->compare('int_day',$this->int_day);
+		$criteria->compare('post_flg',$this->post_flg,true);
+		$criteria->compare('user_id',$this->user_id,true);
+
+		if(!empty($this->cre_dt_date))
+			$criteria->addCondition("TO_CHAR(t.cre_dt,'DD') LIKE '%".$this->cre_dt_date."%'");
+		if(!empty($this->cre_dt_month))
+			$criteria->addCondition("TO_CHAR(t.cre_dt,'MM') LIKE '%".$this->cre_dt_month."%'");
+		if(!empty($this->cre_dt_year))
+			$criteria->addCondition("TO_CHAR(t.cre_dt,'YYYY') LIKE '%".$this->cre_dt_year."%'");
+		if(!empty($this->upd_dt_date))
+			$criteria->addCondition("TO_CHAR(t.upd_dt,'DD') LIKE '%".$this->upd_dt_date."%'");
+		if(!empty($this->upd_dt_month))
+			$criteria->addCondition("TO_CHAR(t.upd_dt,'MM') LIKE '%".$this->upd_dt_month."%'");
+		if(!empty($this->upd_dt_year))
+			$criteria->addCondition("TO_CHAR(t.upd_dt,'YYYY') LIKE '%".$this->upd_dt_year."%'");		$criteria->compare('int_accum',$this->int_accum);
+		$criteria->compare('ovr_flg',$this->ovr_flg,true);
+		$criteria->compare('today_trx',$this->today_trx);
+		$criteria->compare('nontrx',$this->nontrx);
+
+		if(!empty($this->trx_dt_beli_date))
+			$criteria->addCondition("TO_CHAR(t.trx_dt_beli,'DD') LIKE '%".$this->trx_dt_beli_date."%'");
+		if(!empty($this->trx_dt_beli_month))
+			$criteria->addCondition("TO_CHAR(t.trx_dt_beli,'MM') LIKE '%".$this->trx_dt_beli_month."%'");
+		if(!empty($this->trx_dt_beli_year))
+			$criteria->addCondition("TO_CHAR(t.trx_dt_beli,'YYYY') LIKE '%".$this->trx_dt_beli_year."%'");
+		if(!empty($this->trx_dt_jual_date))
+			$criteria->addCondition("TO_CHAR(t.trx_dt_jual,'DD') LIKE '%".$this->trx_dt_jual_date."%'");
+		if(!empty($this->trx_dt_jual_month))
+			$criteria->addCondition("TO_CHAR(t.trx_dt_jual,'MM') LIKE '%".$this->trx_dt_jual_month."%'");
+		if(!empty($this->trx_dt_jual_year))
+			$criteria->addCondition("TO_CHAR(t.trx_dt_jual,'YYYY') LIKE '%".$this->trx_dt_jual_year."%'");		$criteria->compare('int_cre_accum',$this->int_cre_accum);
+		$criteria->compare('int_deb_accum',$this->int_deb_accum);
+		$criteria->compare('sett_int_cre',$this->sett_int_cre);
+		$criteria->compare('deposit',$this->deposit);
+		$criteria->compare('upd_by',$this->upd_by,true);
+		$criteria->compare('approved_sts',$this->approved_sts,true);
+		$criteria->compare('approved_by',$this->approved_by,true);
+
+		if(!empty($this->approved_dt_date))
+			$criteria->addCondition("TO_CHAR(t.approved_dt,'DD') LIKE '%".$this->approved_dt_date."%'");
+		if(!empty($this->approved_dt_month))
+			$criteria->addCondition("TO_CHAR(t.approved_dt,'MM') LIKE '%".$this->approved_dt_month."%'");
+		if(!empty($this->approved_dt_year))
+			$criteria->addCondition("TO_CHAR(t.approved_dt,'YYYY') LIKE '%".$this->approved_dt_year."%'");
+		return new CActiveDataProvider($this, array(
+			'criteria'=>$criteria,
+		));
+	}
+}
