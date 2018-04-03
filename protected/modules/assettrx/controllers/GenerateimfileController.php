@@ -25,6 +25,11 @@ class GenerateimfileController extends AAdminController
                     $model->col_name = $model->col_name_lim;
                     $this->getCSV($model, 'csv');
                 }
+				else if ($model->im_code == 'AH002')//LIM
+                {
+                    $model->col_name = $model->col_name_lim;
+                    $this->getCSV($model, 'csv');
+                }
                 else if ($model->im_code == 'SCH02')//Schroder
                 {
                     $model->col_name = $model->col_name_sch;
